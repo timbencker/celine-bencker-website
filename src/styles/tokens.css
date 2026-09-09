@@ -1,44 +1,93 @@
 /*
- * Design tokens — the single source for colour, type and spacing.
+ * Design tokens, lifted verbatim from the canvas (`_Komponenten`, § Tokens).
+ * That file states the rule plainly: "Sechs Farben, eine Schrift plus
+ * Serif-Akzent, ein Abstandsrhythmus. Mehr gibt es nicht."
  *
- * PLACEHOLDER VALUES. Phase 2 replaces these with the real scale lifted from
- * the Claude Design canvas. Nothing outside this file may use a raw hex value,
- * so that swap is a one-file change.
+ * This is the single source. No raw hex anywhere else in the codebase.
  */
 
-:root {
-  /* Colour */
-  --color-bg: #fdfcfa;
-  --color-surface: #ffffff;
-  --color-text: #1a1a1a;
-  --color-text-muted: #4a4a4a;
-  --color-accent: #1c4b6e;
-  --color-accent-contrast: #ffffff;
-  --color-border: #d8d4ce;
-  --color-focus: #0b5fff;
+@theme {
+  /* --- Colour ---------------------------------------------------------- */
+  /* Text, and buttons ONLY on lilac-tint. There are no ink surfaces. */
+  --color-ink: #171a17;
+  /* Page background */
+  --color-paper: #f4f1ea;
+  /* Header surface (hairline below) and the second section surface */
+  --color-bone: #efece4;
 
-  /* Type */
-  --font-body: system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-heading: var(--font-body);
+  /* Band and button on light ground */
+  --color-lilac: #c9b8ea;
+  /* Surface: "Kurz gesagt", Studie, Redaktionen */
+  --color-lilac-tint: #e9e4f1;
+  /* Text: the serif word, active nav */
+  --color-lilac-text: #7a5fb0;
 
-  --text-sm: 0.875rem;
-  --text-base: 1rem;
-  --text-lg: 1.25rem;
-  --text-xl: 1.75rem;
-  --text-2xl: 2.5rem;
+  /* Every text link and hover */
+  --color-sage: #3f6b52;
 
-  --leading-tight: 1.2;
-  --leading-normal: 1.6;
+  --color-text: #171a17;
+  --color-text-2: #4a4e49;
+  /* Meta — holds >=4.5:1 on paper */
+  --color-text-3: #6b6d68;
 
-  /* Spacing */
-  --space-1: 0.25rem;
-  --space-2: 0.5rem;
-  --space-3: 1rem;
-  --space-4: 1.5rem;
-  --space-5: 2.5rem;
-  --space-6: 4rem;
+  /* Hairline. Only between rows, and always this token, never rgba. */
+  --color-line: #e1dcd1;
 
-  /* Layout */
-  --measure: 68ch;
-  --radius: 4px;
+  /* --- Type ------------------------------------------------------------ */
+  --font-sans: 'Manrope Variable', 'Manrope', system-ui, sans-serif;
+  --font-serif: 'Instrument Serif', Georgia, serif;
+
+  /* Home only, and exactly one word of it in serif italic. */
+  --text-display: 88px;
+  --text-display--line-height: 0.94;
+  --text-display--letter-spacing: -0.05em;
+
+  --text-h2: 44px;
+  --text-h2--line-height: 1;
+  --text-h2--letter-spacing: -0.04em;
+
+  /* Navigating rows (Home, Talks) */
+  --text-h3: 28px;
+  --text-h3--line-height: 1.1;
+  --text-h3--letter-spacing: -0.03em;
+
+  /* Lookup rows (Publications, Methoden) and tiles */
+  --text-h3-lookup: 22px;
+  --text-h3-lookup--line-height: 1.25;
+
+  --text-lead: 21px;
+  --text-lead--line-height: 1.5;
+  /* Page headers use the smaller lead */
+  --text-lead-sm: 19px;
+  --text-lead-sm--line-height: 1.5;
+
+  --text-body: 17px;
+  --text-body--line-height: 1.5;
+
+  --text-meta: 15px;
+  --text-meta--line-height: 1.5;
+
+  /* Quote block only */
+  --text-quote: 44px;
+  --text-quote--line-height: 1.15;
+
+  /* --- Space and form -------------------------------------------------- */
+  /* Section rhythm: compact / normal / reading block */
+  --spacing-section-compact: 96px;
+  --spacing-section: 112px;
+  --spacing-section-read: 128px;
+
+  --spacing-gutter: 48px;
+  --spacing-grid-gap: 24px;
+  --spacing-split-wide: 64px;
+  --spacing-split-narrow: 48px;
+
+  --container-content: 1280px;
+
+  --radius-image: 4px;
+  --radius-card: 6px;
+  --radius-pill: 999px;
+
+  /* Hover only, colour and background. No marquee, no parallax. */
+  --default-transition-duration: 150ms;
 }

@@ -1,60 +1,68 @@
+@import 'tailwindcss';
+
+/*
+ * Fonts are self-hosted via npm, never hotlinked from Google.
+ * The brief requires it: no third-party requests means no cookie banner.
+ * The canvas files link fonts.googleapis.com — that must not reach production.
+ */
+@import '@fontsource-variable/manrope';
+@import '@fontsource/instrument-serif';
+
 @import './tokens.css';
 
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
+@layer base {
+  body {
+    background: var(--color-paper);
+    color: var(--color-text);
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    /* Long German compounds must not overflow a narrow viewport. */
+    overflow-wrap: break-word;
+  }
+
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+
+  p,
+  li {
+    text-wrap: pretty;
+  }
+
+  /*
+   * A visible focus indicator on every focusable element. Never remove without
+   * an equally visible replacement.
+   */
+  :focus-visible {
+    outline: 2px solid var(--color-lilac-text);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
 }
 
-body {
-  margin: 0;
-  background: var(--color-bg);
-  color: var(--color-text);
-  font-family: var(--font-body);
-  font-size: var(--text-base);
-  line-height: var(--leading-normal);
-  /* Keeps long German compounds from overflowing narrow viewports. */
-  overflow-wrap: break-word;
-}
-
-h1,
-h2,
-h3 {
-  font-family: var(--font-heading);
-  line-height: var(--leading-tight);
-  text-wrap: balance;
-}
-
-p {
-  max-width: var(--measure);
-}
-
-/*
- * A visible focus indicator on every focusable element. Never remove this
- * without providing a replacement of at least equal visibility.
- */
-:focus-visible {
-  outline: 3px solid var(--color-focus);
-  outline-offset: 2px;
-  border-radius: 2px;
-}
-
-/* Hidden visually, still announced by screen readers. */
-.visually-hidden {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  margin: -1px;
-  padding: 0;
-  overflow: hidden;
-  clip-path: inset(50%);
-  white-space: nowrap;
-  border: 0;
+@layer utilities {
+  /* Hidden visually, still announced by screen readers. */
+  .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
+  }
 }
 
 /*
- * Respect an explicit request for less motion. Any animation added later is
- * covered by this without needing to remember.
+ * Respect an explicit request for less motion. The canvas allows hover
+ * transitions only — no marquee, no parallax — so this is a safety net rather
+ * than a correction.
  */
 @media (prefers-reduced-motion: reduce) {
   *,
