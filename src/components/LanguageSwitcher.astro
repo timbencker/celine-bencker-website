@@ -1,0 +1,76 @@
+---
+import { LOCALE_HTML_LANG, LOCALE_LABELS, otherLocale } from '../i18n/config';
+import { pageHref, type ResolvedPage } from '../i18n/pages';
+import { t } from '../i18n/ui';
+
+/**
+ * Links to the SAME page in the other language, never to the home page.
+ *
+ * Where no counterpart exists the control renders disabled rather than
+ * redirecting: losing the reader's place is worse than showing an option that
+ * is unavailable. The reason is given as text for screen reader users, since a
+ * greyed-out appearance alone communicates nothing to them.
+ */
+interface Props {
+  current: ResolvedPage;
+  counterpart: ResolvedPage | null;
+}
+
+const { current, counterpart } = Astro.props;
+const target = otherLocale(current.locale);
+const targetLang = LOCALE_HTML_LANG[target];
+---
+
+<div class="lang">
+  <span class="visually-hidden" id="lang-label">
+    {t(current.locale, 'lang.label')}
+  </span>
+  {counterpart ? (
+    <a
+      class="lang__link"
+      href={pageHref(counterpart)}
+      lang={targetLang}
+      hreflang={targetLang}
+      aria-describedby="lang-label"
+      data-language-choice={target}
+    >
+      {LOCALE_LABELS[target]}
+    </a>
+  ) : (
+    <span class="lang__disabled" aria-disabled="true" lang={targetLang}>
+      {LOCALE_LABELS[target]}
+      <span class="visually-hidden">— {t(current.locale, 'lang.unavailable')}</span>
+    </span>
+  )}
+</div>
+
+<style>
+  .lang__link {
+    color: var(--color-accent);
+  }
+
+  .lang__disabled {
+    color: var(--color-text-muted);
+    /* Not conveyed by colour alone — the visually-hidden text carries it too. */
+    text-decoration: line-through;
+  }
+</style>
+
+<script>
+  /*
+   * Remembers an explicit language choice. This is the ONLY place JavaScript
+   * touches routing, and it is written here but read only on `/`.
+   *
+   * It records a click; it never infers from navigator.language, and it never
+   * overrides an explicit URL — a shared link always shows the language it names.
+   */
+  document.querySelectorAll<HTMLAnchorElement>('[data-language-choice]').forEach((link) => {
+    link.addEventListener('click', () => {
+      try {
+        localStorage.setItem('preferred-locale', link.dataset.languageChoice ?? '');
+      } catch {
+        /* Storage can be unavailable (private mode); the link still works. */
+      }
+    });
+  });
+</script>

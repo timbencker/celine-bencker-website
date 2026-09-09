@@ -1,0 +1,33 @@
+---
+import { render } from 'astro:content';
+
+import PageLayout from '../../layouts/PageLayout.astro';
+import { assertTranslationsComplete, loadPages } from '../../i18n/pages';
+
+/**
+ * Every content page, in every language, from one route.
+ *
+ * Localized slugs come from the file name, so `/de/forschung` and
+ * `/en/research` are the same page in two languages — linked by the
+ * `translationKey` in their frontmatter.
+ */
+export async function getStaticPaths() {
+  const allPages = await loadPages();
+
+  // Fails the build on a missing translation or a duplicated translationKey.
+  assertTranslationsComplete(allPages);
+
+  return allPages.map((page) => ({
+    params: { locale: page.locale, slug: page.slug || undefined },
+    props: { page, allPages },
+  }));
+}
+
+const { page, allPages } = Astro.props;
+const { Content } = await render(page.entry);
+---
+
+<PageLayout page={page} allPages={allPages}>
+  <h1>{page.entry.data.title}</h1>
+  <Content />
+</PageLayout>

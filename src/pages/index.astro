@@ -1,0 +1,67 @@
+---
+/**
+ * Root redirect: `/` -> `/de/`.
+ *
+ * `routing.redirectToDefaultLocale` cannot be used here because it requires
+ * `output: 'server'`, and GitHub Pages has no server. A zero-delay meta refresh
+ * is the static equivalent; WCAG technique F40 only fails *timed* refreshes, so
+ * a zero delay is conformant. Real links are rendered as well, so the page is
+ * navigable if the refresh is blocked.
+ *
+ * This is a CONSTANT redirect to the default language, not language detection —
+ * Google's guidance against auto-redirecting by perceived language does not
+ * apply. See docs/i18n-policy.md.
+ */
+import { DEFAULT_LOCALE, LOCALE_LABELS } from '../i18n/config';
+import { withBase } from '../i18n/urls';
+
+const deHref = withBase('de/');
+const enHref = withBase('en/');
+const target = DEFAULT_LOCALE === 'de' ? deHref : enHref;
+---
+
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script is:inline define:vars={{ enHref, deHref }}>
+      /*
+       * A previously chosen language wins over the default — but only here, on
+       * the bare root. An explicit URL like /de/forschung is never overridden,
+       * so shared links always open in the language they name. The choice is
+       * only ever set by clicking the switcher, never inferred from the browser.
+       */
+      try {
+        const preferred = localStorage.getItem('preferred-locale');
+        if (preferred === 'en') location.replace(enHref);
+        else if (preferred === 'de') location.replace(deHref);
+      } catch {
+        /* Storage unavailable — fall through to the meta refresh. */
+      }
+    </script>
+    <meta http-equiv="refresh" content={`0; url=${target}`} />
+    <link rel="alternate" hreflang="de" href={new URL(deHref, Astro.site).href} />
+    <link rel="alternate" hreflang="en" href={new URL(enHref, Astro.site).href} />
+    <link rel="alternate" hreflang="x-default" href={new URL(deHref, Astro.site).href} />
+    <meta name="robots" content="noindex" />
+    <title>Celine Bencker</title>
+  </head>
+  <body>
+    <h1>Celine Bencker</h1>
+    <nav aria-label="Sprache / Language">
+      <ul>
+        <li>
+          <a href={deHref} lang="de" hreflang="de">
+            {LOCALE_LABELS.de}
+          </a>
+        </li>
+        <li>
+          <a href={enHref} lang="en" hreflang="en">
+            {LOCALE_LABELS.en}
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </body>
+</html>

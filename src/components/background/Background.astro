@@ -1,0 +1,52 @@
+---
+/**
+ * Decorative page background.
+ *
+ * Only `verwoben` and `aus` are implemented, per the current brief. The variant
+ * union plus this single component is the seam: adding `shapes` or `achtziger`
+ * later means a new branch here and a new member in the schema enum, not a
+ * change to any layout or page.
+ *
+ * Purely decorative, so it is hidden from assistive technology and must never
+ * affect the contrast of text drawn above it.
+ */
+export type BackgroundVariant = 'aus' | 'verwoben';
+
+interface Props {
+  variant?: BackgroundVariant;
+}
+
+const { variant = 'aus' } = Astro.props;
+---
+
+{variant === 'verwoben' && (
+  <div class="background background--verwoben" aria-hidden="true" role="presentation" />
+)}
+
+<style>
+  .background {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+  }
+
+  /*
+   * PLACEHOLDER pattern. Phase 2 replaces this with the real "verwoben"
+   * treatment and its colour options from the design canvas. Kept deliberately
+   * low-contrast so it cannot pull page text below the AA threshold.
+   */
+  .background--verwoben {
+    background-image:
+      repeating-linear-gradient(
+        45deg,
+        color-mix(in srgb, var(--color-accent) 4%, transparent) 0 2px,
+        transparent 2px 14px
+      ),
+      repeating-linear-gradient(
+        -45deg,
+        color-mix(in srgb, var(--color-accent) 4%, transparent) 0 2px,
+        transparent 2px 14px
+      );
+  }
+</style>
