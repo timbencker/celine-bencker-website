@@ -30,7 +30,7 @@ language switcher and never inferred from `navigator.language`. `/de/` remains
 the no-JavaScript fallback. This is the only place JavaScript touches routing.
 
 **The switcher goes to the same page in the other language**, never to the home
-page. Where no counterpart exists it renders *disabled* — not a dead link, not a
+page. Where no counterpart exists it renders _disabled_ — not a dead link, not a
 redirect. Losing the reader's place is worse than showing an unavailable option.
 The reason is given as text, because a greyed-out appearance communicates nothing
 to a screen reader.
@@ -40,7 +40,7 @@ the two versions drift apart.
 
 ## What need not be bilingual
 
-Not everything has to exist twice. Each exception is *declared*, never implied —
+Not everything has to exist twice. Each exception is _declared_, never implied —
 set `singleLocale: true` in the page's frontmatter, and the build stops
 complaining about that page.
 
@@ -64,12 +64,12 @@ languages in `sitemap.xml`.
 
 ## The root redirect
 
-`/` redirects to `/de/`. This is a *constant* redirect to the default language,
+`/` redirects to `/de/`. This is a _constant_ redirect to the default language,
 not language detection, so Google's guidance against auto-redirecting by
 perceived language does not apply.
 
 It is implemented as a zero-delay meta refresh in `src/pages/index.astro`, not
 via `routing.redirectToDefaultLocale`, because that option requires a server and
-GitHub Pages has none. WCAG technique F40 only fails *timed* refreshes, so a zero
+GitHub Pages has none. WCAG technique F40 only fails _timed_ refreshes, so a zero
 delay is conformant — and the page renders real links as well, so it stays
 navigable if the refresh is blocked.

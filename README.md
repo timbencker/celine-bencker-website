@@ -25,11 +25,11 @@ Jede Datei beginnt mit einem Kopfbereich zwischen `---`-Zeilen:
 
 ```markdown
 ---
-translationKey: research      # verbindet die deutsche und englische Fassung
-title: Forschung              # Überschrift und Browser-Titel
+translationKey: research # verbindet die deutsche und englische Fassung
+title: Forschung # Überschrift und Browser-Titel
 description: Kurzbeschreibung # für Google und beim Teilen von Links
-navOrder: 1                   # Position im Menü (weglassen = nicht im Menü)
-background: verwoben          # "aus" oder "verwoben"
+navOrder: 1 # Position im Menü (weglassen = nicht im Menü)
+background: verwoben # "aus" oder "verwoben"
 ---
 
 Hier steht der eigentliche Text.
@@ -57,30 +57,30 @@ npm install
 npm run dev        # lokaler Server
 ```
 
-| Befehl | Zweck |
-|---|---|
-| `npm run dev` | Entwicklungsserver |
-| `npm run build` | Produktions-Build nach `dist/` |
-| `npm run preview` | Build lokal ansehen |
-| `npm run check` | Typen und Inhalts-Schemata prüfen |
-| `npm run lint` | ESLint inkl. Accessibility-Regeln |
-| `npm run format` | Prettier |
-| `npm run verify` | check + lint + build |
+| Befehl            | Zweck                             |
+| ----------------- | --------------------------------- |
+| `npm run dev`     | Entwicklungsserver                |
+| `npm run build`   | Produktions-Build nach `dist/`    |
+| `npm run preview` | Build lokal ansehen               |
+| `npm run check`   | Typen und Inhalts-Schemata prüfen |
+| `npm run lint`    | ESLint inkl. Accessibility-Regeln |
+| `npm run format`  | Prettier                          |
+| `npm run verify`  | check + lint + build              |
 
 Node-Version siehe `.nvmrc`.
 
 ## Struktur
 
-| Pfad | Inhalt |
-|---|---|
-| `src/content/pages/<sprache>/` | Seiteninhalte |
-| `src/content/data/` | strukturierte Daten (YAML) |
-| `src/content.config.ts` | Schema — prüft die Inhalte beim Build |
-| `src/i18n/` | Sprachlogik, Übersetzungs-Prüfung |
-| `src/layouts/` | Seitengerüst (einmal, für beide Sprachen) |
-| `src/components/` | Bausteine |
-| `src/styles/tokens.css` | Farben, Schrift, Abstände |
-| `docs/i18n-policy.md` | Sprachregeln |
+| Pfad                           | Inhalt                                    |
+| ------------------------------ | ----------------------------------------- |
+| `src/content/pages/<sprache>/` | Seiteninhalte                             |
+| `src/content/data/`            | strukturierte Daten (YAML)                |
+| `src/content.config.ts`        | Schema — prüft die Inhalte beim Build     |
+| `src/i18n/`                    | Sprachlogik, Übersetzungs-Prüfung         |
+| `src/layouts/`                 | Seitengerüst (einmal, für beide Sprachen) |
+| `src/components/`              | Bausteine                                 |
+| `src/styles/tokens.css`        | Farben, Schrift, Abstände                 |
+| `docs/i18n-policy.md`          | Sprachregeln                              |
 
 ## Veröffentlichen
 
