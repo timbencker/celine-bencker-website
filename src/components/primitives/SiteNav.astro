@@ -1,0 +1,177 @@
+---
+import { cva } from 'class-variance-authority';
+
+import { LOCALE_LABELS, otherLocale } from '../../i18n/config';
+import { pageHref, type ResolvedPage } from '../../i18n/pages';
+import { t } from '../../i18n/ui';
+
+/**
+ * Site navigation — ported from the canvas component `ui-SiteNav`.
+ *
+ * Two layouts, one component: the desktop bar, and a mobile disclosure. The
+ * mobile menu uses <details>/<summary> rather than the canvas's JS-driven
+ * role="dialog", so it opens and closes with no JavaScript at all and stays
+ * keyboard operable. Every hit target holds the 44px floor the canvas sets.
+ */
+interface Props {
+  current: ResolvedPage;
+  nav: ResolvedPage[];
+  counterpart: ResolvedPage | null;
+}
+
+const { current, nav, counterpart } = Astro.props;
+const { locale } = current;
+const target = otherLocale(locale);
+const currentPath = pageHref(current);
+
+// Active gets a lilac underline; inactive hovers to sage. Straight from the
+// canvas: border-bottom 1.5px #7a5fb0 / hover #3f6b52.
+const navLink = cva('pb-[2px] transition-colors', {
+  variants: {
+    state: {
+      active: 'border-b-[1.5px] border-lilac-text',
+      idle: 'border-b-[1.5px] border-transparent hover:text-sage',
+    },
+  },
+  defaultVariants: { state: 'idle' },
+});
+
+const langLink = cva('inline-flex min-h-[44px] items-center px-[7px] transition-colors', {
+  variants: {
+    state: {
+      current: 'font-bold text-ink',
+      other: 'font-medium text-text-3 hover:text-ink',
+      unavailable: 'font-medium text-text-3 line-through',
+    },
+  },
+});
+---
+
+<header class="border-b border-line bg-bone text-ink">
+  {/* --- Desktop ---------------------------------------------------------- */}
+  <nav
+    class="mx-auto hidden max-w-content items-center justify-between px-gutter py-[28px] text-[15px] md:flex"
+    aria-label={t(locale, 'nav.primary')}
+  >
+    <a href={pageHref(nav[0] ?? current)} class="flex flex-col gap-[2px] text-ink">
+      <span class="text-[16px] font-bold tracking-[-0.02em]">Celine Bencker</span>
+      <span class="text-[12.5px] font-normal leading-[1.3] text-text-3">
+        Klinische &amp; Gesundheitspsychologie
+      </span>
+    </a>
+
+    <div class="flex items-center gap-8">
+      {
+        nav.map((item) => {
+          const href = pageHref(item);
+          const isCurrent = href === currentPath;
+          return (
+            <a
+              href={href}
+              aria-current={isCurrent ? 'page' : undefined}
+              class={navLink({ state: isCurrent ? 'active' : 'idle' })}
+            >
+              {item.entry.data.title}
+            </a>
+          );
+        })
+      }
+
+      <span class="ml-6 inline-flex items-center gap-[2px] text-[14px]">
+        <span class={langLink({ state: 'current' })} aria-current="true">
+          <span class="border-b-[1.5px] border-ink pb-[3px]">{LOCALE_LABELS[locale]}</span>
+        </span>
+        {
+          counterpart ? (
+            <a
+              href={pageHref(counterpart)}
+              lang={target}
+              hreflang={target}
+              data-language-choice={target}
+              class={langLink({ state: 'other' })}
+            >
+              <span class="border-b-[1.5px] border-transparent pb-[3px]">
+                {LOCALE_LABELS[target]}
+              </span>
+            </a>
+          ) : (
+            <span class={langLink({ state: 'unavailable' })} aria-disabled="true" lang={target}>
+              {LOCALE_LABELS[target]}
+              <span class="visually-hidden">— {t(locale, 'lang.unavailable')}</span>
+            </span>
+          )
+        }
+      </span>
+    </div>
+  </nav>
+
+  {/* --- Mobile ----------------------------------------------------------- */}
+  <details class="group md:hidden">
+    <summary
+      class="flex list-none items-center justify-between px-5 py-[18px] text-[15px] [&::-webkit-details-marker]:hidden"
+    >
+      <span class="flex min-h-[44px] flex-col justify-center gap-px">
+        <span class="font-bold tracking-[-0.02em]">Celine Bencker</span>
+        <span class="text-[11.5px] font-normal leading-[1.3] text-text-3">
+          Klinische &amp; Gesundheitspsychologie
+        </span>
+      </span>
+      <span class="inline-flex min-h-[44px] cursor-pointer items-center gap-2 font-semibold">
+        <span class="group-open:hidden">Menü</span>
+        <span class="hidden group-open:inline">Schließen</span>
+        <span class="inline-flex flex-col gap-[3px] group-open:hidden" aria-hidden="true">
+          <span class="h-[1.5px] w-4 bg-ink"></span>
+          <span class="h-[1.5px] w-4 bg-ink"></span>
+        </span>
+        <span class="hidden text-[20px] leading-none group-open:inline" aria-hidden="true">×</span>
+      </span>
+    </summary>
+
+    <nav class="flex flex-col px-5 pb-2" aria-label={t(locale, 'nav.primary')}>
+      {
+        nav.map((item) => {
+          const href = pageHref(item);
+          const isCurrent = href === currentPath;
+          return (
+            <a
+              href={href}
+              aria-current={isCurrent ? 'page' : undefined}
+              class="flex min-h-[44px] items-center justify-between gap-4 border-t border-line py-[18px] text-[30px] font-bold tracking-[-0.035em] transition-colors hover:text-sage"
+            >
+              {item.entry.data.title}
+              <span class="text-[20px] text-sage" aria-hidden="true">
+                →
+              </span>
+            </a>
+          );
+        })
+      }
+    </nav>
+
+    <div class="flex justify-end px-5 pb-7 pt-4">
+      <div class="flex items-center gap-[2px] text-[14px]">
+        <span class={langLink({ state: 'current' })} aria-current="true">
+          <span class="border-b-[1.5px] border-ink pb-[3px]">{LOCALE_LABELS[locale]}</span>
+        </span>
+        {
+          counterpart ? (
+            <a
+              href={pageHref(counterpart)}
+              lang={target}
+              hreflang={target}
+              data-language-choice={target}
+              class={langLink({ state: 'other' })}
+            >
+              {LOCALE_LABELS[target]}
+            </a>
+          ) : (
+            <span class={langLink({ state: 'unavailable' })} aria-disabled="true" lang={target}>
+              {LOCALE_LABELS[target]}
+              <span class="visually-hidden">— {t(locale, 'lang.unavailable')}</span>
+            </span>
+          )
+        }
+      </div>
+    </div>
+  </details>
+</header>

@@ -61,27 +61,23 @@ const xDefault = alternates.find((a) => a.locale === DEFAULT_LOCALE);
     </a>
     <Background variant={background} />
     <slot />
+
+    <script>
+      /*
+       * Remembers an explicit language choice. This is the ONLY place
+       * JavaScript touches routing, it is written here and read only on `/`,
+       * and it never infers from navigator.language — a shared link always
+       * opens in the language its URL names. See docs/i18n-policy.md.
+       */
+      document.querySelectorAll<HTMLAnchorElement>('[data-language-choice]').forEach((link) => {
+        link.addEventListener('click', () => {
+          try {
+            localStorage.setItem('preferred-locale', link.dataset.languageChoice ?? '');
+          } catch {
+            /* Storage unavailable (private mode) — the link still works. */
+          }
+        });
+      });
+    </script>
   </body>
 </html>
-
-<style>
-  /*
-   * Off-screen until focused, then clearly visible. The first thing a keyboard
-   * user meets on every page.
-   */
-  .skip-link {
-    position: absolute;
-    left: var(--space-2);
-    top: var(--space-2);
-    z-index: 100;
-    padding: var(--space-2) var(--space-3);
-    background: var(--color-accent);
-    color: var(--color-accent-contrast);
-    border-radius: var(--radius);
-    transform: translateY(-200%);
-  }
-
-  .skip-link:focus-visible {
-    transform: translateY(0);
-  }
-</style>
