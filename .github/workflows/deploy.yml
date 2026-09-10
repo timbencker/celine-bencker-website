@@ -1,8 +1,20 @@
 name: Deploy to GitHub Pages
 
+# Manual only, deliberately.
+#
+# Publishing is an outward-facing act: the site carries Celine's name, and
+# every page currently reads "PLATZHALTER". Deploying on each push would put
+# that in public under her name before she has seen any of it, and a Pages URL
+# is indexable the moment it exists.
+#
+# So this runs only when someone asks for it. To go live once the real content
+# has landed, enable Pages on the repository:
+#
+#   gh api -X POST repos/timbencker/celine-bencker-website/pages -f build_type=workflow
+#
+# then run this workflow (Actions -> Deploy to GitHub Pages -> Run workflow),
+# and restore the `push` trigger below if continuous deployment is wanted.
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
 
 permissions:
