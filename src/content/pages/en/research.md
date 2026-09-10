@@ -1,10 +1,10 @@
 ---
-# Different file name, same translationKey: /en/research
 translationKey: research
 title: Research
-description: Placeholder — demonstrates localized slugs (/de/forschung <-> /en/research).
+description: Research lines, methods and current projects.
 navOrder: 1
 background: verwoben
+backgroundHue: salbei
 ---
 
-Placeholder content.
+PLACEHOLDER – content follows from the design canvas and Celine's material.

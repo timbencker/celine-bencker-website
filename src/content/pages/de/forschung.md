@@ -1,10 +1,10 @@
 ---
-# Der Dateiname bestimmt die URL: /de/forschung
 translationKey: research
 title: Forschung
-description: Platzhalter — demonstriert lokalisierte Slugs (/de/forschung <-> /en/research).
+description: Forschungslinien, Methoden und laufende Projekte – fachlich und einfach erklärt.
 navOrder: 1
 background: verwoben
+backgroundHue: salbei
 ---
 
-Platzhalterinhalt.
+PLATZHALTER – Inhalt folgt aus dem Design-Canvas und Celines Material.

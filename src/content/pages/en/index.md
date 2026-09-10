@@ -1,10 +1,10 @@
 ---
-# Same translationKey as de/index.md — this is what links the two versions.
 translationKey: home
-title: Home
-description: Placeholder — replaced once the content from the design is available.
+title: Celine Bencker
+description: Clinical and health psychologist at the University of Vienna. Research on stress, hormones and premenstrual symptoms.
 navOrder: 0
-background: aus
+background: verwoben
+backgroundHue: gelb
 ---
 
-Placeholder content. The real text comes from the design canvas (phase 1).
+PLACEHOLDER – content follows from the design canvas and Celine's material.

@@ -1,52 +1,150 @@
 ---
 /**
- * Decorative page background.
+ * Decorative page background — the canvas's `verwoben` mode (mode 9).
  *
- * Only `verwoben` and `aus` are implemented, per the current brief. The variant
- * union plus this single component is the seam: adding `shapes` or `achtziger`
- * later means a new branch here and a new member in the schema enum, not a
- * change to any layout or page.
+ * "Je Seite ein eigenes Rezept aus gemeinsamen Bausteinen": five shared SVG
+ * shapes, combined differently per page. Ported faithfully, including each
+ * shape's size, opacity and offset.
  *
- * Purely decorative, so it is hidden from assistive technology and must never
- * affect the contrast of text drawn above it.
+ * The canvas scales everything by `sc = viewportWidth / 1280`. That maps
+ * exactly onto `vw` units, so this port needs no JavaScript at all — a
+ * measurement the original had to take at runtime becomes a CSS unit.
+ *
+ * Three rules stated in the canvas source, all of them accessibility
+ * constraints, all preserved here:
+ *   - filled shapes may sit under text only at lightness >= 92%
+ *   - strokes and glyphs stay in the card padding, never under text
+ *   - sage for surfaces, moss for the scale, grey for markings
+ *
+ * Only `verwoben` and `aus` are built. `shapes`, `achtziger`, `zyklus` and the
+ * rest stay in the canvas until asked for; adding one is a new branch here plus
+ * a member in the schema enum.
  */
 export type BackgroundVariant = 'aus' | 'verwoben';
+export type BackgroundHue = 'gelb' | 'salbei' | 'sand' | 'flieder';
+/** Recipe key. Derived from the page's translationKey. */
+export type BackgroundPage = 'home' | 'research' | 'pub' | 'cv' | 'talks' | 'contact' | 'notfound';
 
 interface Props {
   variant?: BackgroundVariant;
+  hue?: BackgroundHue;
+  page?: BackgroundPage;
 }
 
-const { variant = 'aus' } = Astro.props;
+const { variant = 'aus', hue = 'gelb', page = 'home' } = Astro.props;
+
+/** The circle fill, per the canvas's KREIS map. */
+const KREIS: Record<BackgroundHue, string> = {
+  gelb: '#f3e7c9',
+  salbei: '#dde9db',
+  sand: '#f0e6d2',
+  flieder: '#e9e4f1',
+};
+
+/** Sage — `const G` in the canvas source. */
+const MOOS = '#3f6b52';
+const FLAECHE = '#dde9db';
+
+/** Canvas px -> vw, against the 1280 design width. */
+const vw = (px: number) => `calc(${px} / 1280 * 100vw)`;
+
+type Piece = 'kreisFlaeche' | 'kreisLinie' | 'quadratLinks' | 'quadratUnten' | 'kreuzGross';
+
+/** The per-page recipes, verbatim from the canvas's `rezept` map. */
+const REZEPT: Record<BackgroundPage, Piece[]> = {
+  home: ['kreisFlaeche', 'kreisLinie'],
+  research: ['kreisFlaeche', 'kreisLinie', 'quadratLinks'],
+  // Publikationen: nur die Skala, keine Flächen
+  pub: [],
+  // Lebenslauf: bewusst leer – Dokumentcharakter
+  cv: [],
+  talks: ['kreisLinie'],
+  contact: ['quadratUnten', 'kreisLinie'],
+  // 404: eine ruhige Fläche
+  notfound: ['kreisFlaeche'],
+};
+
+const pieces = variant === 'verwoben' ? REZEPT[page] : [];
 ---
 
-{variant === 'verwoben' && (
-  <div class="background background--verwoben" aria-hidden="true" role="presentation" />
+{pieces.length > 0 && (
+  <div
+    class="pointer-events-none absolute inset-0 -z-10 overflow-hidden"
+    aria-hidden="true"
+    role="presentation"
+  >
+    {pieces.includes('kreisFlaeche') && (
+      <div
+        class="absolute"
+        style={`width:${vw(920)};height:${vw(920)};top:${vw(-520)};right:${vw(-40)};opacity:.7`}
+      >
+        <svg viewBox="0 0 920 920" width="100%" height="100%" class="block overflow-visible">
+          <circle cx="460" cy="460" r="460" fill={KREIS[hue]} />
+        </svg>
+      </div>
+    )}
+
+    {pieces.includes('kreisLinie') && (
+      <div
+        class="absolute"
+        style={`width:${vw(1082)};height:${vw(1082)};top:${vw(-620)};right:${vw(-110)};opacity:.08`}
+      >
+        <svg viewBox="0 0 1082 1082" width="100%" height="100%" class="block overflow-visible">
+          <circle cx="541" cy="541" r="540" fill="none" stroke={MOOS} stroke-width="1.5" />
+        </svg>
+      </div>
+    )}
+
+    {pieces.includes('quadratLinks') && (
+      <div
+        class="absolute"
+        style={`width:${vw(700)};height:${vw(700)};bottom:${vw(260)};left:${vw(-260)};opacity:.5`}
+      >
+        <svg viewBox="0 0 700 700" width="100%" height="100%" class="block overflow-visible">
+          <rect
+            x="40"
+            y="40"
+            width="620"
+            height="620"
+            fill={FLAECHE}
+            transform="rotate(-12 350 350)"
+          />
+        </svg>
+      </div>
+    )}
+
+    {pieces.includes('quadratUnten') && (
+      <div
+        class="absolute"
+        style={`width:${vw(560)};height:${vw(560)};bottom:${vw(-160)};right:${vw(-180)};opacity:.28`}
+      >
+        <svg viewBox="0 0 560 560" width="100%" height="100%" class="block overflow-visible">
+          <rect
+            x="30"
+            y="30"
+            width="500"
+            height="500"
+            rx="28"
+            fill={FLAECHE}
+            transform="rotate(9 280 280)"
+          />
+        </svg>
+      </div>
+    )}
+
+    {pieces.includes('kreuzGross') && (
+      <div
+        class="absolute"
+        style={`width:${vw(300)};height:${vw(300)};bottom:${vw(900)};left:${vw(-120)};opacity:.14`}
+      >
+        <svg viewBox="0 0 300 300" width="100%" height="100%" class="block overflow-visible">
+          <path
+            d="M110 8h80a6 6 0 0 1 6 6v82h82a6 6 0 0 1 6 6v80a6 6 0 0 1-6 6h-82v82a6 6 0 0 1-6 6h-80a6 6 0 0 1-6-6v-82H22a6 6 0 0 1-6-6v-80a6 6 0 0 1 6-6h82V14a6 6 0 0 1 6-6z"
+            fill={MOOS}
+            transform="rotate(9 150 150)"
+          />
+        </svg>
+      </div>
+    )}
+  </div>
 )}
-
-<style>
-  .background {
-    position: fixed;
-    inset: 0;
-    z-index: -1;
-    pointer-events: none;
-  }
-
-  /*
-   * PLACEHOLDER pattern. Phase 2 replaces this with the real "verwoben"
-   * treatment and its colour options from the design canvas. Kept deliberately
-   * low-contrast so it cannot pull page text below the AA threshold.
-   */
-  .background--verwoben {
-    background-image:
-      repeating-linear-gradient(
-        45deg,
-        color-mix(in srgb, var(--color-accent) 4%, transparent) 0 2px,
-        transparent 2px 14px
-      ),
-      repeating-linear-gradient(
-        -45deg,
-        color-mix(in srgb, var(--color-accent) 4%, transparent) 0 2px,
-        transparent 2px 14px
-      );
-  }
-</style>

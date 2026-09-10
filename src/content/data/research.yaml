@@ -1,0 +1,37 @@
+# Forschungslinien. Jede Linie hat zwei Register:
+#   text        – die fachliche Fassung
+#   textPlain   – „Einfach erklärt“ (Deutsch nötig, Englisch optional)
+# Die Linien selbst stammen aus dem Brief; die Texte schreibt Celine.
+
+- id: pms-stress
+  order: 0
+  title:
+    de: PMS & Stress
+    en: PMS & Stress
+  text:
+    de: PLATZHALTER – fachliche Beschreibung dieser Forschungslinie.
+    en: PLACEHOLDER – specialist description of this research line.
+  textPlain:
+    de: PLATZHALTER – dieselbe Linie, so einfach wie möglich und immer noch richtig.
+
+- id: hormone-gehirn
+  order: 1
+  title:
+    de: Hormone & Gehirn
+    en: Hormones & Brain
+  text:
+    de: PLATZHALTER – fachliche Beschreibung dieser Forschungslinie.
+    en: PLACEHOLDER – specialist description of this research line.
+  textPlain:
+    de: PLATZHALTER – dieselbe Linie, einfach erklärt.
+
+- id: ambulantes-assessment
+  order: 2
+  title:
+    de: Ambulantes Assessment
+    en: Ambulatory Assessment
+  text:
+    de: PLATZHALTER – fachliche Beschreibung dieser Forschungslinie.
+    en: PLACEHOLDER – specialist description of this research line.
+  textPlain:
+    de: PLATZHALTER – dieselbe Linie, einfach erklärt.

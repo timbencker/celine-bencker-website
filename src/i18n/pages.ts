@@ -112,3 +112,22 @@ export async function navigationFor(locale: Locale, all: ResolvedPage[]): Promis
     .filter((p) => p.locale === locale && p.entry.data.navOrder !== undefined)
     .sort((a, b) => (a.entry.data.navOrder ?? 0) - (b.entry.data.navOrder ?? 0));
 }
+
+/**
+ * Recipe key for the decorative background. The canvas names its recipes for
+ * pages, not for translation keys, so the two vocabularies are joined here in
+ * one place rather than at every call site.
+ */
+export function backgroundPageFor(translationKey: string) {
+  const MAP: Record<string, string> = {
+    home: 'home',
+    research: 'research',
+    publications: 'pub',
+    cv: 'cv',
+    'talks-media': 'talks',
+    contact: 'contact',
+    'not-found': 'notfound',
+  };
+  return (Object.hasOwn(MAP, translationKey) ? MAP[translationKey] : 'home') as
+    'home' | 'research' | 'pub' | 'cv' | 'talks' | 'contact' | 'notfound';
+}

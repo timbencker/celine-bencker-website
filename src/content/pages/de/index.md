@@ -1,10 +1,10 @@
 ---
-# Verbindet diese Seite mit ihrer englischen Fassung (en/index.md).
 translationKey: home
-title: Startseite
-description: Platzhalter — wird ersetzt, sobald die Inhalte aus dem Design vorliegen.
+title: Celine Bencker
+description: Klinische und Gesundheitspsychologin an der Universität Wien. Forschung zu Stress, Hormonen und prämenstruellen Symptomen.
 navOrder: 0
-background: aus
+background: verwoben
+backgroundHue: gelb
 ---
 
-Platzhalterinhalt. Der echte Text kommt aus dem Design-Canvas (Phase 1).
+PLATZHALTER – Inhalt folgt aus dem Design-Canvas und Celines Material.

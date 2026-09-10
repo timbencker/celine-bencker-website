@@ -61,55 +61,49 @@ const langLink = cva('inline-flex min-h-[44px] items-center px-[7px] transition-
     </a>
 
     <div class="flex items-center gap-8">
-      {
-        nav.map((item) => {
-          const href = pageHref(item);
-          const isCurrent = href === currentPath;
-          return (
-            <a
-              href={href}
-              aria-current={isCurrent ? 'page' : undefined}
-              class={navLink({ state: isCurrent ? 'active' : 'idle' })}
-            >
-              {item.entry.data.title}
-            </a>
-          );
-        })
-      }
+      {nav.map((item) => {
+        const href = pageHref(item);
+        const isCurrent = href === currentPath;
+        return (
+          <a
+            href={href}
+            aria-current={isCurrent ? 'page' : undefined}
+            class={navLink({ state: isCurrent ? 'active' : 'idle' })}
+          >
+            {item.entry.data.title}
+          </a>
+        );
+      })}
 
       <span class="ml-6 inline-flex items-center gap-[2px] text-[14px]">
         <span class={langLink({ state: 'current' })} aria-current="true">
           <span class="border-b-[1.5px] border-ink pb-[3px]">{LOCALE_LABELS[locale]}</span>
         </span>
-        {
-          counterpart ? (
-            <a
-              href={pageHref(counterpart)}
-              lang={target}
-              hreflang={target}
-              data-language-choice={target}
-              class={langLink({ state: 'other' })}
-            >
-              <span class="border-b-[1.5px] border-transparent pb-[3px]">
-                {LOCALE_LABELS[target]}
-              </span>
-            </a>
-          ) : (
-            <span class={langLink({ state: 'unavailable' })} aria-disabled="true" lang={target}>
+        {counterpart ? (
+          <a
+            href={pageHref(counterpart)}
+            lang={target}
+            hreflang={target}
+            data-language-choice={target}
+            class={langLink({ state: 'other' })}
+          >
+            <span class="border-b-[1.5px] border-transparent pb-[3px]">
               {LOCALE_LABELS[target]}
-              <span class="visually-hidden">— {t(locale, 'lang.unavailable')}</span>
             </span>
-          )
-        }
+          </a>
+        ) : (
+          <span class={langLink({ state: 'unavailable' })} aria-disabled="true" lang={target}>
+            {LOCALE_LABELS[target]}
+            <span class="visually-hidden">— {t(locale, 'lang.unavailable')}</span>
+          </span>
+        )}
       </span>
     </div>
   </nav>
 
   {/* --- Mobile ----------------------------------------------------------- */}
   <details class="group md:hidden">
-    <summary
-      class="flex list-none items-center justify-between px-5 py-[18px] text-[15px] [&::-webkit-details-marker]:hidden"
-    >
+    <summary class="flex list-none items-center justify-between px-5 py-[18px] text-[15px] [&::-webkit-details-marker]:hidden">
       <span class="flex min-h-[44px] flex-col justify-center gap-px">
         <span class="font-bold tracking-[-0.02em]">Celine Bencker</span>
         <span class="text-[11.5px] font-normal leading-[1.3] text-text-3">
@@ -123,29 +117,29 @@ const langLink = cva('inline-flex min-h-[44px] items-center px-[7px] transition-
           <span class="h-[1.5px] w-4 bg-ink"></span>
           <span class="h-[1.5px] w-4 bg-ink"></span>
         </span>
-        <span class="hidden text-[20px] leading-none group-open:inline" aria-hidden="true">×</span>
+        <span class="hidden text-[20px] leading-none group-open:inline" aria-hidden="true">
+          ×
+        </span>
       </span>
     </summary>
 
     <nav class="flex flex-col px-5 pb-2" aria-label={t(locale, 'nav.primary')}>
-      {
-        nav.map((item) => {
-          const href = pageHref(item);
-          const isCurrent = href === currentPath;
-          return (
-            <a
-              href={href}
-              aria-current={isCurrent ? 'page' : undefined}
-              class="flex min-h-[44px] items-center justify-between gap-4 border-t border-line py-[18px] text-[30px] font-bold tracking-[-0.035em] transition-colors hover:text-sage"
-            >
-              {item.entry.data.title}
-              <span class="text-[20px] text-sage" aria-hidden="true">
-                →
-              </span>
-            </a>
-          );
-        })
-      }
+      {nav.map((item) => {
+        const href = pageHref(item);
+        const isCurrent = href === currentPath;
+        return (
+          <a
+            href={href}
+            aria-current={isCurrent ? 'page' : undefined}
+            class="flex min-h-[44px] items-center justify-between gap-4 border-t border-line py-[18px] text-[30px] font-bold tracking-[-0.035em] transition-colors hover:text-sage"
+          >
+            {item.entry.data.title}
+            <span class="text-[20px] text-sage" aria-hidden="true">
+              →
+            </span>
+          </a>
+        );
+      })}
     </nav>
 
     <div class="flex justify-end px-5 pb-7 pt-4">
@@ -153,24 +147,22 @@ const langLink = cva('inline-flex min-h-[44px] items-center px-[7px] transition-
         <span class={langLink({ state: 'current' })} aria-current="true">
           <span class="border-b-[1.5px] border-ink pb-[3px]">{LOCALE_LABELS[locale]}</span>
         </span>
-        {
-          counterpart ? (
-            <a
-              href={pageHref(counterpart)}
-              lang={target}
-              hreflang={target}
-              data-language-choice={target}
-              class={langLink({ state: 'other' })}
-            >
-              {LOCALE_LABELS[target]}
-            </a>
-          ) : (
-            <span class={langLink({ state: 'unavailable' })} aria-disabled="true" lang={target}>
-              {LOCALE_LABELS[target]}
-              <span class="visually-hidden">— {t(locale, 'lang.unavailable')}</span>
-            </span>
-          )
-        }
+        {counterpart ? (
+          <a
+            href={pageHref(counterpart)}
+            lang={target}
+            hreflang={target}
+            data-language-choice={target}
+            class={langLink({ state: 'other' })}
+          >
+            {LOCALE_LABELS[target]}
+          </a>
+        ) : (
+          <span class={langLink({ state: 'unavailable' })} aria-disabled="true" lang={target}>
+            {LOCALE_LABELS[target]}
+            <span class="visually-hidden">— {t(locale, 'lang.unavailable')}</span>
+          </span>
+        )}
       </div>
     </div>
   </details>

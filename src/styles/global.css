@@ -12,6 +12,9 @@
 
 @layer base {
   body {
+    /* Positioning context and stacking root for the decorative background. */
+    position: relative;
+    isolation: isolate;
     background: var(--color-paper);
     color: var(--color-text);
     font-family: var(--font-sans);
@@ -41,6 +44,29 @@
     outline: 2px solid var(--color-lilac-text);
     outline-offset: 3px;
     border-radius: 2px;
+  }
+}
+
+@layer components {
+  /*
+   * Off-screen until focused, then unmistakable. The first thing a keyboard
+   * user meets on every page, so it must never be silently unstyled — an
+   * earlier refactor dropped its rules and left it permanently visible.
+   */
+  .skip-link {
+    position: absolute;
+    left: 0.5rem;
+    top: 0.5rem;
+    z-index: 100;
+    padding: 0.5rem 1rem;
+    background: var(--color-ink);
+    color: var(--color-paper);
+    border-radius: var(--radius-card);
+    transform: translateY(-250%);
+  }
+
+  .skip-link:focus-visible {
+    transform: translateY(0);
   }
 }
 

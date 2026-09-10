@@ -1,18 +1,34 @@
 import { defineCollection } from 'astro:content';
+import { file, glob } from 'astro/loaders';
 import { z } from 'astro/zod';
-import { glob } from 'astro/loaders';
 
 /**
  * The content contract.
  *
- * One schema, applied to every locale, so the German and English versions of a
- * page cannot drift apart structurally. `.strict()` means an unknown or
- * misspelled key fails the build rather than being silently ignored.
+ * Two kinds of content, per the brief § 6:
  *
- * Locale and slug are NOT frontmatter fields — they are derived from the file
- * path (`src/content/pages/<locale>/<slug>.md`). Renaming the file changes the
- * URL, which is one less thing to keep in sync by hand.
+ *   PER LOCALE — prose. Page bodies and any text that reads differently in
+ *   German and English. One file per language under `src/content/pages/<locale>/`.
+ *
+ *   LANGUAGE-NEUTRAL — records. Publications, talks and media are maintained
+ *   ONCE, not twice: a DOI, a date, a venue and a journal name do not translate.
+ *   Where such a record does carry prose (a plain-language summary), that one
+ *   field is localized rather than the whole record being duplicated.
+ *
+ * `.strict()` throughout, so a misspelled key fails the build instead of being
+ * silently ignored.
  */
+
+/** Text that must exist in both languages. */
+const localized = z.object({ de: z.string().min(1), en: z.string().min(1) }).strict();
+
+/** Text that may exist in either language, or neither. */
+const localizedOptional = z
+  .object({ de: z.string().optional(), en: z.string().optional() })
+  .strict();
+
+// --- Pages: per locale -----------------------------------------------------
+
 const pageSchema = z
   .object({
     /**
@@ -30,15 +46,16 @@ const pageSchema = z
 
     /**
      * Declares that this page is intentionally single-language, so the
-     * translation-completeness check does not fail the build for it.
-     * Every exception is declared here rather than implied — e.g. a
-     * German-only Impressum, or an "Einfach erklärt" page with no English
-     * counterpart.
+     * translation check does not fail the build for it. Every exception is
+     * declared, never implied. See docs/i18n-policy.md.
      */
     singleLocale: z.boolean().default(false),
 
-    /** Decorative page background. `shapes` and `achtziger` are not built yet. */
+    /** Decorative page background. `shapes`/`achtziger` etc. are not built. */
     background: z.enum(['aus', 'verwoben']).default('aus'),
+
+    /** Hue of the verwoben circle. Ignored when background is `aus`. */
+    backgroundHue: z.enum(['gelb', 'salbei', 'sand', 'flieder']).default('gelb'),
 
     draft: z.boolean().default(false),
   })
@@ -51,19 +68,94 @@ const pages = defineCollection({
   schema: pageSchema,
 });
 
-/**
- * Site-wide values that are not page content (contact details, social links).
- * Structured data lives in YAML because YAML takes comments and JSON does not.
- */
+// --- Research lines: language-neutral records, localized prose --------------
+
+const research = defineCollection({
+  loader: file('./src/content/data/research.yaml'),
+  schema: z
+    .object({
+      id: z.string().min(1),
+      order: z.number().int().nonnegative(),
+      title: localized,
+      /** The specialist version — the toggle's "Fachlich" register. */
+      text: localized,
+      /**
+       * The plain-language version — "Einfach erklärt".
+       * German is the audience the brief names; English is optional.
+       */
+      textPlain: localizedOptional,
+    })
+    .strict(),
+});
+
+// --- Publications: language-neutral ----------------------------------------
+
+const publications = defineCollection({
+  loader: file('./src/content/data/publications.yaml'),
+  schema: z
+    .object({
+      id: z.string().min(1),
+      year: z.number().int(),
+      /** Rendered verbatim — publication titles stay in their own language. */
+      title: z.string().min(1),
+      authors: z.string().min(1),
+      venue: z.string().optional(),
+      doi: z.string().optional(),
+      url: z.string().url().optional(),
+      pdf: z.string().optional(),
+      /** Marks first authorship, which the design sets in bold. */
+      firstAuthor: z.boolean().default(false),
+      kind: z.enum(['peer-review', 'preprint', 'talk']).default('peer-review'),
+      /** The optional "Kurz gesagt" callout. Only on selected works. */
+      summaryPlain: localizedOptional.optional(),
+    })
+    .strict(),
+});
+
+// --- Talks and media: language-neutral --------------------------------------
+
+const talks = defineCollection({
+  loader: file('./src/content/data/talks.yaml'),
+  schema: z
+    .object({
+      id: z.string().min(1),
+      date: z.string().min(1),
+      title: z.string().min(1),
+      venue: z.string().min(1),
+      location: z.string().optional(),
+      url: z.string().url().optional(),
+      upcoming: z.boolean().default(false),
+    })
+    .strict(),
+});
+
+const media = defineCollection({
+  loader: file('./src/content/data/media.yaml'),
+  schema: z
+    .object({
+      id: z.string().min(1),
+      date: z.string().min(1),
+      outlet: z.string().min(1),
+      title: z.string().min(1),
+      url: z.string().url().optional(),
+      format: z.enum(['podcast', 'print', 'tv', 'radio', 'online']).default('online'),
+    })
+    .strict(),
+});
+
+// --- Site-wide --------------------------------------------------------------
+
 const site = defineCollection({
   loader: glob({ pattern: '**/*.yaml', base: './src/content/data/site' }),
   schema: z
     .object({
       siteName: z.string().min(1),
-      tagline: z.string().min(1),
+      tagline: localized,
       email: z.email().optional(),
+      orcid: z.string().optional(),
+      affiliation: localized.optional(),
     })
     .strict(),
 });
 
-export const collections = { pages, site };
+export const collections = { pages, research, publications, talks, media, site };

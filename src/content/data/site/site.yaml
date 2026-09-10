@@ -1,3 +1,9 @@
 # Site-wide values. YAML rather than JSON so these comments are possible.
 siteName: Celine Bencker
-tagline: Platzhalter — wird im Zuge von Phase 1 ersetzt.
+tagline:
+  de: Klinische & Gesundheitspsychologie
+  en: Clinical & Health Psychology
+affiliation:
+  de: Universität Wien · ÖAW DOC-Fellow
+  en: University of Vienna · ÖAW DOC Fellow
+orcid: 0000-0002-3802-1339

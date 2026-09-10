@@ -1,7 +1,11 @@
 ---
 import '../styles/global.css';
 
-import Background, { type BackgroundVariant } from '../components/background/Background.astro';
+import Background, {
+  type BackgroundHue,
+  type BackgroundPage,
+  type BackgroundVariant,
+} from '../components/background/Background.astro';
 import { DEFAULT_LOCALE, LOCALE_HTML_LANG, type Locale } from '../i18n/config';
 import { t } from '../i18n/ui';
 import { withBase } from '../i18n/urls';
@@ -21,11 +25,22 @@ interface Props {
   title: string;
   description: string;
   background?: BackgroundVariant;
+  backgroundHue?: BackgroundHue;
+  backgroundPage?: BackgroundPage;
   alternates?: Alternate[];
   canonical?: string;
 }
 
-const { locale, title, description, background = 'aus', alternates = [], canonical } = Astro.props;
+const {
+  locale,
+  title,
+  description,
+  background = 'aus',
+  backgroundHue = 'gelb',
+  backgroundPage = 'home',
+  alternates = [],
+  canonical,
+} = Astro.props;
 
 const xDefault = alternates.find((a) => a.locale === DEFAULT_LOCALE);
 ---
@@ -59,7 +74,7 @@ const xDefault = alternates.find((a) => a.locale === DEFAULT_LOCALE);
     <a class="skip-link" href="#main">
       {t(locale, 'skip.toContent')}
     </a>
-    <Background variant={background} />
+    <Background variant={background} hue={backgroundHue} page={backgroundPage} />
     <slot />
 
     <script>
