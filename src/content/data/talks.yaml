@@ -1,2 +1,46 @@
-# Vorträge. Sprachneutral. Quelle: Liste von Celine.
-[]
+# Vorträge und Konferenzbeiträge. Sprachneutral: ein Eintrag für beide Sprachen.
+# Ob ein Eintrag unter „Nächste Talks" oder „Bisherige Beiträge" erscheint,
+# ergibt sich beim Build aus dem Datum.
+#
+# Felder:
+#   id       eindeutig, klein, mit Bindestrichen
+#   date     so genau, wie die Quelle es angibt: '2026', '2026-10' oder
+#            '2026-10-14'. Keinen Tag ergänzen, den niemand bestätigt hat.
+#   title    der Titel des Beitrags
+#   lang     Sprache des Titels: de oder en
+#   venue    Tagung, Veranstaltung oder Zeitschrift
+#   location optional, die Stadt
+#   format   conference-presentation | conference-poster | public-talk | abstract
+#   url      optional, der Nachweis (u:cris, DOI, Programm)
+#
+# Beispiele im Design – NICHT belegt, nicht übernehmen, bis Celine sie bestätigt:
+#   14.10.2026 · Stress across the menstrual cycle – first results from ISSAC
+#     · DGPs Kongress · Berlin · Fachvortrag
+#   27.11.2026 · Warum der Zyklus in die Stressforschung gehört
+#     · Lange Nacht der Forschung · Wien · Publikumsvortrag, offen für alle
+#
+# Die Einträge unten stammen aus Celines öffentlichem ORCID-Profil
+# (0000-0002-3802-1339, Werke; dort eingetragen von u:cris, Universität Wien).
+
+# ORCID: Typ „conference-presentation". Zwei Tagesangaben im Eintrag:
+# Veröffentlichungsdatum 2025-08-05, im Tagungsnamen „6/08/25". Bis Celine den
+# Vortragstag bestätigt, steht hier nur der Monat. Der Punkt am Ende des Titels
+# in ORCID ist weggelassen.
+- id: icbm-2025-stress-trauma-premenstrual-disorders
+  date: '2025-08'
+  title: 'Stress, Trauma, and Core Premenstrual Disorders: A Systematic Review and Comprehensive Meta-Analysis'
+  lang: en
+  venue: International Congress of Behavioral Medicine 2025 (ICBM 2025)
+  format: conference-presentation
+  url: https://ucrisportal.univie.ac.at/en/publications/9d416722-336e-443a-b970-7fb1949e5b13
+
+# ORCID: Typ „other", International Journal of Behavioral Medicine, Datum
+# 2025-07-01 – das Erscheinungsdatum des Abstracts, kein Vortragstermin. Darum
+# nur der Monat. Ob dazu ein Vortrag oder Poster gehörte, sagt der Eintrag nicht.
+- id: ijbm-2025-issac-abstract
+  date: '2025-07'
+  title: 'Exploring Patterns of Stress and Premenstrual Symptoms in Daily Life: The ISSAC Study'
+  lang: en
+  venue: International Journal of Behavioral Medicine
+  format: abstract
+  url: https://ucrisportal.univie.ac.at/en/publications/bf00095b-2989-4ba7-8e5c-67cf6af8955a

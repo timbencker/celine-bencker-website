@@ -1,2 +1,37 @@
-# Medienauftritte. Sprachneutral. Quelle: Liste von Celine.
+# Medienbeiträge. Sprachneutral. Quelle: Liste von Celine.
+# Solange die Liste leer ist, zeigt die Seite den Platzhalter aus dem
+# Seitenkopf (talksMedia.media.placeholder).
+#
+# Felder:
+#   id       eindeutig, klein, mit Bindestrichen
+#   date     '2026', '2026-05' oder '2026-05-12' – so genau wie bekannt
+#   outlet   Sender, Zeitung, Podcast
+#   title    Titel des Beitrags
+#   lang     Sprache des Titels: de oder en
+#   format   interview | guest-article | podcast | radio | tv | print | online
+#   url      Link zum Beitrag (Pflicht – jeder Beitrag ist eine verlinkte Kachel)
+#   quote    optional, bei höchstens einem Beitrag: das große Zitat oben auf
+#            der Seite. Nur echt und von Celine freigegeben.
+#     text      das Zitat, ohne Anführungszeichen
+#     lang      Sprache des Zitats: de oder en
+#     approved  true – erst eintragen, wenn Celine das Zitat freigegeben hat
+#     audio     optional, Link zu einem Hörausschnitt
+#
+# Vorlage:
+#   - id: sender-2026-thema
+#     date: '2026-05'
+#     outlet: Name des Mediums
+#     title: Titel des Beitrags
+#     lang: de
+#     format: interview
+#     url: https://…
+#
+# Beispiele im Design – NICHT belegt, nicht übernehmen, bis Celine sie bestätigt:
+#   „Warum PMS mehr ist als schlechte Laune" · Ö1 Radiokolleg · Interview · Sep 2026
+#   „Stress, Zyklus und was die Forschung dazu weiß" · Der Standard
+#     · Gastkommentar · Mai 2026
+#   „Folge 42: Hormone und Psyche" · Podcast „Psychologie to go" · Feb 2026
+#   Zitat: „PMS ist kein Stimmungsproblem, sondern eine Frage, wie der Körper
+#     mit Stress umgeht – und das ist messbar." · Ö1 Radiokolleg
+#     · September 2026 · „30 Sekunden anhören"
 []
