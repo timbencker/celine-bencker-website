@@ -1,20 +1,46 @@
 ---
 /**
- * Decorative page background — the canvas's `verwoben` mode (mode 9).
+ * Decorative page background — the canvas's `verwoben` mode (mode 9 of `bgSvg`
+ * in design/seiten-logic.js).
  *
- * "Je Seite ein eigenes Rezept aus gemeinsamen Bausteinen": five shared SVG
- * shapes, combined differently per page. Ported faithfully, including each
- * shape's size, opacity and offset.
- *
- * The canvas scales everything by `sc = viewportWidth / 1280`. That maps
- * exactly onto `vw` units, so this port needs no JavaScript at all — a
- * measurement the original had to take at runtime becomes a CSS unit.
+ * "Je Seite ein eigenes Rezept aus gemeinsamen Bausteinen": shared shapes and
+ * marks, combined differently per page. Ported faithfully, including each
+ * piece's size, opacity, offset, rotation and path, and which pieces a phone
+ * leaves out.
  *
  * Three rules stated in the canvas source, all of them accessibility
  * constraints, all preserved here:
  *   - filled shapes may sit under text only at lightness >= 92%
- *   - strokes and glyphs stay in the card padding, never under text
+ *   - strokes and marks stay in the card padding, never under text
  *   - sage for surfaces, moss for the scale, grey for markings
+ *
+ * How it scales, and why that needs no JavaScript:
+ *
+ * The canvas draws each page twice, on a 1280px and a 390px card, and passes
+ * `mobile` to pick the pieces. It sizes the large motifs by
+ * `sc = cardWidth / 1280`, so on either card a motif's box is `px / 1280` of
+ * the card: a fixed share of the width, which is what a `vw` unit is. Both
+ * sets are rendered below as layers; the one `md` breakpoint hides the other.
+ *
+ * On the phone card the canvas scales only a motif's box, not its SVG:
+ * `svgBox` keeps the unscaled width and height, so a 920px circle overflows
+ * its 280px box and the card clips it. The phone boards show those large
+ * shapes, so the phone layer sizes its SVGs against 390 and lets them overflow
+ * the same way.
+ *
+ * The marks are placed in plain pixels, never scaled by `sc`, because they
+ * rely on bands that are fixed in pixels: the page margin (48px, 20px on
+ * phones) for the scale, and the gap between the phone nav and the title for
+ * the phone mark. They stay in pixels here. The desktop hero marks sit in the
+ * header's column gap, and that gap is fluid, so they follow the content
+ * column: scaled against 1280 below that width, fixed and centred with the
+ * column above it. Their top stays in pixels, like the nav and padding above
+ * them.
+ *
+ * The canvas says an edge mark's inner edge ends 4px inside the margin, and the
+ * mark may be cropped at the outer edge. Its scale keeps to that on the 1280
+ * card but not on the 390 one (a 22px tick in a 20px margin), so the phone
+ * layer shifts those marks outwards until the rule holds.
  *
  * Only `verwoben` and `aus` are built. `shapes`, `achtziger`, `zyklus` and the
  * rest stay in the canvas until asked for; adding one is a new branch here plus
@@ -33,118 +59,320 @@ interface Props {
 
 const { variant = 'aus', hue = 'gelb', page = 'home' } = Astro.props;
 
-/** The circle fill, per the canvas's KREIS map. */
+/*
+ * Colours: a token wherever one exists. The rest are used by this layer alone
+ * and nowhere else on the site, so they stay here rather than widen the token
+ * set.
+ */
+
+/** The circle fill, per the canvas's KREIS map. Each tint renders at >= 92% lightness. */
 const KREIS: Record<BackgroundHue, string> = {
   gelb: '#f3e7c9',
   salbei: '#dde9db',
   sand: '#f0e6d2',
-  flieder: '#e9e4f1',
+  flieder: 'var(--color-lilac-tint)',
 };
-
-/** Sage — `const G` in the canvas source. */
-const MOOS = '#3f6b52';
+/** The sage surface of both squares. */
 const FLAECHE = '#dde9db';
+/** `MOSS` — the scale. */
+const MOOS = '#6f8a5e';
+/** The warm rhombus in the hero. */
+const WARM = '#c4703f';
+/** `G` — the circle line and the dashed curve. */
+const SALBEI = 'var(--color-sage)';
+/** The solid curve. */
+const LILA = 'var(--color-lilac-text)';
+/** Markings. The canvas's #6b6d68 is the spec's text-3, since darkened for contrast. */
+const GRAU = 'var(--color-text-3)';
 
-/** Canvas px -> vw, against the 1280 design width. */
-const vw = (px: number) => `calc(${px} / 1280 * 100vw)`;
+type Css = Record<string, string | number>;
 
-type Piece = 'kreisFlaeche' | 'kreisLinie' | 'quadratLinks' | 'quadratUnten' | 'kreuzGross';
+/** One positioned piece — the canvas's `{ w, h, o, css, node }`. */
+interface Piece {
+  /** Canvas name, rendered as `data-piece` so a build can be counted. */
+  name: string;
+  /** The wrapper: size, offsets, opacity. */
+  box: Css;
+  /** The SVG inside: drawn size (viewBox), rendered size, children. A bar has none. */
+  svg?: { w: number; h: number; width: string; height: string; body: string };
+}
 
-/** The per-page recipes, verbatim from the canvas's `rezept` map. */
-const REZEPT: Record<BackgroundPage, Piece[]> = {
-  home: ['kreisFlaeche', 'kreisLinie'],
-  research: ['kreisFlaeche', 'kreisLinie', 'quadratLinks'],
-  // Publikationen: nur die Skala, keine Flächen
-  pub: [],
-  // Lebenslauf: bewusst leer – Dokumentcharakter
-  cv: [],
-  talks: ['kreisLinie'],
-  contact: ['quadratUnten', 'kreisLinie'],
-  // 404: eine ruhige Fläche
-  notfound: ['kreisFlaeche'],
-};
+/** `big` and `hero` are the canvas's `pieces`, `items` its `edge`. */
+interface Recipe {
+  big: Piece[];
+  hero: Piece[];
+  items: Piece[];
+}
 
-const pieces = variant === 'verwoben' ? REZEPT[page] : [];
+/** A length drawn on a `card`-wide board, as the same share of the viewport. */
+const vw = (px: number, card = 1280) => `calc(${px} / ${card} * 100vw)`;
+
+/** A length in the content column: scales with it up to 1280, then holds. */
+const column = (px: number) => `calc(${px} / 1280 * min(100%, 1280px))`;
+
+/** An offset from the content column's left edge; the column centres above 1280. */
+const fromColumn = (px: number) =>
+  `calc(${px} / 1280 * min(100%, 1280px) + max(0px, (100% - 1280px) / 2))`;
+
+function bausteine(mobile: boolean): Record<BackgroundPage, Recipe> {
+  const card = mobile ? 390 : 1280;
+  /** Kartenpolster — the only band guaranteed free of text. */
+  const pad = mobile ? 20 : 48;
+
+  /**
+   * A large motif anchored to card corners. `px * sc` on a `card`-wide board
+   * is `px / 1280` of it on either card; the SVG keeps its drawn size.
+   */
+  const motif = (
+    name: string,
+    w: number,
+    h: number,
+    o: number,
+    at: Record<string, number>,
+    body: string,
+  ): Piece => ({
+    name,
+    box: {
+      width: vw(w),
+      height: vw(h),
+      opacity: o,
+      ...Object.fromEntries(Object.entries(at).map(([side, px]) => [side, vw(px)])),
+    },
+    svg: { w, h, width: vw(w, card), height: vw(h, card), body },
+  });
+
+  /** A desktop hero mark, placed in the content column. */
+  const columnMark = (
+    name: string,
+    w: number,
+    h: number,
+    o: number,
+    at: { top: number; left: number },
+    body: string,
+  ): Piece => ({
+    name,
+    box: {
+      top: `${at.top}px`,
+      left: fromColumn(at.left),
+      width: column(w),
+      aspectRatio: `${w} / ${h}`,
+      opacity: o,
+    },
+    svg: { w, h, width: '100%', height: '100%', body },
+  });
+
+  /** A mark on the right edge, in pixels, with its inner edge at most `pad - 4` in. */
+  const edge = (
+    name: string,
+    y: number,
+    w: number,
+    h: number,
+    o: number,
+    inset = 0,
+    body = '',
+  ): Piece => ({
+    name,
+    box: {
+      top: `${y}px`,
+      right: `${Math.min(inset, pad - 4 - w)}px`,
+      width: `${w}px`,
+      height: `${h}px`,
+      opacity: o,
+      ...(body ? {} : { background: MOOS }),
+    },
+    svg: body ? { w, h, width: '100%', height: '100%', body } : undefined,
+  });
+
+  const kreisFlaeche = motif(
+    'kreisFlaeche',
+    920,
+    920,
+    0.7,
+    { top: -520, right: -40 },
+    `<circle cx="460" cy="460" r="460" style="fill:${KREIS[hue]}"/>`,
+  );
+  const kreisLinie = motif(
+    'kreisLinie',
+    1082,
+    1082,
+    0.08,
+    { top: -620, right: -110 },
+    `<circle cx="541" cy="541" r="540" fill="none" stroke-width="1.5" style="stroke:${SALBEI}"/>`,
+  );
+  const quadratLinks = motif(
+    'quadratLinks',
+    700,
+    700,
+    0.5,
+    { bottom: 260, left: -260 },
+    `<rect x="40" y="40" width="620" height="620" transform="rotate(-12 350 350)" style="fill:${FLAECHE}"/>`,
+  );
+  const quadratUnten = motif(
+    'quadratUnten',
+    560,
+    560,
+    0.28,
+    { bottom: -160, right: -180 },
+    `<rect x="30" y="30" width="500" height="500" rx="28" transform="rotate(9 280 280)" style="fill:${FLAECHE}"/>`,
+  );
+
+  // A warm, filled mark: the hero's strong accent. On phones, one small
+  // rhombus at the right edge, between the nav and the title.
+  const heroMobil: Piece[] = [
+    {
+      name: 'heroMobil',
+      box: { top: '96px', right: '20px', width: '18px', height: '18px', opacity: 1 },
+      svg: {
+        w: 18,
+        h: 18,
+        width: '100%',
+        height: '100%',
+        body: `<polygon points="9,0 18,9 9,18 0,9" style="fill:${WARM}"/>`,
+      },
+    },
+  ];
+  // On desktop, two planes in the column gap: the warm rhombus in front, the
+  // scientific cross behind it on a second axis further in. (The canvas has two
+  // more marks here, commented out.)
+  const heroMark: Piece[] = mobile
+    ? heroMobil
+    : [
+        columnMark(
+          'heroRaute',
+          36,
+          36,
+          1,
+          { top: 262, left: 716 },
+          `<polygon points="18,0 36,18 18,36 0,18" style="fill:${WARM}"/>`,
+        ),
+        columnMark(
+          'heroKreuz',
+          12,
+          12,
+          0.45,
+          { top: 372, left: 742 },
+          `<path d="M0 6h12M6 0v12" fill="none" stroke-width="1" shape-rendering="crispEdges" style="stroke:${GRAU}"/>`,
+        ),
+      ];
+
+  // The scale: a tick every 92px, every fifth one long, one tick swapped for a triangle.
+  const skala = (n: number, marke?: number): Piece[] => {
+    const out: Piece[] = [];
+    for (let i = 0; i < n; i++) {
+      if (i === marke) continue; // room for the triangle
+      const lang = i % 5 === 0;
+      out.push(edge('skala', 420 + i * 92, lang ? 22 : 12, 1, lang ? 0.3 : 0.18));
+    }
+    if (marke !== undefined) {
+      out.push(
+        edge(
+          'skalaDreieck',
+          420 + marke * 92 - 5,
+          13,
+          11,
+          0.8,
+          14,
+          `<polygon points="6.5,0 13,11 0,11" style="fill:${MOOS}"/>`,
+        ),
+      );
+    }
+    return out;
+  };
+
+  // Scientific marks: the curve pair from the cycle graphic and a row of
+  // measuring points, bottom right and bottom left. Desktop only.
+  const kurvenPaar: Piece[] = mobile
+    ? []
+    : [
+        motif(
+          'kurvenPaar',
+          620,
+          200,
+          0.5,
+          { bottom: 140, right: -90 },
+          `<path d="M10,150 C110,150 210,40 310,60 C350,68 390,120 430,110 C490,100 550,120 610,150" fill="none" stroke-width="2" stroke-opacity=".55" style="stroke:${LILA}"/>` +
+            `<path d="M10,155 C190,155 270,150 330,130 C390,90 430,70 470,80 C530,95 580,140 610,155" fill="none" stroke-width="2" stroke-opacity=".5" stroke-dasharray="6 5" style="stroke:${SALBEI}"/>`,
+        ),
+      ];
+  const messpunkte: Piece[] = mobile
+    ? []
+    : [
+        motif(
+          'messpunkte',
+          300,
+          10,
+          0.45,
+          { bottom: 96, left: 48 },
+          `<g style="fill:${GRAU}">` +
+            Array.from(
+              { length: 25 },
+              (_, i) => `<circle cx="${5 + i * 12}" cy="5" r="1.6"/>`,
+            ).join('') +
+            '</g>',
+        ),
+      ];
+
+  // The per-page recipes, verbatim from the canvas's `rezept` map. Its `menu`
+  // key has no page here: the phone menu opens in place, over the page's own
+  // background.
+  return {
+    home: {
+      big: [kreisFlaeche, kreisLinie, ...kurvenPaar],
+      hero: [...heroMark, ...messpunkte],
+      items: [],
+    },
+    research: {
+      big: [kreisFlaeche, kreisLinie, quadratLinks],
+      hero: [...heroMark, ...messpunkte],
+      items: skala(26, 10),
+    },
+    // Publikationen: nur die Skala, keine Flächen
+    pub: { big: [], hero: [], items: skala(26) },
+    // Lebenslauf: bewusst leer – Dokumentcharakter
+    cv: { big: [], hero: [], items: [] },
+    talks: { big: [kreisLinie], hero: [], items: skala(14, 5) },
+    contact: { big: [quadratUnten, kreisLinie], hero: [], items: [] },
+    // 404: eine ruhige Fläche
+    notfound: { big: [kreisFlaeche], hero: [], items: [] },
+  };
+}
+
+const layers =
+  variant === 'verwoben'
+    ? [
+        { name: 'desktop', class: 'hidden md:block', recipe: bausteine(false)[page] },
+        { name: 'phone', class: 'md:hidden', recipe: bausteine(true)[page] },
+      ]
+        .map(({ recipe, ...layer }) => ({
+          ...layer,
+          // The canvas paints `pieces(big + hero)`, then `edge(items)` on top.
+          pieces: [...recipe.big, ...recipe.hero, ...recipe.items],
+        }))
+        .filter((layer) => layer.pieces.length > 0)
+    : [];
 ---
 
-{pieces.length > 0 && (
+{layers.length > 0 && (
   <div
     class="pointer-events-none absolute inset-0 -z-10 overflow-hidden"
     aria-hidden="true"
     role="presentation"
   >
-    {pieces.includes('kreisFlaeche') && (
-      <div
-        class="absolute"
-        style={`width:${vw(920)};height:${vw(920)};top:${vw(-520)};right:${vw(-40)};opacity:.7`}
-      >
-        <svg viewBox="0 0 920 920" width="100%" height="100%" class="block overflow-visible">
-          <circle cx="460" cy="460" r="460" fill={KREIS[hue]} />
-        </svg>
+    {layers.map((layer) => (
+      <div class:list={['absolute inset-0', layer.class]} data-layer={layer.name}>
+        {layer.pieces.map((piece) => (
+          <div class="absolute" style={piece.box} data-piece={piece.name}>
+            {piece.svg && (
+              <svg
+                viewBox={`0 0 ${piece.svg.w} ${piece.svg.h}`}
+                class="block overflow-visible"
+                style={{ width: piece.svg.width, height: piece.svg.height }}
+                set:html={piece.svg.body}
+              />
+            )}
+          </div>
+        ))}
       </div>
-    )}
-
-    {pieces.includes('kreisLinie') && (
-      <div
-        class="absolute"
-        style={`width:${vw(1082)};height:${vw(1082)};top:${vw(-620)};right:${vw(-110)};opacity:.08`}
-      >
-        <svg viewBox="0 0 1082 1082" width="100%" height="100%" class="block overflow-visible">
-          <circle cx="541" cy="541" r="540" fill="none" stroke={MOOS} stroke-width="1.5" />
-        </svg>
-      </div>
-    )}
-
-    {pieces.includes('quadratLinks') && (
-      <div
-        class="absolute"
-        style={`width:${vw(700)};height:${vw(700)};bottom:${vw(260)};left:${vw(-260)};opacity:.5`}
-      >
-        <svg viewBox="0 0 700 700" width="100%" height="100%" class="block overflow-visible">
-          <rect
-            x="40"
-            y="40"
-            width="620"
-            height="620"
-            fill={FLAECHE}
-            transform="rotate(-12 350 350)"
-          />
-        </svg>
-      </div>
-    )}
-
-    {pieces.includes('quadratUnten') && (
-      <div
-        class="absolute"
-        style={`width:${vw(560)};height:${vw(560)};bottom:${vw(-160)};right:${vw(-180)};opacity:.28`}
-      >
-        <svg viewBox="0 0 560 560" width="100%" height="100%" class="block overflow-visible">
-          <rect
-            x="30"
-            y="30"
-            width="500"
-            height="500"
-            rx="28"
-            fill={FLAECHE}
-            transform="rotate(9 280 280)"
-          />
-        </svg>
-      </div>
-    )}
-
-    {pieces.includes('kreuzGross') && (
-      <div
-        class="absolute"
-        style={`width:${vw(300)};height:${vw(300)};bottom:${vw(900)};left:${vw(-120)};opacity:.14`}
-      >
-        <svg viewBox="0 0 300 300" width="100%" height="100%" class="block overflow-visible">
-          <path
-            d="M110 8h80a6 6 0 0 1 6 6v82h82a6 6 0 0 1 6 6v80a6 6 0 0 1-6 6h-82v82a6 6 0 0 1-6 6h-80a6 6 0 0 1-6-6v-82H22a6 6 0 0 1-6-6v-80a6 6 0 0 1 6-6h82V14a6 6 0 0 1 6-6z"
-            fill={MOOS}
-            transform="rotate(9 150 150)"
-          />
-        </svg>
-      </div>
-    )}
+    ))}
   </div>
 )}
