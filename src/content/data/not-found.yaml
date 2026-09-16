@@ -1,2 +1,36 @@
-# Texte der 404-Seite. Wird mit der 404-Seite gefüllt.
-[]
+# Texte der 404-Seite (Board 11a).
+# GitHub Pages zeigt diese eine Seite für jede Adresse, die es nicht gibt – in
+# jeder Sprache. Deshalb ist die Seite deutsch (`de`) und hat einen englischen
+# Absatz (`en`) mit einem Link zur englischen Startseite.
+- id: not-found
+  # Entwurf aus dem Design – von Celine zu prüfen
+  de:
+    label: Fehler 404
+    title: Diese Seite gibt es nicht
+    # Das Handy-Board endet anders: „Alles, was es hier gibt, steht darunter.“
+    # Die Seite hat einen Text für beide Breiten; dieser ist der vom Desktop.
+    intro: Vielleicht ist der Link alt oder die Adresse hat einen Tippfehler. Alles, was es auf dieser Website gibt, steht hier.
+    # Beschriftung des Mail-Links. Die Adresse kommt aus site/site.yaml.
+    report: Kaputter Link gefunden? Kurze Mail genügt
+    onward:
+      heading: Weiter zu
+      # Eine Zeile je Seite der Navigation, benannt über ihren translationKey.
+      # Titel und Adresse kommen aus der Seite selbst. Fehlt hier eine Seite
+      # der Navigation oder steht hier eine, die es dort nicht gibt, bricht der
+      # Build ab.
+      descriptions:
+        research: Projekte, Methoden und laufende Studien
+        publications: Alle Arbeiten, chronologisch, mit DOI
+        # Verspricht Interviews und ein Pressekit. Nur so lassen, wenn die
+        # Seite beides zeigt – das Pressekit erscheint erst, wenn die Datei
+        # existiert.
+        talks-media: Termine, Interviews, Pressekit
+        # Verspricht Lehre und einen PDF-Download. Beides ist noch offen: die
+        # Lehre ist ein Platzhalter, der PDF-Button erscheint erst, wenn die
+        # Datei existiert.
+        cv: Stationen, Lehre, PDF-Download
+        contact: Mail, Institut, Profile
+  en:
+    # EN: Übersetzung – von Celine zu prüfen
+    text: This page does not exist. The link may be out of date, or the address may contain a typo.
+    link: Go to the English home page
