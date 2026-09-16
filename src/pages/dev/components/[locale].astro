@@ -1,0 +1,680 @@
+---
+import { statSync } from 'node:fs';
+
+import Band from '../../../components/primitives/Band.astro';
+import Button from '../../../components/primitives/Button.astro';
+import Callout from '../../../components/primitives/Callout.astro';
+import ExternalLink from '../../../components/primitives/ExternalLink.astro';
+import ListRow from '../../../components/primitives/ListRow.astro';
+import MailLink from '../../../components/primitives/MailLink.astro';
+import PageHeader from '../../../components/primitives/PageHeader.astro';
+import PageTitle from '../../../components/primitives/PageTitle.astro';
+import Portrait from '../../../components/primitives/Portrait.astro';
+import Section from '../../../components/primitives/Section.astro';
+import TextLink from '../../../components/primitives/TextLink.astro';
+import Tile from '../../../components/primitives/Tile.astro';
+import { LOCALES, otherLocale, type Locale } from '../../../i18n/config';
+import { homeHref, loadPages, pageHref, resolvePage } from '../../../i18n/pages';
+import { withBase } from '../../../i18n/urls';
+import SiteChrome from '../../../layouts/SiteChrome.astro';
+import { heading, splitGrid } from '../../../lib/styles';
+import { getSite } from '../../../lib/site';
+
+/**
+ * Review page: every shared component and variant on one page, inside the
+ * real chrome (SiteNav, LanguageSwitch, SiteFooter), at
+ * `/dev/components/de/` and `/dev/components/en/`. The locale segment is not
+ * decoration: the site's i18n routing (`prefixDefaultLocale`) answers 404 for
+ * any page path that names no locale.
+ *
+ * Development only — `getStaticPaths` returns nothing in a production build,
+ * so no `/dev/` route is ever published.
+ *
+ * The sample copy is invented, in German in both versions, and makes no claim
+ * about Celine; interface strings, dates and file sizes follow the locale.
+ * Several PageTitles appear, so this page has more than one h1 — that is the
+ * specimen, not a pattern.
+ */
+export function getStaticPaths() {
+  return import.meta.env.DEV ? LOCALES.map((locale) => ({ params: { locale } })) : [];
+}
+
+const locale = Astro.params.locale as Locale;
+// Imported only in dev: a static import would make the production build emit
+// the file even though this page never renders there.
+const sample = import.meta.env.DEV
+  ? (await import('../../../assets/dev/sample.png')).default
+  : undefined;
+const pages = await loadPages();
+const site = await getSite();
+const email = site.email ?? 'beispiel@example.org';
+const orcid = site.profiles[0]?.url ?? 'https://orcid.org/';
+const researchHref = pageHref(resolvePage('research', locale, pages));
+const talksHref = pageHref(resolvePage('talks-media', locale, pages));
+const home = homeHref(locale);
+// A verified DOI (BMJ Open 2026, the ISSAC protocol).
+const doi = 'https://doi.org/10.1136/bmjopen-2026-123210';
+// Downloads show a real file and its real size.
+const sampleFile = { href: withBase('favicon.svg'), bytes: statSync('public/favicon.svg').size };
+
+const specimen = 'font-mono text-[12px] text-text-3';
+const frame = 'border-y border-line';
+---
+
+<SiteChrome
+  locale={locale}
+  title="Komponenten · Entwicklung"
+  description="Alle geteilten Komponenten und Varianten zur Durchsicht."
+  currentHref=""
+  counterpartHref={withBase(`dev/components/${otherLocale(locale)}/`)}
+  robots="noindex"
+>
+  <PageHeader slot="masthead">
+    <PageTitle
+      title="Komponenten"
+      intro="Jede geteilte Komponente mit jeder Variante. Nur im Entwicklungsserver – der Build gibt diese Seite nicht aus."
+    />
+    <Button slot="aside" href={researchHref} locale={locale}>
+      Beispiel intern
+    </Button>
+  </PageHeader>
+
+  {/* --- Headings ------------------------------------------------------- */}
+  <Section labelledby="dev-headings" layout="stacked" space="compact" class="gap-6">
+    <p class={specimen}>heading · section / row / lookup</p>
+    <h2 id="dev-headings" class={heading({ level: 'section' })}>
+      Überschriften (section)
+    </h2>
+    <h3 class={heading({ level: 'row' })}>Zeilentitel und Forschungslinie (row)</h3>
+    <h3 class={heading({ level: 'lookup' })}>Nachschlage-Zeile und Kachel (lookup)</h3>
+  </Section>
+
+  {/* --- PageHeader + PageTitle ----------------------------------------- */}
+  <Section labelledby="dev-header" layout="stacked" space="none" class="pt-14 md:pt-24">
+    <h2 id="dev-header" class={heading({ level: 'section' })}>
+      PageHeader & PageTitle
+    </h2>
+  </Section>
+
+  <div class="flex flex-col gap-10 py-10">
+    <div>
+      <p class:list={['mx-auto max-w-content px-5 md:px-12', specimen]}>
+        split · 7/5 · title + intro · aside: Button download + TextLink
+      </p>
+      <div class={frame}>
+        <PageHeader>
+          <PageTitle
+            title="Beispielseite"
+            intro="Ein Einleitungssatz in der kleineren Lead-Stufe, höchstens 44 Zeichen breit, damit er ruhig liest."
+          />
+          <div slot="aside" class="flex flex-wrap items-center gap-x-6 gap-y-3">
+            <Button
+              href={sampleFile.href}
+              locale={locale}
+              download={{ format: 'SVG', bytes: sampleFile.bytes }}
+            >
+              Datei
+            </Button>
+            <TextLink href={home} class="text-[15px]">
+              Textlink
+            </TextLink>
+          </div>
+        </PageHeader>
+      </div>
+    </div>
+
+    <div>
+      <p class:list={['mx-auto max-w-content px-5 md:px-12', specimen]}>
+        split · 6/6 · title as slot with a line break · aside: question list
+      </p>
+      <div class={frame}>
+        <PageHeader ratio="6/6">
+          <PageTitle intro="Ein Satz darüber, worum es auf der Seite geht.">
+            Beispiel
+            <br />& Zweite Zeile
+          </PageTitle>
+          <ul
+            slot="aside"
+            role="list"
+            class="flex flex-col gap-3 text-[18px] font-semibold leading-[1.3] tracking-[-0.02em] md:gap-[18px] md:text-[22px]"
+          >
+            <li>Eine Beispielfrage für Redaktionen?</li>
+            <li>Noch eine Frage, etwas länger formuliert?</li>
+          </ul>
+        </PageHeader>
+      </div>
+    </div>
+
+    <div>
+      <p class:list={['mx-auto max-w-content px-5 md:px-12', specimen]}>
+        compact · title only · aside: external links
+      </p>
+      <div class={frame}>
+        <PageHeader layout="compact">
+          <PageTitle title="Kompakt" />
+          <ul
+            slot="aside"
+            role="list"
+            class="flex flex-wrap gap-x-[18px] gap-y-2 text-[14px] font-semibold md:gap-6 md:text-meta"
+          >
+            <li>
+              <ExternalLink
+                href={orcid}
+                locale={locale}
+                class="text-sage transition-colors hover:text-ink"
+              >
+                ORCID
+              </ExternalLink>
+            </li>
+            <li>
+              <ExternalLink
+                href={doi}
+                locale={locale}
+                class="text-sage transition-colors hover:text-ink"
+              >
+                DOI
+              </ExternalLink>
+            </li>
+          </ul>
+        </PageHeader>
+      </div>
+    </div>
+
+    <div>
+      <p class:list={['mx-auto max-w-content px-5 md:px-12', specimen]}>
+        split · small label above · PageTitle size="question" · aside: MailLink with label
+      </p>
+      <div class={frame}>
+        <PageHeader>
+          <p class="font-mono text-[12px] uppercase tracking-[0.1em] text-text-3 md:text-[13px]">
+            Kleines Label
+          </p>
+          <PageTitle size="question" title="Wie sieht ein Titel aus, der eine ganze Frage ist?" />
+          <MailLink
+            slot="aside"
+            email={email}
+            label="Beschriftete Mail statt Adresse"
+            class="text-[15px] text-text-2 transition-colors hover:text-ink"
+          />
+        </PageHeader>
+      </div>
+    </div>
+  </div>
+
+  {/* --- Button --------------------------------------------------------- */}
+  <Section labelledby="dev-button" layout="stacked" space="compact" class="gap-6">
+    <h2 id="dev-button" class={heading({ level: 'section' })}>
+      Button
+    </h2>
+    <p class={specimen}>tone lilac on paper · internal / external / download</p>
+    <div class="flex flex-wrap items-center gap-4">
+      <Button href={researchHref} locale={locale}>
+        Intern
+      </Button>
+      <Button href={doi} locale={locale}>
+        Extern
+      </Button>
+      <Button
+        href={sampleFile.href}
+        locale={locale}
+        download={{ format: 'SVG', bytes: sampleFile.bytes }}
+      >
+        Herunterladen
+      </Button>
+    </div>
+  </Section>
+  <Section surface="bone" layout="stacked" space="compact" class="gap-6">
+    <p class={specimen}>tone lilac on bone · download, size in English</p>
+    <div class="flex flex-wrap items-center gap-4">
+      <Button href={sampleFile.href} locale="en" download={{ format: 'PDF', bytes: 1_234_567 }}>
+        Download
+      </Button>
+    </div>
+  </Section>
+  <Section surface="lilac" layout="stacked" space="compact" class="gap-6">
+    <p class={specimen}>tone ink — only on the lilac tint</p>
+    <div class="flex flex-wrap items-center gap-4">
+      <Button
+        tone="ink"
+        href={sampleFile.href}
+        locale={locale}
+        download={{ format: 'ZIP', bytes: 180_000 }}
+      >
+        Pressekit
+      </Button>
+      <Button tone="ink" href={talksHref} locale={locale}>
+        Intern
+      </Button>
+      <Button tone="ink" href={doi} locale={locale}>
+        Extern
+      </Button>
+    </div>
+  </Section>
+
+  {/* --- Links ---------------------------------------------------------- */}
+  <Section labelledby="dev-links" layout="label" space="compact">
+    <h2 id="dev-links" class={heading({ level: 'section' })}>
+      Links
+    </h2>
+    <ul role="list" class="flex flex-col gap-4 text-[17px]">
+      <li>
+        <p class={specimen}>TextLink · internal</p>
+        <TextLink href={researchHref}>Zur Beispielseite</TextLink>
+      </li>
+      <li>
+        <p class={specimen}>ExternalLink</p>
+        <ExternalLink href={orcid} locale={locale} class="font-semibold text-sage hover:text-ink">
+          ORCID
+        </ExternalLink>
+      </li>
+      <li>
+        <p class={specimen}>MailLink · address</p>
+        <MailLink email={email} class="font-bold text-sage transition-colors hover:text-ink" />
+      </li>
+      <li>
+        <p class={specimen}>MailLink · subject</p>
+        <MailLink
+          email={email}
+          subject="Beispiel Betreff & mehr"
+          class="font-bold text-sage transition-colors hover:text-ink"
+        />
+      </li>
+      <li>
+        <p class={specimen}>MailLink · label</p>
+        <MailLink
+          email={email}
+          label="Kurze Mail genügt"
+          class="text-text-2 transition-colors hover:text-ink"
+        />
+      </li>
+      <li>
+        <p class={specimen}>MailLink · large address, break-all on phones</p>
+        <MailLink
+          email={email}
+          class="break-all text-[20px] font-bold tracking-[-0.03em] text-sage transition-colors hover:text-ink md:text-[28px]"
+        />
+      </li>
+    </ul>
+  </Section>
+
+  {/* --- ListRow -------------------------------------------------------- */}
+  <Section labelledby="dev-rows" layout="split">
+    <div class="flex flex-col gap-2">
+      <h2 id="dev-rows" class={heading({ level: 'section' })}>
+        ListRow
+      </h2>
+      <p class={specimen}>default · whole row links, 28px title</p>
+    </div>
+    <ul role="list" class="flex flex-col">
+      <li>
+        <ListRow
+          href={`${researchHref}#pms-stress`}
+          title="Beispielzeile"
+          sub="Ein Satz, der erklärt, wohin die Zeile führt."
+        />
+      </li>
+      <li>
+        <ListRow href={home} title="Zweite Zeile ohne Untertitel" />
+      </li>
+    </ul>
+  </Section>
+
+  <Section surface="bone" layout="split">
+    <div class="flex flex-col gap-3">
+      <p class={heading({ level: 'section' })}>static</p>
+      <p class={specimen}>edge first · plain · edge last (edges from md only)</p>
+    </div>
+    <ul role="list" class="flex flex-col">
+      <li>
+        <ListRow
+          kind="static"
+          edge="first"
+          title="Erste Zeile ohne Linie oben"
+          sub="Beispieltext in der sekundären Farbe, zwei Zeilen lang, wenn der Platz knapp wird."
+        />
+      </li>
+      <li>
+        <ListRow kind="static" title="Mittlere Zeile" sub="Beispieltext." />
+      </li>
+      <li>
+        <ListRow
+          kind="static"
+          edge="last"
+          title="Letzte Zeile schließt bündig"
+          sub="Beispieltext."
+        />
+      </li>
+    </ul>
+  </Section>
+
+  <Section surface="bone" layout="stacked" space="compact">
+    <p class:list={['pb-7', specimen]}>
+      date · internal link · external link (en) · plain without meta
+    </p>
+    <ul role="list" class="flex flex-col">
+      <li>
+        <ListRow
+          kind="date"
+          locale={locale}
+          date={new Date('2026-10-14')}
+          href={talksHref}
+          title="Beispielvortrag mit einem längeren Titel"
+          meta={['Musterkonferenz · Musterstadt', 'Fachvortrag']}
+        />
+      </li>
+      <li>
+        <ListRow
+          kind="date"
+          locale="en"
+          date={new Date('2026-03-01')}
+          href={doi}
+          title="Sample talk, English date"
+          meta={['Sample venue · Sample city']}
+        />
+      </li>
+      <li>
+        <ListRow
+          kind="date"
+          locale={locale}
+          date={new Date('2025-05-27')}
+          title="Ohne Link und ohne Meta"
+        />
+      </li>
+    </ul>
+  </Section>
+
+  <Section layout="label" space="compact">
+    <p class={heading({ level: 'section' })}>2099</p>
+    <div class="flex flex-col gap-3">
+      <p class={specimen}>publication · link + bold own name + Callout · plain sub · status</p>
+      <ul role="list" class="flex flex-col">
+        <li>
+          <ListRow
+            kind="publication"
+            locale={locale}
+            title="Beispieltitel einer Veröffentlichung, lang genug für zwei Zeilen im Raster"
+            href={doi}
+          >
+            <Fragment slot="sub">
+              <strong>Muster, A.</strong>, Beispiel, B., &amp; Probe, C. ·{' '}
+              <em>Journal of Examples</em>, 1, 101
+            </Fragment>
+            <Callout locale={locale}>
+              Ein Satz Klartext, der sagt, was die Arbeit herausgefunden hat. Höchstens zwei Sätze.
+            </Callout>
+          </ListRow>
+        </li>
+        <li>
+          <ListRow
+            kind="publication"
+            locale={locale}
+            title="Zweiter Beispieltitel ohne Kurzfassung"
+            sub="Probe, C., Muster, A. · Beispielverlag"
+            href={doi}
+            linkLabel="Paper"
+          />
+        </li>
+        <li>
+          <ListRow
+            kind="publication"
+            locale={locale}
+            title="Eingereichtes Manuskript (Beispiel)"
+            sub="Erstautorin · Empirische Arbeit"
+            status="in Begutachtung"
+          />
+        </li>
+      </ul>
+    </div>
+  </Section>
+
+  <Section layout="stacked" space="compact">
+    <p class:list={['pb-6', specimen]}>publication columns · the Methods list</p>
+    <ul role="list" class="flex flex-col">
+      <li>
+        <ListRow
+          kind="publication"
+          columns
+          locale={locale}
+          title="Beispielmethode"
+          sub="Eine Beschreibung, die in der mittleren Spalte steht und dort umbricht."
+          href={doi}
+          linkLabel="Studienprotokoll"
+        />
+      </li>
+      <li>
+        <ListRow
+          kind="publication"
+          columns
+          locale={locale}
+          title="Methode ohne Beschreibung"
+          href={doi}
+          linkLabel="Beispiel 2099"
+        />
+      </li>
+      <li>
+        <ListRow
+          kind="publication"
+          columns
+          locale={locale}
+          title="Methode ohne Link"
+          sub="Nur Titel und Beschreibung."
+        />
+      </li>
+    </ul>
+  </Section>
+
+  <Section layout="stacked" space="compact">
+    <div class="grid gap-3 border-t border-line py-7 md:grid-cols-12 md:gap-12 md:py-10">
+      <p class:list={[heading({ level: 'row' }), 'md:col-span-3']}>cv</p>
+      <ul role="list" class="flex flex-col md:col-span-9 md:gap-5">
+        <li>
+          <ListRow
+            kind="cv"
+            period="seit 2099"
+            title="Beispielposition"
+            detail="Musterinstitut, Musterstadt"
+          />
+        </li>
+        <li>
+          <ListRow
+            kind="cv"
+            period="2090–2095"
+            title="Beispielabschluss"
+            detail="Musteruniversität"
+          />
+        </li>
+        <li>
+          <ListRow kind="cv" period="—" title="Eintrag ohne Detail" />
+        </li>
+      </ul>
+    </div>
+  </Section>
+
+  {/* --- Tile ----------------------------------------------------------- */}
+  <Section labelledby="dev-tiles" layout="stacked" space="compact" class="gap-6">
+    <h2 id="dev-tiles" class={heading({ level: 'section' })}>
+      Tile
+    </h2>
+    <p class={specimen}>row · two exits</p>
+    <ul role="list" class="grid gap-3 md:grid-cols-2 md:gap-6">
+      <li>
+        <Tile href={talksHref} title="Erster Ausgang" meta="Eine Zeile Meta" />
+      </li>
+      <li>
+        <Tile href={home} title="Zweiter Ausgang" />
+      </li>
+    </ul>
+
+    <p class={specimen}>card · media: logo placeholder / logo slot, external</p>
+    <ul role="list" class="grid gap-3 md:grid-cols-3 md:gap-5">
+      <li>
+        <Tile
+          kind="card"
+          logo
+          locale={locale}
+          href={doi}
+          title="„Ein Beitragstitel als Zitat“"
+          meta="Beispielsender · Interview · Sep 2099"
+        />
+      </li>
+      <li>
+        <Tile
+          kind="card"
+          logo
+          locale={locale}
+          href={orcid}
+          title="Beitrag mit Logo im Slot"
+          meta="Beispielzeitung · Gastkommentar"
+        >
+          <svg slot="logo" viewBox="0 0 80 20" class="h-full w-auto text-text-2" aria-hidden="true">
+            <rect x="0" y="4" width="12" height="12" rx="2" fill="currentColor" />
+            <rect x="18" y="7" width="62" height="6" rx="2" fill="currentColor" />
+          </svg>
+        </Tile>
+      </li>
+      <li>
+        <Tile
+          kind="card"
+          locale={locale}
+          href={orcid}
+          title="Karte ohne Logo"
+          meta="Nur Titel und Meta"
+        />
+      </li>
+    </ul>
+
+    <p class={specimen}>card · contact: mail with subject / internal / anchor</p>
+    <ul role="list" class="grid gap-3 md:grid-cols-3 md:gap-6">
+      <li>
+        <Tile
+          kind="card"
+          locale={locale}
+          href={`mailto:${email}?subject=Beispiel`}
+          eyebrow="Anliegen eins"
+          title="Mail mit vorausgefülltem Betreff"
+          action="Mail schreiben"
+        />
+      </li>
+      <li>
+        <Tile
+          kind="card"
+          locale={locale}
+          href={talksHref}
+          eyebrow="Anliegen zwei"
+          title="Weiter zu einer Seite"
+          action="Zur Seite"
+        />
+      </li>
+      <li>
+        <Tile
+          kind="card"
+          locale={locale}
+          href={`${researchHref}#stress-im-alltag`}
+          eyebrow="Anliegen drei"
+          title="Weiter zu einem Abschnitt"
+          action="Zum Abschnitt"
+        />
+      </li>
+    </ul>
+  </Section>
+
+  {/* --- Callout -------------------------------------------------------- */}
+  <Section labelledby="dev-callout" layout="split" space="compact">
+    <h2 id="dev-callout" class={heading({ level: 'section' })}>
+      Callout
+    </h2>
+    <div class="flex flex-col gap-4">
+      <p class={specimen}>default label · custom label</p>
+      <Callout locale={locale}>
+        Ein Satz Klartext unter einer Veröffentlichung. Höchstens zwei Sätze.
+      </Callout>
+      <Callout locale="en">The English label.</Callout>
+      <Callout locale={locale} label="Eigenes Label">
+        Mit eigenem Label.
+      </Callout>
+    </div>
+  </Section>
+
+  {/* --- Section -------------------------------------------------------- */}
+  <Section labelledby="dev-section" layout="split" surface="bone">
+    <h2 id="dev-section" class={heading({ level: 'section' })}>
+      Section · split · bone
+    </h2>
+    <p class="text-body text-text-2">
+      Titel links auf fünf Spalten, Prosa rechts auf sieben. Auf Telefonen untereinander.
+    </p>
+  </Section>
+  <Section layout="label" space="compact">
+    <p class={heading({ level: 'row' })}>label · paper</p>
+    <p class="text-body text-text-2">Label links auf drei Spalten, Liste rechts auf neun.</p>
+  </Section>
+  <Section layout="stacked" space="read" surface="lilac">
+    <p class={heading({ level: 'row' })}>stacked · lilac · read</p>
+    <p class="text-body text-text-2">Die Tint-Fläche kommt auf der ganzen Site genau einmal vor.</p>
+  </Section>
+  <Section layout="stacked" space="compact">
+    <p class={specimen}>framed · two splitGrid rows between hairlines</p>
+  </Section>
+  <Section layout="framed">
+    <div class={splitGrid}>
+      <p class={heading({ level: 'row' })}>Erste Zeile im Rahmen</p>
+      <p class="text-body text-text-2">
+        Der Rahmen bringt sein eigenes Padding mit; der Abstand drumherum kommt von den Nachbarn.
+      </p>
+    </div>
+    <div class={splitGrid}>
+      <Portrait locale={locale} ratio="16/9" compact label="grafik — beispiel" />
+      <p class="text-body text-text-2">Zweite Zeile im Rahmen.</p>
+    </div>
+  </Section>
+
+  {/* --- Portrait ------------------------------------------------------- */}
+  <Section labelledby="dev-portrait" layout="stacked" class="gap-6">
+    <h2 id="dev-portrait" class={heading({ level: 'section' })}>
+      Portrait
+    </h2>
+    <p class={specimen}>placeholder · 4/5 default · 16/9 with label · 1/1 compact</p>
+    <div class="grid items-start gap-6 md:grid-cols-3">
+      <Portrait locale={locale} />
+      <Portrait locale={locale} ratio="16/9" label="grafik — beispiel, 16:9" />
+      <Portrait locale={locale} ratio="1/1" compact label="pressefoto — 1:1" />
+    </div>
+    <p class={specimen}>
+      src · picture with AVIF and WebP · 4/5 · 16/9 · 1/1 (generated sample, not a photo)
+    </p>
+    {sample && (
+      <div class="grid items-start gap-6 md:grid-cols-3">
+        <Portrait
+          locale={locale}
+          src={sample}
+          alt="Beispielbild: zwei Farbflächen, diagonal geteilt"
+          sizes="(min-width: 768px) 33vw, 100vw"
+        />
+        <Portrait
+          locale={locale}
+          ratio="16/9"
+          src={sample}
+          alt="Dasselbe Beispielbild, auf 16:9 zugeschnitten"
+          sizes="(min-width: 768px) 33vw, 100vw"
+        />
+        <Portrait
+          locale={locale}
+          ratio="1/1"
+          src={sample}
+          alt=""
+          sizes="(min-width: 768px) 33vw, 100vw"
+        />
+      </div>
+    )}
+  </Section>
+
+  {/* --- Band ----------------------------------------------------------- */}
+  <Section labelledby="dev-band" layout="stacked" space="none" class="pt-14 md:pt-24">
+    <h2 id="dev-band" class={heading({ level: 'section' })}>
+      Band
+    </h2>
+    <p class:list={['pb-6 pt-2', specimen]}>Home only · reads news.yaml</p>
+  </Section>
+  <Band locale={locale} />
+  <div class="h-14 md:h-24"></div>
+</SiteChrome>

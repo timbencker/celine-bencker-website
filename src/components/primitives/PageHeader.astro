@@ -1,0 +1,60 @@
+---
+import { cva, type VariantProps } from 'class-variance-authority';
+
+import { cn } from '../../lib/cn';
+import { container } from '../../lib/styles';
+
+/**
+ * The subpage masthead — `pageHeader` in _Komponenten, as the boards draw it:
+ * on paper inside the site header (which supplies the hairline), 64px above
+ * and 72px below from md, 40/40 on phones.
+ *
+ * Put it in the layout's `masthead` slot. The default slot is the title side
+ * (a PageTitle, plus anything that belongs above it, like the 404's small
+ * error label). The `aside` slot carries what the page needs next to the
+ * title: the PDF button (CV), the large address (Contact), the register
+ * toggle (Research), profile links (Publications). No button rows,
+ * statistics or eyebrow texts.
+ *
+ * - `split` — title and aside on the "Header 7/5" grid, bottoms aligned.
+ *   `ratio="6/6"` is for Talks & Media, whose board splits the header evenly.
+ * - `compact` — title and aside on one line, baselines aligned, no intro
+ *   (Publications). Its phone padding is the board's tighter 32/36.
+ *
+ * On phones everything stacks: title, then aside, left-aligned.
+ */
+const header = cva('flex flex-col gap-5 pb-10 pt-10 md:gap-16 md:pb-[72px] md:pt-16', {
+  variants: {
+    layout: {
+      split: 'md:grid md:items-end',
+      compact: 'pb-9 pt-8 md:flex-row md:items-baseline md:justify-between',
+    },
+    ratio: {
+      '7/5': '',
+      '6/6': '',
+    },
+  },
+  compoundVariants: [
+    { layout: 'split', ratio: '7/5', class: 'md:grid-cols-[minmax(0,7fr)_minmax(0,5fr)]' },
+    { layout: 'split', ratio: '6/6', class: 'md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]' },
+  ],
+  defaultVariants: { layout: 'split', ratio: '7/5' },
+});
+
+type Props = VariantProps<typeof header> & {
+  class?: string;
+};
+
+const { layout, ratio, class: className } = Astro.props;
+---
+
+<div class={cn(container, header({ layout, ratio }), className)}>
+  <div class="flex min-w-0 flex-col gap-5">
+    <slot />
+  </div>
+  {Astro.slots.has('aside') && (
+    <div class="flex min-w-0 flex-col items-start gap-2 md:items-end md:gap-2.5 md:text-right">
+      <slot name="aside" />
+    </div>
+  )}
+</div>

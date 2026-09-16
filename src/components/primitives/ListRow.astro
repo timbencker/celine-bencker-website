@@ -1,55 +1,311 @@
 ---
 import { cva } from 'class-variance-authority';
 
+import type { Locale } from '../../i18n/config';
+import { t } from '../../i18n/ui';
 import { cn } from '../../lib/cn';
-import { arrow } from '../../lib/styles';
+import { arrow, EXTERNAL_GLYPH, heading } from '../../lib/styles';
+import ExternalLink from './ExternalLink.astro';
+import { dateParts } from './format';
+import { linkKind } from './links';
 
 /**
  * The workhorse row: hairline on top, content, arrow — `listRow` in
- * _Komponenten. The whole row is the link and its title turns sage on hover.
- * Hairline above every row including the first, never below the last.
+ * _Komponenten. Hairline above every row including the first, never below the
+ * last. Rows are list items: wrap each in `<li>` inside `<ul role="list">`.
+ * Never cards for lists of text.
  *
- * Only `default` is built so far (research lines on Home). `date`,
- * `publication` and `cv` arrive with the pages that use them.
+ * - `default` — research lines on Home, the 404's "Weiter zu". Title 28px and
+ *   a sentence; the whole row is the link and turns sage on hover.
+ * - `static` — the same row without link or arrow, title 22px ("Was ich
+ *   mitbringe" on CV).
+ * - `date` — talks. Day large, month and year beside it, title, meta lines,
+ *   arrow. With `href` the whole row is the link; without, it is plain text.
+ * - `publication` — publications and the research methods. Title 22px and a
+ *   sub line; the link (DOI, paper) sits on the right and is the only link.
+ *   Put a Callout in the default slot for the plain summary. `status` takes
+ *   the link's place for unpublished work. `columns` sets title, description
+ *   and link side by side, as the Methods list on Research does.
+ * - `cv` — period left (130px), entry right: bold title, then detail. From md
+ *   the rows have no hairline and sit 20px apart — give their list
+ *   `class="flex flex-col md:gap-5"`, as on 7b. On phones they are hairline
+ *   rows with the period above.
+ *
+ * `edge` closes a list flush with a heading beside it (`ui-HairlineRow`):
+ * `first` drops the top hairline and padding, `last` the bottom padding. Both
+ * apply from md only; on phones every row keeps its hairline, as on 7b.
  */
-const row = cva(
-  'group grid items-start border-t border-line text-ink transition-colors hover:text-sage',
-  {
-    variants: {
-      kind: {
-        default:
-          'grid-cols-[minmax(0,1fr)_20px] gap-4 py-5 md:grid-cols-[minmax(0,1fr)_28px] md:gap-8 md:py-8',
-      },
+const row = cva('', {
+  variants: {
+    kind: {
+      // Unchanged since Home; its HTML is compared byte for byte.
+      default:
+        'group grid items-start border-t border-line text-ink transition-colors hover:text-sage grid-cols-[minmax(0,1fr)_20px] gap-4 py-5 md:grid-cols-[minmax(0,1fr)_28px] md:gap-8 md:py-8',
+      static:
+        'flex flex-col gap-1.5 border-t border-line pb-[18px] pt-[18px] text-ink md:gap-2 md:pb-7 md:pt-7',
+      date: 'flex flex-col gap-2.5 border-t border-line pb-6 pt-6 text-ink md:grid md:grid-cols-[200px_minmax(0,1fr)_280px_28px] md:items-center md:gap-8 md:pb-9 md:pt-9',
+      publication:
+        'flex flex-col gap-2 border-t border-line pb-[22px] pt-[22px] text-ink md:grid md:grid-cols-[minmax(0,1fr)_80px] md:items-start md:gap-8 md:pb-8 md:pt-8',
+      cv: 'flex flex-col gap-0.5 border-t border-line pb-3.5 pt-3.5 text-[16px] leading-[1.45] text-ink md:grid md:grid-cols-[130px_minmax(0,1fr)] md:items-baseline md:gap-6 md:border-t-0 md:pb-0 md:pt-0 md:text-body',
     },
-    defaultVariants: { kind: 'default' },
   },
-);
+  defaultVariants: { kind: 'default' },
+});
 
-interface Props {
-  href: string;
-  title: string;
-  sub?: string;
+/** Applied after every other row class, so it wins over per-row padding. */
+const edge = cva('', {
+  variants: {
+    edge: {
+      first: 'md:border-t-0 md:pt-0',
+      last: 'md:pb-0',
+    },
+  },
+});
+
+/** The whole row as a link: sage on hover, arrow nudging right. */
+const linked = 'group transition-colors hover:text-sage';
+
+interface Base {
+  edge?: 'first' | 'last';
   class?: string;
 }
 
-const { href, title, sub, class: className } = Astro.props;
+interface DefaultRow extends Base {
+  kind?: 'default';
+  /** An internal page or anchor. */
+  href: string;
+  title: string;
+  sub?: string;
+}
+
+interface StaticRow extends Base {
+  kind: 'static';
+  title: string;
+  sub?: string;
+}
+
+interface DateRow extends Base {
+  kind: 'date';
+  /** A calendar date, read in UTC (as YAML dates are). */
+  date: Date;
+  /** Formats the date and speaks the link warning. */
+  locale: Locale;
+  title: string;
+  /** "Venue · City", "Format" — one line each from md, joined by " · " on phones. */
+  meta?: string[];
+  /** Internal → arrow; external → ↗ and a new tab. Omit for a plain row. */
+  href?: string;
+}
+
+interface PublicationRow extends Base {
+  kind: 'publication';
+  locale: Locale;
+  title: string;
+  /** Authors and venue. Use the `sub` slot instead to set the own name in `<strong>`. */
+  sub?: string;
+  /** The DOI or paper URL. It always leaves the site. */
+  href?: string;
+  /** Text of the link. Defaults to "DOI". */
+  linkLabel?: string;
+  /** Where an unpublished manuscript stands ("in Begutachtung"), in the link's place. */
+  status?: string;
+  /** Title, description and link side by side — the Methods list (10b). */
+  columns?: boolean;
+}
+
+interface CvRow extends Base {
+  kind: 'cv';
+  /** Free text: "seit 2023", "2020–2023". */
+  period: string;
+  title: string;
+  /** Follows the title after a comma: institution, place. */
+  detail?: string;
+}
+
+type Props = DefaultRow | StaticRow | DateRow | PublicationRow | CvRow;
+
+const props = Astro.props;
+const kind = props.kind ?? 'default';
+const rowClass = (extra?: string | false) =>
+  cn(row({ kind }), extra, props.edge && edge({ edge: props.edge }), props.class);
 ---
 
-<a href={href} class={cn(row(), className)}>
-  <span class="flex flex-col gap-1.5 md:gap-2.5">
-    <span class="text-[22px] font-bold leading-[1.15] tracking-[-0.03em] md:text-h3 md:leading-[1.1]">
-      {title}
-    </span>
-    {sub && (
-      <span class="text-[15px] leading-[1.45] text-text-2 md:max-w-[56ch] md:text-body md:leading-[1.5]">
-        {sub}
+{props.kind === undefined || props.kind === 'default' ? (
+  <a href={props.href} class={rowClass()}>
+    <span class="flex flex-col gap-1.5 md:gap-2.5">
+      <span class="text-[22px] font-bold leading-[1.15] tracking-[-0.03em] md:text-h3 md:leading-[1.1]">
+        {props.title}
       </span>
+      {props.sub && (
+        <span class="text-[15px] leading-[1.45] text-text-2 md:max-w-[56ch] md:text-body md:leading-[1.5]">
+          {props.sub}
+        </span>
+      )}
+    </span>
+    <span
+      class={cn(arrow, 'pt-0.5 text-[20px] leading-none md:pt-1 md:text-[24px]')}
+      aria-hidden="true"
+    >
+      →
+    </span>
+  </a>
+) : props.kind === 'static' ? (
+  <div class={rowClass()}>
+    <span class={heading({ level: 'lookup' })}>{props.title}</span>
+    {props.sub && (
+      <span class="text-[15px] leading-[1.5] text-text-2 md:text-body">{props.sub}</span>
     )}
-  </span>
-  <span
-    class={cn(arrow, 'pt-0.5 text-[20px] leading-none md:pt-1 md:text-[24px]')}
-    aria-hidden="true"
-  >
-    →
-  </span>
-</a>
+  </div>
+) : props.kind === 'date' ? (
+  (() => {
+    const { date, locale, title, meta = [], href } = props;
+    const parts = dateParts(date, locale);
+    const target = href ? linkKind(href) : null;
+    if (target === 'mail') {
+      throw new Error(`A date row cannot link to mail (${href}).`);
+    }
+    const Tag = href ? 'a' : 'div';
+    return (
+      <Tag
+        href={href}
+        target={target === 'external' ? '_blank' : undefined}
+        rel={target === 'external' ? 'noopener' : undefined}
+        class={rowClass(Boolean(href) && linked)}
+      >
+        <time datetime={parts.iso} class="flex items-baseline gap-2 md:gap-2.5">
+          <span
+            class="text-[40px] font-bold leading-[0.9] tracking-[-0.05em] md:text-[64px]"
+            aria-hidden="true"
+          >
+            {parts.day}
+          </span>
+          <span class="text-meta text-text-2 md:text-[17px]" aria-hidden="true">
+            {parts.monthYear}
+          </span>
+          <span class="visually-hidden">{parts.long}</span>
+        </time>
+        <span class="text-[20px] font-bold leading-[1.2] tracking-[-0.03em] md:text-h3 md:leading-[1.15]">
+          {title}
+          {target === 'external' && (
+            <span class="md:hidden" aria-hidden="true">
+              {' '}
+              {EXTERNAL_GLYPH}
+            </span>
+          )}
+        </span>
+        {meta.length > 0 && (
+          <span class="text-[14px] leading-[1.5] text-text-2 md:text-[16px]">
+            {meta.map((line, i) => (
+              <>
+                {i > 0 && (
+                  <>
+                    <span class="md:hidden"> · </span>
+                    <br class="hidden md:inline" />
+                  </>
+                )}
+                {line}
+              </>
+            ))}
+          </span>
+        )}
+        {target === 'internal' && (
+          <span
+            class={cn(arrow, 'hidden text-[24px] leading-none md:col-start-4 md:inline-block')}
+            aria-hidden="true"
+          >
+            →
+          </span>
+        )}
+        {target === 'external' && (
+          <>
+            <span
+              class="hidden text-[24px] leading-none md:col-start-4 md:inline-block"
+              aria-hidden="true"
+            >
+              {EXTERNAL_GLYPH}
+            </span>
+            <span class="visually-hidden">{t(locale, 'link.newTab')}</span>
+          </>
+        )}
+      </Tag>
+    );
+  })()
+) : props.kind === 'publication' ? (
+  (() => {
+    const { locale, title, sub, href, linkLabel = 'DOI', status, columns } = props;
+    if (href && linkKind(href) !== 'external') {
+      throw new Error(`A publication links out (DOI, paper); got "${href}".`);
+    }
+    const hasSub = Boolean(sub) || Astro.slots.has('sub');
+    // In `columns` the link keeps the third column even when a row has no description.
+    const asideColumn = columns && 'md:col-start-3 md:text-right';
+    const aside = href ? (
+      <ExternalLink
+        href={href}
+        locale={locale}
+        class={cn(
+          'self-start text-[14px] font-semibold text-sage transition-colors hover:text-ink md:self-auto md:justify-self-end md:pt-1 md:text-meta',
+          asideColumn,
+        )}
+      >
+        {linkLabel}
+      </ExternalLink>
+    ) : status ? (
+      <span
+        class={cn(
+          'text-[13px] text-text-3 md:justify-self-end md:pt-1 md:text-[14px]',
+          asideColumn,
+        )}
+      >
+        {status}
+      </span>
+    ) : null;
+
+    if (columns) {
+      return (
+        <div
+          class={rowClass(
+            'gap-1.5 pb-[18px] pt-[18px] md:grid-cols-[minmax(0,4fr)_minmax(0,6fr)_200px] md:gap-10 md:pb-[26px] md:pt-[26px]',
+          )}
+        >
+          <span class={heading({ level: 'lookup' })}>{title}</span>
+          {hasSub && (
+            <span class="text-[14px] leading-[1.5] text-text-2 md:text-[16px]">
+              <slot name="sub">{sub}</slot>
+            </span>
+          )}
+          {aside}
+        </div>
+      );
+    }
+
+    return (
+      <div
+        class={rowClass(!href && status && 'md:grid-cols-[minmax(0,1fr)_140px] md:pb-7 md:pt-7')}
+      >
+        <div class={cn('flex min-w-0 flex-col gap-2 md:gap-2.5', status && 'md:gap-1.5')}>
+          <span class={heading({ level: 'lookup' })}>{title}</span>
+          {hasSub && (
+            <span class="text-[13px] leading-[1.5] text-text-3 md:text-[14px] md:leading-[1.55] [&_strong]:text-text-2">
+              <slot name="sub">{sub}</slot>
+            </span>
+          )}
+          {Astro.slots.has('default') && (
+            <div class="mt-3.5">
+              <slot />
+            </div>
+          )}
+        </div>
+        {aside}
+      </div>
+    );
+  })()
+) : props.kind === 'cv' ? (
+  <div class={rowClass()}>
+    <span class="text-[13px] text-text-3 md:text-meta">{props.period}</span>
+    <span>
+      {/* One expression, so no template whitespace lands before the comma. */}
+      {[<strong class="font-bold">{props.title}</strong>, props.detail && `, ${props.detail}`]}
+    </span>
+  </div>
+) : null}
