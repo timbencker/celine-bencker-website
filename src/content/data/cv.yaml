@@ -1,2 +1,221 @@
-# Lebenslauf-Einträge. Wird mit der Lebenslauf-Seite gefüllt.
-[]
+# Lebenslauf-Einträge (Board 7b). Sprachneutral gepflegt, nur Titel und Details
+# sind übersetzt.
+#
+# Regeln
+# - Nur Belegtes: Quelle ist Celines öffentliches ORCID-Profil (0000-0002-3802-1339),
+#   Stand der Abfrage 2026-09-16. Jeder Eintrag nennt seine Quelle (put-code).
+# - Daten in der Genauigkeit, die ORCID angibt: 2019, 2022-10 oder 2023-10-01.
+#   Ohne `end` schreibt die Seite „seit …“.
+# - Alles andere ist ein Platzhalter: `placeholder: true`, Titel beginnt mit
+#   „PLATZHALTER –“ / „PLACEHOLDER –“. Das Beispiel aus dem Design steht als
+#   Kommentar daneben – es ist NICHT geprüft und darf so nicht übernommen werden.
+# - Publikationen stehen nicht hier: Die Seite liest sie aus publications.yaml.
+# - Englisch ist der ORCID-Wortlaut; Deutsch ist übersetzt (# DE: …).
+
+# --- Ausbildung ---------------------------------------------------------------
+
+# Design-Beispiel (nicht geprüft): „seit 2023 · Doktorat Psychologie, Universität Wien“.
+# ORCID führt eine Ausbildung an der Universität Wien ohne Abschluss und ohne
+# Datum (Quelle u:cris, put-code 25608525) – vermutlich das Doktorat. Bitte bestätigen.
+- id: doktorat
+  section: education
+  order: 0
+  placeholder: true
+  title:
+    de: PLATZHALTER – Doktorat mit Fach, Universität und Beginn eintragen
+    en: PLACEHOLDER – Add the doctorate with subject, university and start
+
+# orcid-educations.json, put-code 17417939: „Master of Science“, Psychology,
+# Universität Wien, 2019–2022.
+# DE: „Psychology“ → „Psychologie“. EN: „University of Vienna“ ist der Name,
+# unter dem ORCID dieselbe Universität sonst führt (ROR 03prydq77).
+# Design-Beispiel „2020–2023 · MSc Psychologie, Universität Salzburg“ ist FALSCH.
+- id: msc-psychologie
+  section: education
+  order: 1
+  start: 2019
+  end: 2022
+  title:
+    de: MSc Psychologie
+    en: MSc Psychology
+  detail:
+    de: Universität Wien
+    en: University of Vienna
+
+# orcid-educations.json, put-code 17417945: „Bachelor of Science“, Psychology,
+# Universität Wien, 2015–2019.
+# Design-Beispiel „2017–2020 · BSc Psychologie, Universität Salzburg“ ist FALSCH.
+- id: bsc-psychologie
+  section: education
+  order: 2
+  start: 2015
+  end: 2019
+  title:
+    de: BSc Psychologie
+    en: BSc Psychology
+  detail:
+    de: Universität Wien
+    en: University of Vienna
+
+# --- Positionen ---------------------------------------------------------------
+
+# orcid-employments.json, put-code 21786594: „ÖAW Praedoc“, Department of
+# Clinical and Health Psychology, University of Vienna, 2023-10-01 bis 2026-09-30.
+# Die Stelle endet am 30.09.2026. Die Seite zeigt den Zeitraum, nicht „seit“ –
+# so bleibt der Eintrag auch nach dem Enddatum richtig. Danach bitte ergänzen,
+# wie es weitergeht (und den Untertitel „ÖAW DOC-Fellow“ in site.yaml prüfen).
+# DE: „ÖAW Praedoc“ → „ÖAW-Praedoc“ (Bindestrich nach deutscher Schreibung);
+# „Department of Clinical and Health Psychology“ → „Institut für Klinische und
+# Gesundheitspsychologie“ (so im Design); „University of Vienna“ → „Universität Wien“.
+# Design-Beispiel: „seit 2023 · Prae-Doc-Forscherin, Institut für Klinische und
+# Gesundheitspsychologie, Universität Wien“.
+- id: oeaw-praedoc
+  section: positions
+  order: 1
+  start: 2023-10-01
+  end: 2026-09-30
+  title:
+    de: ÖAW-Praedoc
+    en: ÖAW Praedoc
+  detail:
+    de: Institut für Klinische und Gesundheitspsychologie, Universität Wien
+    en: Department of Clinical and Health Psychology, University of Vienna
+
+# orcid-employments.json, put-code 20241267: „Study Coordinator“, 3rd Medical
+# Department for Hematology and Oncology, Hanusch Hospital, Vienna,
+# 2022-10 bis 2023-07-31. Nicht im Design.
+# DE: „Study Coordinator“ → „Studienkoordinatorin“; „3rd Medical Department for
+# Hematology and Oncology“ → „3. Medizinische Abteilung für Hämatologie und
+# Onkologie“ (wörtlich – den offiziellen deutschen Namen der Abteilung bitte
+# bestätigen); „Hanusch Hospital“ → „Hanusch-Krankenhaus“; „Vienna“ → „Wien“.
+- id: hanusch-studienkoordination
+  section: positions
+  order: 2
+  start: 2022-10
+  end: 2023-07-31
+  title:
+    de: Studienkoordinatorin
+    en: Study Coordinator
+  detail:
+    de: 3. Medizinische Abteilung für Hämatologie und Onkologie, Hanusch-Krankenhaus, Wien
+    en: 3rd Medical Department for Hematology and Oncology, Hanusch Hospital, Vienna
+
+# Design-Beispiel (nicht geprüft): „2023 · Forschungsaufenthalt, Uppsala University (Platzhalter)“.
+# Kein Forschungsaufenthalt in ORCID.
+- id: forschungsaufenthalt
+  section: positions
+  order: 3
+  placeholder: true
+  title:
+    de: PLATZHALTER – Forschungsaufenthalt mit Ort und Zeitraum eintragen
+    en: PLACEHOLDER – Add the research stay with place and dates
+
+# --- Förderungen & Preise -----------------------------------------------------
+
+# orcid-fundings.json, put-code 1687467: Typ „salary-award“, Austrian Academy of
+# Sciences, 2023-10 bis 2026-09. Projekttitel: „Investigating psycho-biological
+# interactions in premenstrual symptomatology and stress during daily life“.
+# „DOC“ stammt aus dem Brief („ÖAW DOC-Fellow“, site.yaml).
+# DE: „Austrian Academy of Sciences“ → „Österreichische Akademie der
+# Wissenschaften“; EN „DOC Fellowship“ passt zu „ÖAW DOC Fellow“ in site.yaml.
+# Design-Beispiel „seit 2024 · DOC-Stipendium, …“ – das Jahr ist FALSCH (ORCID: 2023-10).
+- id: oeaw-doc
+  section: funding
+  order: 1
+  start: 2023-10
+  end: 2026-09
+  title:
+    de: DOC-Stipendium
+    en: DOC Fellowship
+  detail:
+    de: Österreichische Akademie der Wissenschaften (ÖAW)
+    en: Austrian Academy of Sciences (ÖAW)
+
+# Design-Beispiel: „— · Preis / Stipendium eintragen“. Kein Preis in ORCID.
+- id: preis
+  section: funding
+  order: 2
+  placeholder: true
+  title:
+    de: PLATZHALTER – Preis oder Stipendium eintragen
+    en: PLACEHOLDER – Add a prize or grant
+
+# --- Vorträge & Poster ----------------------------------------------------------
+
+# Design-Beispiel (nicht geprüft): „2026 · Vortrag, DGPs Kongress, Berlin (Platzhalter)“.
+# Belegt in orcid-works.json, aber hier noch nicht übernommen: ein Vortrag beim
+# International Congress of Behavioral Medicine (ICBM 2025, 6. August 2025) und
+# ein Abstract zur ISSAC-Studie im International Journal of Behavioral Medicine
+# (2025). Beides gehört auf die Seite „Vorträge & Medien“; sobald es dort in
+# talks.yaml steht, kann diese Gruppe daraus abgeleitet werden.
+- id: vortrag
+  section: talks
+  order: 1
+  placeholder: true
+  title:
+    de: PLATZHALTER – Vortrag mit Anlass, Ort und Jahr eintragen
+    en: PLACEHOLDER – Add a talk with event, place and year
+
+# Design-Beispiel (nicht geprüft): „2025 · Poster, ISPNE, (Platzhalter)“.
+- id: poster
+  section: talks
+  order: 2
+  placeholder: true
+  title:
+    de: PLATZHALTER – Poster mit Anlass und Jahr eintragen
+    en: PLACEHOLDER – Add a poster with event and year
+
+# --- Lehre --------------------------------------------------------------------
+
+# Design-Beispiel (nicht geprüft): „seit 2024 · Übung Klinische Psychologie,
+# Universität Wien (Platzhalter)“. Keine Lehre in ORCID.
+- id: lehre
+  section: teaching
+  order: 1
+  placeholder: true
+  title:
+    de: PLATZHALTER – Lehrveranstaltung mit Zeitraum eintragen
+    en: PLACEHOLDER – Add a course with dates
+
+# --- Service & Mitgliedschaften -------------------------------------------------
+
+# Peer Review: orcid-peer-reviews.json, eine Zeile je Gutachten (Abschlussjahr).
+# Die Seite fasst alle zu einer Zeile „Reviewerin für Fachzeitschriften“ zusammen.
+# Zeitschriftennamen über die Crossref-Journal-API zur ISSN
+# (https://api.crossref.org/journals/<issn>), abgerufen 2026-09-16.
+# Design-Beispiel: „laufend · Reviewerin für Fachzeitschriften, (Journals eintragen)“.
+
+# issn:0306-4530, Elsevier: fünf Gutachten, alle 2025.
+- id: review-psychoneuroendocrinology
+  section: review
+  order: 1
+  journal: Psychoneuroendocrinology
+  issn: 0306-4530
+  years: [2025, 2025, 2025, 2025, 2025]
+
+# issn:1472-1465 (Online-ISSN; Print 0007-1250), über Web of Science: 2025 und 2024.
+- id: review-british-journal-of-psychiatry
+  section: review
+  order: 2
+  journal: The British Journal of Psychiatry
+  issn: 1472-1465
+  years: [2025, 2024]
+
+# issn:1878-531X (Online-ISSN; Print 1016-9040), Hogrefe, über Web of Science:
+# 2023 und 2022.
+- id: review-european-psychologist
+  section: review
+  order: 3
+  journal: European Psychologist
+  issn: 1878-531X
+  years: [2023, 2022]
+
+# Design-Beispiel (nicht geprüft): „— · Fachgesellschaften, z. B. DGPs, ISPNE“.
+# Keine Mitgliedschaft in ORCID.
+- id: mitgliedschaften
+  section: service
+  order: 4
+  placeholder: true
+  title:
+    de: PLATZHALTER – Mitgliedschaften in Fachgesellschaften eintragen
+    en: PLACEHOLDER – Add memberships in professional societies
