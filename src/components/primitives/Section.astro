@@ -1,0 +1,59 @@
+---
+import { cva, type VariantProps } from 'class-variance-authority';
+
+import { cn } from '../../lib/cn';
+import { container } from '../../lib/styles';
+
+/**
+ * The container of every block below the header — `section` in _Komponenten.
+ *
+ * Surfaces alternate paper → bone → paper. Paper paints nothing of its own, so
+ * the decorative background shows through, as it does on the boards. The
+ * lilac tint appears exactly once on the whole site (Talks, "Für Redaktionen").
+ *
+ * `split` is title + prose (5/7), `label` is label + list (3/9), `stacked` is
+ * for lists and tiles. On phones every layout is one column.
+ */
+const surface = cva('', {
+  variants: {
+    surface: { paper: '', bone: 'bg-bone', lilac: 'bg-lilac-tint' },
+  },
+  defaultVariants: { surface: 'paper' },
+});
+
+const body = cva(container, {
+  variants: {
+    layout: {
+      split:
+        'grid gap-6 md:grid-cols-12 md:gap-16 md:[&>*:first-child]:col-span-5 md:[&>*:last-child]:col-span-7',
+      label:
+        'grid gap-6 md:grid-cols-12 md:gap-12 md:[&>*:first-child]:col-span-3 md:[&>*:last-child]:col-span-9',
+      stacked: 'flex flex-col',
+    },
+    space: {
+      compact: 'py-14 md:py-24',
+      normal: 'py-14 md:py-28',
+      read: 'py-14 md:py-32',
+      /** For the few sections whose spacing the board sets by hand. */
+      none: '',
+    },
+  },
+  defaultVariants: { layout: 'split', space: 'normal' },
+});
+
+type Props = VariantProps<typeof surface> &
+  VariantProps<typeof body> & {
+    /** A `section` needs a heading to reference; without one this is a `div`. */
+    labelledby?: string;
+    class?: string;
+  };
+
+const { surface: tone, layout, space, labelledby, class: className } = Astro.props;
+const Tag = labelledby ? 'section' : 'div';
+---
+
+<Tag class={surface({ surface: tone })} aria-labelledby={labelledby}>
+  <div class={cn(body({ layout, space }), className)}>
+    <slot />
+  </div>
+</Tag>

@@ -1,0 +1,78 @@
+---
+import { cva } from 'class-variance-authority';
+
+import { LOCALE_LABELS, LOCALES, type Locale } from '../../i18n/config';
+import { pageHref, type ResolvedPage } from '../../i18n/pages';
+import { t } from '../../i18n/ui';
+
+/**
+ * DE / EN, always in that order. Leads to the same page in the other language;
+ * where no translation exists that language is shown disabled rather than
+ * linked somewhere else (docs/i18n-policy.md). Every target holds the 44px
+ * floor. Short codes on screen, full language names for screen readers.
+ */
+interface Props {
+  locale: Locale;
+  counterpart: ResolvedPage | null;
+}
+
+const { locale, counterpart } = Astro.props;
+
+const item = cva('inline-flex min-h-[44px] items-center px-[7px] transition-colors', {
+  variants: {
+    state: {
+      current: 'font-bold text-ink',
+      other: 'font-medium text-text-3 hover:text-ink',
+      unavailable: 'font-medium text-text-3 line-through',
+    },
+  },
+});
+
+const underline = (on: boolean) =>
+  `border-b-[1.5px] pb-[3px] ${on ? 'border-ink' : 'border-transparent'}`;
+---
+
+<div
+  role="group"
+  aria-label={t(locale, 'lang.label')}
+  class="inline-flex items-center gap-[2px] text-[14px]"
+>
+  {LOCALES.map((l) => {
+    const label = (
+      <>
+        <span aria-hidden="true">{l.toUpperCase()}</span>
+        <span class="visually-hidden">{LOCALE_LABELS[l]}</span>
+      </>
+    );
+
+    if (l === locale) {
+      return (
+        <span class={item({ state: 'current' })} aria-current="true">
+          <span class={underline(true)}>{label}</span>
+        </span>
+      );
+    }
+
+    if (counterpart) {
+      return (
+        <a
+          href={pageHref(counterpart)}
+          lang={l}
+          hreflang={l}
+          data-language-choice={l}
+          class={item({ state: 'other' })}
+        >
+          <span class={underline(false)}>{label}</span>
+        </a>
+      );
+    }
+
+    return (
+      <span class={item({ state: 'unavailable' })} aria-disabled="true">
+        <span lang={l}>{label}</span>
+        {/* The reason is in the page's language, so it stays outside the lang span. */}
+        <span class="visually-hidden"> — {t(locale, 'lang.unavailable')}</span>
+      </span>
+    );
+  })}
+</div>

@@ -1,19 +1,27 @@
 ---
+import SiteFooter from '../components/primitives/SiteFooter.astro';
 import SiteNav from '../components/primitives/SiteNav.astro';
 import { LOCALES } from '../i18n/config';
 import {
   backgroundPageFor,
   findCounterpart,
+  homeHref,
   navigationFor,
   pageHref,
+  resolvePage,
   type ResolvedPage,
 } from '../i18n/pages';
-import { t } from '../i18n/ui';
+import { getSite } from '../lib/site';
 import BaseLayout, { type Alternate } from './BaseLayout.astro';
 
 /**
  * Page chrome — defined once and shared by every route in both languages, so
  * the German and English versions cannot drift apart.
+ *
+ * The header sits on paper with a hairline below, as on all seven boards, and
+ * holds the navigation plus a `masthead` slot for the page's own title block.
+ * Sections below the header manage their own width, so full-width surfaces
+ * (the Home band, bone sections) can reach the edges.
  */
 interface Props {
   page: ResolvedPage;
@@ -23,8 +31,10 @@ interface Props {
 const { page, allPages } = Astro.props;
 const { locale, entry } = page;
 
+const site = await getSite();
 const nav = await navigationFor(locale, allPages);
 const counterpart = findCounterpart(page, allPages);
+const imprintHref = `${pageHref(resolvePage('contact', locale, allPages))}#impressum`;
 
 const absolute = (p: ResolvedPage) => new URL(pageHref(p), Astro.site).href;
 
@@ -44,16 +54,22 @@ const alternates: Alternate[] = LOCALES.flatMap((l) => {
   alternates={alternates}
   canonical={absolute(page)}
 >
-  <SiteNav current={page} nav={nav} counterpart={counterpart} />
+  <header class="relative border-b border-line">
+    <SiteNav
+      locale={locale}
+      current={page}
+      nav={nav}
+      counterpart={counterpart}
+      homeHref={homeHref(locale)}
+      tagline={site.tagline[locale]}
+    />
+    <slot name="masthead" />
+  </header>
 
-  <main id="main" class="mx-auto max-w-content px-gutter">
+  {/* tabindex lets the skip link move focus here; main itself is not interactive. */}
+  <main id="main" tabindex="-1" class="focus-visible:outline-none">
     <slot />
   </main>
 
-  <footer
-    class="mx-auto max-w-content px-gutter py-section-compact text-meta text-text-3"
-    aria-label={t(locale, 'footer.label')}
-  >
-    <slot name="footer" />
-  </footer>
+  <SiteFooter locale={locale} imprintHref={imprintHref} />
 </BaseLayout>

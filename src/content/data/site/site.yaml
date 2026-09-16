@@ -1,4 +1,4 @@
-# Site-wide values. YAML rather than JSON so these comments are possible.
+# Seitenweite Angaben. YAML statt JSON, damit Kommentare möglich sind.
 siteName: Celine Bencker
 tagline:
   de: Klinische & Gesundheitspsychologie
@@ -6,4 +6,23 @@ tagline:
 affiliation:
   de: Universität Wien · ÖAW DOC-Fellow
   en: University of Vienna · ÖAW DOC Fellow
+
+# Aus dem Design übernommen – vor dem Launch bestätigen.
+# Wird auf der Seite verschleiert ausgegeben (HTML-Entities, ohne JavaScript).
+email: celine.bencker@univie.ac.at
+
 orcid: 0000-0002-3802-1339
+
+# Profile im Footer, in dieser Reihenfolge. Nur Einträge mit URL erscheinen.
+# Im Design außerdem vorgesehen: Google Scholar, OSF, u:cris, LinkedIn –
+# eintragen, sobald die Adressen feststehen.
+profiles:
+  - label: ORCID
+    url: https://orcid.org/0000-0002-3802-1339
+
+credit:
+  label:
+    de: Gestaltet von Tim Bencker
+    en: Designed by Tim Bencker
+  # Portfolio-Adresse aus dem alten WordPress-Export – bestätigen.
+  url: https://timbencker.de

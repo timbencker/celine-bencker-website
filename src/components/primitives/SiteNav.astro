@@ -1,169 +1,129 @@
 ---
 import { cva } from 'class-variance-authority';
 
-import { LOCALE_LABELS, otherLocale } from '../../i18n/config';
+import type { Locale } from '../../i18n/config';
 import { pageHref, type ResolvedPage } from '../../i18n/pages';
 import { t } from '../../i18n/ui';
+import { cn } from '../../lib/cn';
+import { container } from '../../lib/styles';
+import LanguageSwitch from './LanguageSwitch.astro';
 
 /**
- * Site navigation — ported from the canvas component `ui-SiteNav`.
+ * Site navigation — the canvas component `ui-SiteNav`, with link states from
+ * the `navLink` CVA in _Komponenten. It sits on paper inside the page header,
+ * as on every board; the header supplies the hairline.
  *
- * Two layouts, one component: the desktop bar, and a mobile disclosure. The
- * mobile menu uses <details>/<summary> rather than the canvas's JS-driven
- * role="dialog", so it opens and closes with no JavaScript at all and stays
- * keyboard operable. Every hit target holds the 44px floor the canvas sets.
+ * Desktop: name left, five links and DE/EN right. Phones: name left and a
+ * "Menü" control right. The menu is a <details> disclosure, so it opens with
+ * no JavaScript, and it expands in the page flow rather than as an overlay —
+ * keyboard focus can never land on content hidden behind it. The control is
+ * positioned into the name row; the panel follows below it.
  */
 interface Props {
+  locale: Locale;
   current: ResolvedPage;
   nav: ResolvedPage[];
   counterpart: ResolvedPage | null;
+  homeHref: string;
+  tagline: string;
 }
 
-const { current, nav, counterpart } = Astro.props;
-const { locale } = current;
-const target = otherLocale(locale);
-const currentPath = pageHref(current);
+const { locale, current, nav, counterpart, homeHref, tagline } = Astro.props;
+const currentHref = pageHref(current);
+const onHome = currentHref === homeHref;
 
-// Active gets a lilac underline; inactive hovers to sage. Straight from the
-// canvas: border-bottom 1.5px #7a5fb0 / hover #3f6b52.
-const navLink = cva('pb-[2px] transition-colors', {
+const navLink = cva('pb-0.5 text-[15px] transition-opacity hover:opacity-60', {
   variants: {
-    state: {
-      active: 'border-b-[1.5px] border-lilac-text',
-      idle: 'border-b-[1.5px] border-transparent hover:text-sage',
-    },
-  },
-  defaultVariants: { state: 'idle' },
-});
-
-const langLink = cva('inline-flex min-h-[44px] items-center px-[7px] transition-colors', {
-  variants: {
-    state: {
-      current: 'font-bold text-ink',
-      other: 'font-medium text-text-3 hover:text-ink',
-      unavailable: 'font-medium text-text-3 line-through',
+    active: {
+      true: 'border-b-[1.5px] border-lilac-text',
+      false: 'border-b-[1.5px] border-transparent',
     },
   },
 });
 ---
 
-<header class="border-b border-line bg-bone text-ink">
-  {/* --- Desktop ---------------------------------------------------------- */}
-  <nav
-    class="mx-auto hidden max-w-content items-center justify-between px-gutter py-[28px] text-[15px] md:flex"
-    aria-label={t(locale, 'nav.primary')}
-  >
-    <a href={pageHref(nav[0] ?? current)} class="flex flex-col gap-[2px] text-ink">
+{/* --- Desktop --------------------------------------------------------- */}
+<nav class="hidden md:block" aria-label={t(locale, 'nav.primary')}>
+  <div class={cn(container, 'flex items-center justify-between gap-8 py-7')}>
+    <a
+      href={homeHref}
+      aria-current={onHome ? 'page' : undefined}
+      class="flex flex-col gap-[2px] text-ink"
+    >
       <span class="text-[16px] font-bold tracking-[-0.02em]">Celine Bencker</span>
-      <span class="text-[12.5px] font-normal leading-[1.3] text-text-3">
-        Klinische &amp; Gesundheitspsychologie
-      </span>
+      <span class="text-[12.5px] leading-[1.3] text-text-3">{tagline}</span>
     </a>
 
-    <div class="flex items-center gap-8">
-      {nav.map((item) => {
-        const href = pageHref(item);
-        const isCurrent = href === currentPath;
-        return (
-          <a
-            href={href}
-            aria-current={isCurrent ? 'page' : undefined}
-            class={navLink({ state: isCurrent ? 'active' : 'idle' })}
-          >
-            {item.entry.data.title}
-          </a>
-        );
-      })}
-
-      <span class="ml-6 inline-flex items-center gap-[2px] text-[14px]">
-        <span class={langLink({ state: 'current' })} aria-current="true">
-          <span class="border-b-[1.5px] border-ink pb-[3px]">{LOCALE_LABELS[locale]}</span>
-        </span>
-        {counterpart ? (
-          <a
-            href={pageHref(counterpart)}
-            lang={target}
-            hreflang={target}
-            data-language-choice={target}
-            class={langLink({ state: 'other' })}
-          >
-            <span class="border-b-[1.5px] border-transparent pb-[3px]">
-              {LOCALE_LABELS[target]}
-            </span>
-          </a>
-        ) : (
-          <span class={langLink({ state: 'unavailable' })} aria-disabled="true" lang={target}>
-            {LOCALE_LABELS[target]}
-            <span class="visually-hidden">— {t(locale, 'lang.unavailable')}</span>
-          </span>
-        )}
-      </span>
+    <div class="flex items-center gap-14">
+      <ul role="list" class="flex flex-wrap items-center gap-x-8 gap-y-2">
+        {nav.map((item) => {
+          const href = pageHref(item);
+          const active = href === currentHref;
+          return (
+            <li>
+              <a href={href} aria-current={active ? 'page' : undefined} class={navLink({ active })}>
+                {item.entry.data.title}
+              </a>
+            </li>
+          );
+        })}
+      </ul>
+      <LanguageSwitch locale={locale} counterpart={counterpart} />
     </div>
-  </nav>
+  </div>
+</nav>
 
-  {/* --- Mobile ----------------------------------------------------------- */}
-  <details class="group md:hidden">
-    <summary class="flex list-none items-center justify-between px-5 py-[18px] text-[15px] [&::-webkit-details-marker]:hidden">
-      <span class="flex min-h-[44px] flex-col justify-center gap-px">
-        <span class="font-bold tracking-[-0.02em]">Celine Bencker</span>
-        <span class="text-[11.5px] font-normal leading-[1.3] text-text-3">
-          Klinische &amp; Gesundheitspsychologie
-        </span>
+{/* --- Phones ---------------------------------------------------------- */}
+<div class="relative md:hidden">
+  <div class={cn(container, 'flex items-center py-[18px] pr-28')}>
+    <a
+      href={homeHref}
+      aria-current={onHome ? 'page' : undefined}
+      class="flex min-h-[44px] flex-col justify-center gap-px text-ink"
+    >
+      <span class="text-[15px] font-bold tracking-[-0.02em]">Celine Bencker</span>
+      <span class="text-[11.5px] leading-[1.3] text-text-3">{tagline}</span>
+    </a>
+  </div>
+
+  <details class="group open:bg-bone-soft">
+    <summary class="absolute right-5 top-[18px] inline-flex min-h-[44px] cursor-pointer list-none items-center gap-2 text-[15px] font-semibold text-ink [&::-webkit-details-marker]:hidden">
+      <span class="group-open:hidden">{t(locale, 'nav.menuOpen')}</span>
+      <span class="hidden group-open:inline">{t(locale, 'nav.menuClose')}</span>
+      <span class="inline-flex flex-col gap-[3px] group-open:hidden" aria-hidden="true">
+        <span class="h-[1.5px] w-4 bg-ink"></span>
+        <span class="h-[1.5px] w-4 bg-ink"></span>
       </span>
-      <span class="inline-flex min-h-[44px] cursor-pointer items-center gap-2 font-semibold">
-        <span class="group-open:hidden">Menü</span>
-        <span class="hidden group-open:inline">Schließen</span>
-        <span class="inline-flex flex-col gap-[3px] group-open:hidden" aria-hidden="true">
-          <span class="h-[1.5px] w-4 bg-ink"></span>
-          <span class="h-[1.5px] w-4 bg-ink"></span>
-        </span>
-        <span class="hidden text-[20px] leading-none group-open:inline" aria-hidden="true">
-          ×
-        </span>
+      <span class="hidden text-[20px] leading-none group-open:inline" aria-hidden="true">
+        ×
       </span>
     </summary>
 
-    <nav class="flex flex-col px-5 pb-2" aria-label={t(locale, 'nav.primary')}>
-      {nav.map((item) => {
-        const href = pageHref(item);
-        const isCurrent = href === currentPath;
-        return (
-          <a
-            href={href}
-            aria-current={isCurrent ? 'page' : undefined}
-            class="flex min-h-[44px] items-center justify-between gap-4 border-t border-line py-[18px] text-[30px] font-bold tracking-[-0.035em] transition-colors hover:text-sage"
-          >
-            {item.entry.data.title}
-            <span class="text-[20px] text-sage" aria-hidden="true">
-              →
-            </span>
-          </a>
-        );
-      })}
+    <nav aria-label={t(locale, 'nav.primary')}>
+      <ul role="list" class={cn(container, 'flex flex-col')}>
+        {nav.map((item) => {
+          const href = pageHref(item);
+          const active = href === currentHref;
+          return (
+            <li>
+              <a
+                href={href}
+                aria-current={active ? 'page' : undefined}
+                class="group flex min-h-[44px] items-center justify-between gap-4 border-t border-line py-[18px] text-[30px] font-bold tracking-[-0.035em] text-ink transition-colors hover:text-sage"
+              >
+                {item.entry.data.title}
+                <span class="text-[20px] text-sage" aria-hidden="true">
+                  →
+                </span>
+              </a>
+            </li>
+          );
+        })}
+      </ul>
     </nav>
 
-    <div class="flex justify-end px-5 pb-7 pt-4">
-      <div class="flex items-center gap-[2px] text-[14px]">
-        <span class={langLink({ state: 'current' })} aria-current="true">
-          <span class="border-b-[1.5px] border-ink pb-[3px]">{LOCALE_LABELS[locale]}</span>
-        </span>
-        {counterpart ? (
-          <a
-            href={pageHref(counterpart)}
-            lang={target}
-            hreflang={target}
-            data-language-choice={target}
-            class={langLink({ state: 'other' })}
-          >
-            {LOCALE_LABELS[target]}
-          </a>
-        ) : (
-          <span class={langLink({ state: 'unavailable' })} aria-disabled="true" lang={target}>
-            {LOCALE_LABELS[target]}
-            <span class="visually-hidden">— {t(locale, 'lang.unavailable')}</span>
-          </span>
-        )}
-      </div>
+    <div class={cn(container, 'flex justify-end pb-7 pt-4')}>
+      <LanguageSwitch locale={locale} counterpart={counterpart} />
     </div>
   </details>
-</header>
+</div>

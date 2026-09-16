@@ -1,0 +1,124 @@
+---
+import { getCollection } from 'astro:content';
+
+import Band from '../components/primitives/Band.astro';
+import ListRow from '../components/primitives/ListRow.astro';
+import Portrait from '../components/primitives/Portrait.astro';
+import Section from '../components/primitives/Section.astro';
+import TextLink from '../components/primitives/TextLink.astro';
+import Tile from '../components/primitives/Tile.astro';
+import { pageHref, resolvePage, type ResolvedPage } from '../i18n/pages';
+import PageLayout from '../layouts/PageLayout.astro';
+import { cn } from '../lib/cn';
+import { container, heading } from '../lib/styles';
+
+/**
+ * Home — board 6a, "Reduziert – alles, was nicht trägt, ist weg".
+ * Who: every audience, mostly arriving from search or a shared link.
+ * Job: topic and affiliation in three seconds, then onward.
+ *
+ * Header with the one serif word and the portrait, the lilac band the portrait
+ * tucks behind, the research lines, and two exits. Nothing else.
+ */
+interface Props {
+  page: ResolvedPage;
+  allPages: ResolvedPage[];
+}
+
+const { page, allPages } = Astro.props;
+const { locale } = page;
+const { hero, home } = page.entry.data;
+
+if (!hero || !home) {
+  throw new Error(
+    `src/content/pages/${page.entry.id}.md needs both \`hero\` and \`home\` in its frontmatter.`,
+  );
+}
+
+const hrefFor = (to: string) => pageHref(resolvePage(to, locale, allPages));
+const researchHref = hrefFor('research');
+const research = (await getCollection('research')).sort((a, b) => a.data.order - b.data.order);
+
+const lastLine = hero.lines.length - 1;
+---
+
+<PageLayout page={page} allPages={allPages}>
+  <div
+    slot="masthead"
+    class={cn(
+      container,
+      'grid gap-5 pt-10 md:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] md:items-end md:gap-20 md:pt-24',
+    )}
+  >
+    <div class="flex flex-col gap-5 md:gap-9 md:pb-16">
+      <h1 class="text-[52px] font-bold leading-[0.98] tracking-[-0.04em] text-balance md:text-[length:clamp(52px,6.875vw,88px)] md:leading-[0.94] md:tracking-[-0.05em]">
+        {hero.lines.map((line, i) => (
+          <>
+            {i > 0 && <br class="hidden md:inline" />}
+            {i > 0 && ' '}
+            <span class="md:whitespace-nowrap">
+              {line}
+              {i === lastLine && hero.emphasis && (
+                <>
+                  {' '}
+                  <span class="font-serif font-normal italic tracking-[-0.02em] text-lilac-text">
+                    {hero.emphasis}
+                  </span>
+                </>
+              )}
+            </span>
+          </>
+        ))}
+      </h1>
+
+      {hero.lead && (
+        <p class="max-w-[36ch] text-[17px] leading-[1.5] text-text-2 md:text-lead">{hero.lead}</p>
+      )}
+
+      <ul
+        role="list"
+        class="flex flex-wrap gap-x-6 gap-y-2.5 text-[16px] md:flex-nowrap md:gap-7 md:text-[17px]"
+      >
+        {home.links.map((link) => (
+          <li>
+            <TextLink href={hrefFor(link.to)}>{link.label}</TextLink>
+          </li>
+        ))}
+      </ul>
+    </div>
+
+    {/* Tucks behind the band: 72px on phones, 48px from md. */}
+    <div class="relative z-[2] -mb-[72px] mt-2 w-[70%] rounded-image shadow-[0_24px_48px_-28px_rgb(0_0_0/0.25)] md:-mb-12 md:ml-auto md:mt-0 md:w-[86%] md:shadow-[0_30px_60px_-30px_rgb(0_0_0/0.25)]">
+      <Portrait locale={locale} />
+    </div>
+  </div>
+
+  <Band locale={locale} />
+
+  <Section labelledby="home-research" space="none" class="pb-12 pt-24 md:pb-32 md:pt-[184px]">
+    <h2 id="home-research" class={heading({ level: 'section' })}>
+      {home.researchHeading}
+    </h2>
+    <ul role="list" class="flex flex-col">
+      {research.map((line) => (
+        <li>
+          <ListRow
+            href={`${researchHref}#${line.data.id}`}
+            title={line.data.title[locale]}
+            sub={line.data.teaser[locale]}
+          />
+        </li>
+      ))}
+    </ul>
+  </Section>
+
+  <Section layout="stacked" space="none" class="pb-16 md:pb-24">
+    <ul role="list" class="grid gap-3 md:grid-cols-2 md:gap-6">
+      {home.exits.map((exit) => (
+        <li>
+          <Tile href={hrefFor(exit.to)} title={exit.title} meta={exit.meta} />
+        </li>
+      ))}
+    </ul>
+  </Section>
+</PageLayout>

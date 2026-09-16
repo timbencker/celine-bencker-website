@@ -1,0 +1,24 @@
+---
+import type { Locale } from '../../i18n/config';
+import { t } from '../../i18n/ui';
+import { cn } from '../../lib/cn';
+import { EXTERNAL_GLYPH } from '../../lib/styles';
+
+/**
+ * A link that leaves the site: ↗ at 1em, a new tab, and a spoken warning that
+ * it opens one — the glyph alone says nothing to a screen reader.
+ */
+interface Props {
+  href: string;
+  locale: Locale;
+  class?: string;
+}
+
+const { href, locale, class: className } = Astro.props;
+---
+
+<a href={href} target="_blank" rel="noopener" class={cn('inline-flex gap-1', className)}>
+  <slot />
+  <span aria-hidden="true">{EXTERNAL_GLYPH}</span>
+  <span class="visually-hidden">{t(locale, 'link.newTab')}</span>
+</a>

@@ -1,0 +1,81 @@
+---
+import type { Locale } from '../../i18n/config';
+import { t } from '../../i18n/ui';
+import { getSite } from '../../lib/site';
+import { container } from '../../lib/styles';
+import { cn } from '../../lib/cn';
+import ExternalLink from './ExternalLink.astro';
+import MailLink from './MailLink.astro';
+
+/**
+ * Footer — "Nav & Footer" in _Komponenten. One line on desktop: mail and
+ * profiles on the left, © · Impressum · credit on the right. No large name, no
+ * columns. On phones it stacks.
+ *
+ * Profiles come from site.yaml; only those with a URL are shown.
+ */
+interface Props {
+  locale: Locale;
+  imprintHref: string;
+}
+
+const { locale, imprintHref } = Astro.props;
+const site = await getSite();
+const year = new Date().getFullYear();
+---
+
+<footer class="border-t border-line bg-bone-soft">
+  <div
+    class={cn(
+      container,
+      'flex flex-col gap-4 pb-10 pt-8 text-[14px] text-text-2 md:flex-row md:flex-wrap md:items-baseline md:justify-between md:gap-x-7 md:gap-y-3 md:py-10 md:text-[15px]',
+    )}
+  >
+    <div class="flex flex-col gap-4 md:flex-row md:flex-wrap md:items-baseline md:gap-7">
+      {site.email && (
+        <MailLink email={site.email} class="font-bold text-ink transition-colors hover:text-sage" />
+      )}
+      {site.profiles.length > 0 && (
+        <ul
+          role="list"
+          aria-label={t(locale, 'footer.profiles')}
+          class="flex flex-wrap gap-x-5 gap-y-2 md:gap-7"
+        >
+          {site.profiles.map((profile) => (
+            <li>
+              <ExternalLink
+                href={profile.url}
+                locale={locale}
+                class="transition-colors hover:text-ink"
+              >
+                {profile.label}
+              </ExternalLink>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+
+    {/* Links here are under 24px tall; the row gap keeps wrapped targets far enough apart (WCAG 2.5.8). */}
+    <div class="flex flex-wrap gap-x-4 gap-y-2 text-[12px] text-text-3 md:gap-7 md:text-[13px]">
+      <span>
+        © {year} {site.siteName}
+      </span>
+      <a href={imprintHref} class="transition-colors hover:text-ink">
+        {t(locale, 'footer.imprint')}
+      </a>
+      {site.credit &&
+        (site.credit.url ? (
+          <ExternalLink
+            href={site.credit.url}
+            locale={locale}
+            class="transition-colors hover:text-ink"
+          >
+            {site.credit.label[locale]}
+          </ExternalLink>
+        ) : (
+          <span>{site.credit.label[locale]}</span>
+        ))}
+    </div>
+  </div>
+</footer>

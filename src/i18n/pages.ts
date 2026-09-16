@@ -5,14 +5,6 @@ import { LOCALES, otherLocale, isLocale, type Locale } from './config';
 
 export type PageEntry = CollectionEntry<'pages'>;
 
-/**
- * Content is addressed by (locale, variant). Only `standard` is built today;
- * "Einfach erklärt" becomes a second member here once the design canvas shows
- * whether it is a separate page or a section within one. Adding it is a new
- * collection plus a branch in `loadPages()` — not a change to callers.
- */
-export type PageVariant = 'standard';
-
 export interface ResolvedPage {
   entry: PageEntry;
   locale: Locale;
@@ -52,6 +44,25 @@ export async function loadPages(): Promise<ResolvedPage[]> {
 
 export function pageHref(page: Pick<ResolvedPage, 'locale' | 'slug'>): string {
   return getRelativeLocaleUrl(page.locale, page.slug);
+}
+
+/** The home page of a locale. */
+export function homeHref(locale: Locale): string {
+  return pageHref({ locale, slug: '' });
+}
+
+/**
+ * Resolves a content link (`to: research`) to the page in the given locale.
+ * Content names targets by translationKey, so renaming a slug never breaks a
+ * link — and a typo fails the build instead of shipping a dead link.
+ */
+export function resolvePage(to: string, locale: Locale, all: ResolvedPage[]): ResolvedPage {
+  const match = all.find((p) => p.locale === locale && p.translationKey === to);
+  if (!match) {
+    const known = [...new Set(all.map((p) => p.translationKey))].sort().join(', ');
+    throw new Error(`Link target "${to}" does not exist in "${locale}". Known pages: ${known}.`);
+  }
+  return match;
 }
 
 /**

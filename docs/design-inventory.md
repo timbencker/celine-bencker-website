@@ -135,17 +135,57 @@ into the build.
 - `doc-page.js` — paged-document helper, used only by `_Brief`.
 - `_Komponenten - Celine Bencker copy.dc.html` — duplicate; ignore.
 
-## Open divergences
+## When the sources disagree
 
-Tracked in the plan file; listed here so the mapping is in one place.
+The canvas has three layers that do not always agree: the brief, the
+`_Komponenten` spec, and the rendered boards. The rule used throughout:
 
-1. **Stack.** `_Komponenten` states _"Astro · Tailwind ·
-   class-variance-authority"_ and defines each component's variants as CVA.
-   The scaffold currently uses plain scoped CSS with custom properties.
-2. **URL shape.** The brief §6 says DE at `/`, EN at `/en/`. The later
-   instruction — and what is built — is `/de/` + `/en/` with `/` redirecting.
-3. **Missing translations.** Brief §6 says fall back to DE. The built rule is a
+- **The boards win on what the page looks like.** They are the decided state.
+- **A CVA definition in `_Komponenten` wins inside its component** (classes,
+  variants, hover behaviour). Values it leaves open come from the matching
+  `ui-*` file.
+- **The brief's accessibility floor wins over both** — contrast ≥ 4.5:1,
+  keyboard operable, no lost content.
+
+## Divergences, and how each was settled
+
+1. **Stack.** Settled: Astro + Tailwind 4 + CVA, as `_Komponenten` specifies.
+2. **URL shape.** The brief §6 says DE at `/`, EN at `/en/`. Built as Tim
+   decided later: `/de/` + `/en/`, `/` redirecting to `/de/`.
+3. **Missing translations.** The brief §6 says fall back to DE. Built as a
    disabled switcher. See `docs/i18n-policy.md`.
-4. **Language-neutral content.** Brief §6: publications, talks and media are
-   maintained once, not per language. The current schema is per-locale
-   throughout and needs a language-neutral data collection.
+4. **Language-neutral content.** Settled: publications, talks and media are
+   single records; only their prose fields are localized.
+5. **Header surface.** `_Komponenten` describes the header as bone. All seven
+   boards draw it on paper with a hairline below, and only that lets the
+   `verwoben` shapes show. Built on paper.
+6. **A seventh neutral.** The token list says six colours, but four boards use
+   `#f2efe7` for the footer and the open menu, distinctly from bone. Added as
+   `bone-soft`.
+7. **text-3 darkened to `#666863`.** The spec's `#6b6d68` promises ≥ 4.5:1 but
+   holds it only on paper: 4.43 on bone, 4.19 on the lilac tint, about 4.3 over
+   every `verwoben` circle hue — where the language switch and the phone
+   tagline sit. Five steps darker holds everywhere (lowest 4.52).
+8. **The Home band wraps.** Its CVA sets `whitespace-nowrap overflow-hidden`,
+   which clips items on narrower screens. It wraps instead; four short items
+   on one line stays an authoring rule.
+9. **The phone menu opens in place.** `ui-SiteNav` draws a full-screen overlay
+   driven by JavaScript. Built as a `<details>` disclosure that pushes the page
+   down: no JavaScript, and keyboard focus can never land on content hidden
+   behind an overlay.
+10. **The band's example items are not used.** "Talk am DGPs Kongress",
+    "Neues Paper im British Journal of Psychiatry" and "Interview im Ö1
+    Radiokolleg" are specific claims nobody has confirmed. `news.yaml` holds
+    placeholders; the examples are kept there as comments.
+
+## Still to confirm before launch
+
+- **Email** `celine.bencker@univie.ac.at` comes from the footer design.
+- **Credit link** `https://timbencker.de` comes from an old WordPress export.
+- **English copy** on Home and the research teasers is a translation of the
+  German draft.
+- **Profiles** — only ORCID has a known URL; Scholar, OSF, u:cris and LinkedIn
+  appear once their addresses are in `site.yaml`.
+- **Nav at tablet width** — between 768px and roughly 1000px the five desktop
+  links wrap to two rows. The spec allows one breakpoint only, so this is left
+  as is.

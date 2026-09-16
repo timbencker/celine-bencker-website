@@ -1,15 +1,15 @@
 ---
-import { render } from 'astro:content';
-
-import PageLayout from '../../layouts/PageLayout.astro';
 import { assertTranslationsComplete, loadPages } from '../../i18n/pages';
+import DraftView from '../../views/DraftView.astro';
+import HomeView from '../../views/HomeView.astro';
 
 /**
  * Every content page, in every language, from one route.
  *
  * Localized slugs come from the file name, so `/de/forschung` and
  * `/en/research` are the same page in two languages — linked by the
- * `translationKey` in their frontmatter.
+ * `translationKey` in their frontmatter. The translationKey also picks the
+ * view: one view per board, composed from the shared components.
  */
 export async function getStaticPaths() {
   const allPages = await loadPages();
@@ -23,11 +23,12 @@ export async function getStaticPaths() {
   }));
 }
 
+const VIEWS = { home: HomeView } as const;
+
 const { page, allPages } = Astro.props;
-const { Content } = await render(page.entry);
+const View = Object.hasOwn(VIEWS, page.translationKey)
+  ? VIEWS[page.translationKey as keyof typeof VIEWS]
+  : DraftView;
 ---
 
-<PageLayout page={page} allPages={allPages}>
-  <h1>{page.entry.data.title}</h1>
-  <Content />
-</PageLayout>
+<View page={page} allPages={allPages} />

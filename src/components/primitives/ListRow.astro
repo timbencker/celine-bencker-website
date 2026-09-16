@@ -1,0 +1,55 @@
+---
+import { cva } from 'class-variance-authority';
+
+import { cn } from '../../lib/cn';
+import { arrow } from '../../lib/styles';
+
+/**
+ * The workhorse row: hairline on top, content, arrow — `listRow` in
+ * _Komponenten. The whole row is the link and its title turns sage on hover.
+ * Hairline above every row including the first, never below the last.
+ *
+ * Only `default` is built so far (research lines on Home). `date`,
+ * `publication` and `cv` arrive with the pages that use them.
+ */
+const row = cva(
+  'group grid items-start border-t border-line text-ink transition-colors hover:text-sage',
+  {
+    variants: {
+      kind: {
+        default:
+          'grid-cols-[minmax(0,1fr)_20px] gap-4 py-5 md:grid-cols-[minmax(0,1fr)_28px] md:gap-8 md:py-8',
+      },
+    },
+    defaultVariants: { kind: 'default' },
+  },
+);
+
+interface Props {
+  href: string;
+  title: string;
+  sub?: string;
+  class?: string;
+}
+
+const { href, title, sub, class: className } = Astro.props;
+---
+
+<a href={href} class={cn(row(), className)}>
+  <span class="flex flex-col gap-1.5 md:gap-2.5">
+    <span class="text-[22px] font-bold leading-[1.15] tracking-[-0.03em] md:text-h3 md:leading-[1.1]">
+      {title}
+    </span>
+    {sub && (
+      <span class="text-[15px] leading-[1.45] text-text-2 md:max-w-[56ch] md:text-body md:leading-[1.5]">
+        {sub}
+      </span>
+    )}
+  </span>
+  <span
+    class={cn(arrow, 'pt-0.5 text-[20px] leading-none md:pt-1 md:text-[24px]')}
+    aria-hidden="true"
+  >
+    →
+  </span>
+</a>

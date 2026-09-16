@@ -1,0 +1,26 @@
+---
+import { toHtmlEntities } from '../../lib/obfuscate';
+
+/**
+ * A mailto link whose address is written as HTML entities, so it never appears
+ * in the raw HTML. No glyph and the same tab — the address is the signal
+ * ("mail" in _Komponenten).
+ */
+interface Props {
+  email: string;
+  class?: string;
+}
+
+const { email, class: className = '' } = Astro.props;
+
+// The link below is inlined as raw HTML, so refuse anything that could break
+// out of an attribute. Both values come from our own code and content files.
+if (/["<>]/.test(className) || /["<>\s]/.test(email)) {
+  throw new Error(`MailLink received an unsafe value: ${JSON.stringify({ email, className })}`);
+}
+
+const href = toHtmlEntities(`mailto:${email}`);
+const html = `<a href="${href}" class="${className}">${toHtmlEntities(email)}</a>`;
+---
+
+<Fragment set:html={html} />

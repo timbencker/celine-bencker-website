@@ -1,0 +1,27 @@
+# Das lila Band auf der Startseite. Höchstens vier Meldungen, zusammen eine Zeile.
+# Kurz halten – so sehen die Beispiele im Design aus:
+#   „14. Oktober · Talk am DGPs Kongress, Berlin"
+#   „Neues Paper im British Journal of Psychiatry"
+#   „ISSAC-Studie: Teilnehmerinnen gesucht"
+# Die Einträge unten sind Platzhalter, bis echte Meldungen feststehen.
+
+- id: talk
+  order: 0
+  text:
+    de: PLATZHALTER · nächster Vortrag
+    en: PLACEHOLDER · next talk
+- id: paper
+  order: 1
+  text:
+    de: PLATZHALTER · neueste Publikation
+    en: PLACEHOLDER · latest paper
+- id: studie
+  order: 2
+  text:
+    de: PLATZHALTER · laufende Studie
+    en: PLACEHOLDER · current study
+- id: medien
+  order: 3
+  text:
+    de: PLATZHALTER · Medienauftritt
+    en: PLACEHOLDER · media appearance

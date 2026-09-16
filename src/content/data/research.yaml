@@ -1,35 +1,47 @@
-# Forschungslinien. Jede Linie hat zwei Register:
-#   text        – die fachliche Fassung
-#   textPlain   – „Einfach erklärt“ (Deutsch nötig, Englisch optional)
-# Die Linien selbst stammen aus dem Brief; die Texte schreibt Celine.
+# Forschungslinien – Reihenfolge und Titel wie im Design.
+#   title       – Titel der Linie
+#   teaser      – ein Satz; erscheint auf der Startseite unter dem Titel
+#   text        – die fachliche Fassung (Forschungsseite, Register „Fachlich")
+#   textPlain   – „Einfach erklärt" (Deutsch nötig, Englisch optional)
+# Titel und Teaser stammen aus dem Design-Entwurf; die englischen Fassungen sind
+# Übersetzungen und brauchen noch Celines Durchsicht.
 
 - id: pms-stress
   order: 0
   title:
-    de: PMS & Stress
-    en: PMS & Stress
+    de: Prämenstruelle Symptome & Stress
+    en: Premenstrual symptoms & stress
+  teaser:
+    de: Warum reagieren manche Körper vor der Periode stärker auf Stress?
+    en: Why do some bodies react more strongly to stress before their period?
   text:
     de: PLATZHALTER – fachliche Beschreibung dieser Forschungslinie.
     en: PLACEHOLDER – specialist description of this research line.
   textPlain:
     de: PLATZHALTER – dieselbe Linie, so einfach wie möglich und immer noch richtig.
 
-- id: hormone-gehirn
+- id: stress-im-alltag
   order: 1
   title:
-    de: Hormone & Gehirn
-    en: Hormones & Brain
+    de: Stress im Alltag über den Zyklus
+    en: Everyday stress across the cycle
+  teaser:
+    de: Handy-Abfragen und Speichelproben, einen ganzen Zyklus lang.
+    en: Smartphone check-ins and saliva samples, across a whole cycle.
   text:
     de: PLATZHALTER – fachliche Beschreibung dieser Forschungslinie.
     en: PLACEHOLDER – specialist description of this research line.
   textPlain:
     de: PLATZHALTER – dieselbe Linie, einfach erklärt.
 
-- id: ambulantes-assessment
+- id: hormone-gehirn-stimmung
   order: 2
   title:
-    de: Ambulantes Assessment
-    en: Ambulatory Assessment
+    de: Hormone, Gehirn & Stimmung
+    en: Hormones, brain & mood
+  teaser:
+    de: Was Progesteron mit Stimmung, Stressempfinden und Denken macht.
+    en: What progesterone does to mood, stress perception and thinking.
   text:
     de: PLATZHALTER – fachliche Beschreibung dieser Forschungslinie.
     en: PLACEHOLDER – specialist description of this research line.
