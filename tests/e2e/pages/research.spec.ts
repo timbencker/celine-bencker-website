@@ -44,7 +44,8 @@ for (const [locale, route] of Object.entries(ROUTES)) {
 
     test(`${route} offers exactly two registers`, async ({ page }) => {
       await page.goto(route);
-      const radios = page.locator('main').getByRole('radio');
+      // The board puts the toggle in the page header, outside main.
+      const radios = page.locator('header, main').getByRole('radio');
       await expect(radios).toHaveCount(2);
       await expect(radios.first()).toBeChecked();
     });
@@ -94,7 +95,7 @@ test.describe('research register toggle without JavaScript', () => {
     page,
   }) => {
     await page.goto(ROUTES.en);
-    await page.locator('main').getByRole('radio').nth(1).check();
+    await page.locator('header, main').getByRole('radio').nth(1).check();
     for (const id of LINE_IDS) {
       expect((await page.locator(`#${id}`).innerText()).trim().length, id).toBeGreaterThan(0);
     }

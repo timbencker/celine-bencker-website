@@ -33,14 +33,23 @@ test.describe(`not-found ${MISSING}`, () => {
 
   test(`${MISSING} speaks to English readers too`, async ({ page }) => {
     await page.goto(MISSING);
-    const main = page.locator('main');
-    await expect(main.locator('[lang="en"]').first()).toBeVisible();
-    await expect(main.locator('a[href$="/en/"]').first()).toBeVisible();
+    // English text in the page's own content — header or main — with a link
+    // to the English home. The language switch (an English-tagged link inside
+    // role="group") does not count.
+    await expect(
+      page.locator(':is(header, main) [lang="en"]:not(a):not([role="group"] *)').first(),
+    ).toBeVisible();
+    await expect(
+      page.locator(':is(header, main) [lang="en"]:not(a) a[href$="/en/"]').first(),
+    ).toBeVisible();
   });
 
   test(`${MISSING} offers a way to report the broken link`, async ({ page }) => {
     await page.goto(MISSING);
-    await expect(page.locator('main a[href^="mailto:"]').first()).toBeVisible();
+    // The board puts it under the title. The footer's mail link does not count.
+    await expect(
+      page.locator('header a[href^="mailto:"], main a[href^="mailto:"]').first(),
+    ).toBeVisible();
   });
 
   test(`${MISSING} ships no JavaScript beyond the language memory`, async ({ page }) => {

@@ -115,15 +115,19 @@ for (const [locale, route] of Object.entries(ROUTES)) {
 
     test(`${route} has no filter controls`, async ({ page }) => {
       await page.goto(route);
-      await expect(page.locator('main').locator('button, select, input')).toHaveCount(0);
+      await expect(page.locator('header, main').locator('button, select, input')).toHaveCount(0);
     });
 
     test(`${route} links only verified profiles`, async ({ page }) => {
       await page.goto(route);
       await expect(page.locator('a[href*="scholar.google"]')).toHaveCount(0);
       await expect(page.locator('a[href*="linkedin.com"]')).toHaveCount(0);
+      // The board lists the profiles beside the page title, in the header.
+      // The footer's own ORCID link is outside both.
       await expect(
-        page.locator('main a[href^="https://orcid.org/0000-0002-3802-1339"]'),
+        page.locator(
+          'header a[href^="https://orcid.org/0000-0002-3802-1339"], main a[href^="https://orcid.org/0000-0002-3802-1339"]',
+        ),
       ).toHaveCount(1);
     });
 
