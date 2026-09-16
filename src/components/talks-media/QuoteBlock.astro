@@ -1,0 +1,111 @@
+---
+import type { ImageMetadata } from 'astro';
+
+import type { Locale } from '../../i18n/config';
+import { cn } from '../../lib/cn';
+import { container } from '../../lib/styles';
+import ExternalLink from '../primitives/ExternalLink.astro';
+import Portrait from '../primitives/Portrait.astro';
+
+/**
+ * QuoteBlock — _Komponenten: press photo left, serif quote right, source and
+ * optional audio below it. Only on Talks & Media, directly after the header:
+ * the one place with serif in running text. The quote must be real and
+ * approved, so the caller passes one only from an approved media record.
+ *
+ * On paper, which paints nothing, so the page background shows through as on
+ * the board. The CVA's grid (420px photo, 64px gap, 96px block padding) from
+ * md; on phones the photo takes 60% of the width above a 30px quote, and the
+ * source line wraps.
+ *
+ * Without `quote` it renders its placeholder state: the photo slot and the
+ * placeholder line in the quote's type, so the page keeps its shape until a
+ * quote is approved. Without `photo` the slot is the hatched placeholder.
+ */
+interface Quote {
+  text: string;
+  /** The language the quote was said in. */
+  lang: Locale;
+  /** "Outlet · month year". */
+  source: string;
+  /** An audio excerpt; leaves the site. */
+  audio?: string;
+}
+
+interface Props {
+  locale: Locale;
+  quote?: Quote;
+  /** Shown in the quote's place while there is no quote. */
+  placeholder: string;
+  /** The photo slot's label while there is no photo. */
+  photoLabel: string;
+  photo?: { src: ImageMetadata; alt: string };
+  /** Text of the audio link. */
+  listenLabel: string;
+  class?: string;
+}
+
+const {
+  locale,
+  quote,
+  placeholder,
+  photoLabel,
+  photo,
+  listenLabel,
+  class: className,
+} = Astro.props;
+
+const MARKS: Record<Locale, [string, string]> = { de: ['„', '“'], en: ['“', '”'] };
+const [open, close] = MARKS[locale];
+const quoteType =
+  'font-serif text-[30px] font-normal leading-[1.15] tracking-[-0.01em] text-balance md:text-quote';
+---
+
+<div
+  class={cn(
+    container,
+    'grid gap-6 py-14 md:grid-cols-[420px_minmax(0,1fr)] md:items-center md:gap-16 md:py-24',
+    className,
+  )}
+>
+  <div class="w-[60%] md:w-full">
+    {photo ? (
+      <Portrait
+        locale={locale}
+        src={photo.src}
+        alt={photo.alt}
+        sizes="(min-width: 768px) 420px, 60vw"
+      />
+    ) : (
+      <Portrait locale={locale} label={photoLabel} />
+    )}
+  </div>
+
+  {quote ? (
+    <figure class="flex flex-col gap-6 md:gap-7">
+      <blockquote lang={quote.lang === locale ? undefined : quote.lang}>
+        <p class={quoteType}>{[open, quote.text, close]}</p>
+      </blockquote>
+      <figcaption class="flex flex-wrap items-center gap-x-4 gap-y-2 text-[14px] text-text-2 md:gap-x-5 md:text-meta">
+        <span>{quote.source}</span>
+        {quote.audio && (
+          <ExternalLink
+            href={quote.audio}
+            locale={locale}
+            class="min-h-[44px] items-center gap-2 font-semibold text-sage transition-colors hover:text-ink md:gap-2.5"
+          >
+            <span
+              class="inline-flex size-7 items-center justify-center rounded-pill bg-bone-soft text-[11px] text-ink md:size-8 md:text-[12px]"
+              aria-hidden="true"
+            >
+              ▶︎
+            </span>
+            {listenLabel}
+          </ExternalLink>
+        )}
+      </figcaption>
+    </figure>
+  ) : (
+    <p class={quoteType}>{placeholder}</p>
+  )}
+</div>
