@@ -3,3 +3,6 @@ dist/
 design/
 package-lock.json
 .worktrees/
+test-results/
+playwright-report/
+blob-report/

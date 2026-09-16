@@ -9,6 +9,7 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
+    "test:e2e": "node tests/e2e/support/run.ts",
     "check": "astro check",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
@@ -33,6 +34,8 @@
     "esbuild": true
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
+    "@playwright/test": "^1.63.0",
     "@types/node": "^22.20.2",
     "astro-eslint-parser": "^1.4.0",
     "eslint": "^9.39.5",
