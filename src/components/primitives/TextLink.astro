@@ -1,29 +1,58 @@
 ---
+import type { Locale } from '../../i18n/config';
+import { t } from '../../i18n/ui';
 import { cn } from '../../lib/cn';
 import { arrow } from '../../lib/styles';
+import { formatFileSize } from './format';
 
 /**
- * An internal text link: sage, darkening on hover, with a trailing arrow.
- * "Button & Link" in _Komponenten — internal links never open a new tab.
- * Size comes from the parent.
+ * A text link on this site: sage, darkening on hover. "Button & Link" in
+ * _Komponenten — internal links never open a new tab. Size comes from the
+ * parent.
+ *
+ * - Default: a page, with a trailing → that nudges on hover.
+ * - `download`: a file on this site ("PDF English ↓ (180 kB)", "BibTeX ↓").
+ *   The caller measures the file and renders the link only when the file
+ *   exists; the size is shown and spoken with it.
  */
 interface Props {
   href: string;
   class?: string;
+  /** A file on this site. `format` is shown as given ("PDF", "BibTeX"). */
+  download?: { format: string; bytes: number; locale: Locale };
 }
 
-const { href, class: className } = Astro.props;
+const { href, class: className, download } = Astro.props;
+
+if (download && !/^\/(?!\/)/.test(href)) {
+  throw new Error(`TextLink download must point at a file on this site, got "${href}".`);
+}
+
+const meta = download
+  ? `(${download.format}, ${formatFileSize(download.bytes, download.locale)})`
+  : '';
 ---
 
 <a
   href={href}
+  download={download ? true : undefined}
   class={cn(
-    'group inline-flex items-center gap-2.5 font-semibold text-sage transition-colors hover:text-ink',
+    'group inline-flex flex-wrap items-center gap-x-2.5 font-semibold text-sage transition-colors hover:text-ink',
     className,
   )}
 >
   <slot />
-  <span class={arrow} aria-hidden="true">
-    →
-  </span>
+  {download ? (
+    <>
+      <span aria-hidden="true">↓</span>
+      <span class="font-normal text-text-2">
+        <span class="visually-hidden">{t(download.locale, 'link.download')}, </span>
+        {meta}
+      </span>
+    </>
+  ) : (
+    <span class={arrow} aria-hidden="true">
+      →
+    </span>
+  )}
 </a>

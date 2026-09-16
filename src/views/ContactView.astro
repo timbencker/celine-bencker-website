@@ -1,11 +1,15 @@
 ---
 import type { ResolvedPage } from '../i18n/pages';
+import { t } from '../i18n/ui';
 import DraftView from './DraftView.astro';
 
 /**
  * Contact — board 9b.
  * OWNER: the Contact work unit. A stub that renders the draft view until the
  * board is built. See docs/plans/remaining-pages.md.
+ *
+ * It already carries the `#impressum` target the footer links to on every
+ * page, so that link resolves while the page is a stub.
  */
 interface Props {
   page: ResolvedPage;
@@ -15,4 +19,6 @@ interface Props {
 const { page, allPages } = Astro.props;
 ---
 
-<DraftView page={page} allPages={allPages} />
+<DraftView page={page} allPages={allPages}>
+  <h2 id="impressum">{t(page.locale, 'footer.imprint')}</h2>
+</DraftView>

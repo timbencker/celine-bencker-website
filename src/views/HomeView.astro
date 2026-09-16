@@ -40,6 +40,28 @@ const researchHref = hrefFor('research');
 const research = (await getCollection('research')).sort((a, b) => a.data.order - b.data.order);
 
 const lastLine = hero.lines.length - 1;
+
+/**
+ * On desktop the title's lines never wrap, so each must fit its column: the
+ * gap beside it holds the background's hero marks, and a line running into
+ * the gap would put a mark under text. The size follows the column (container
+ * query units) and the longest line, and never exceeds the spec's 88px.
+ *
+ * HEADING_FIT is the column share one character takes at this weight and
+ * tracking (cqi × characters), measured in the browser with a margin — so a
+ * heading Celine edits keeps fitting. A line may reach GAP_ALLOWANCE into the
+ * 80px gap, as the board's own 1280px title does; the hero marks start at
+ * least 24px in, so 8px stay clear. Measured: German 88px at 1280, 47px at
+ * 768; English 82px and 44px.
+ */
+const HEADING_FIT = 200;
+const GAP_ALLOWANCE = '16px';
+const longest = Math.max(
+  ...hero.lines.map(
+    (line, i) => line.length + (i === lastLine && hero.emphasis ? hero.emphasis.length + 1 : 0),
+  ),
+);
+const headingFit = `--heading-fit: calc((100cqi + ${GAP_ALLOWANCE}) * ${(HEADING_FIT / longest / 100).toFixed(4)})`;
 ---
 
 <PageLayout page={page} allPages={allPages}>
@@ -50,8 +72,11 @@ const lastLine = hero.lines.length - 1;
       'grid gap-5 pt-10 md:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] md:items-end md:gap-20 md:pt-24',
     )}
   >
-    <div class="flex flex-col gap-5 md:gap-9 md:pb-16">
-      <h1 class="text-[52px] font-bold leading-[0.98] tracking-[-0.04em] text-balance md:text-[length:clamp(52px,6.875vw,88px)] md:leading-[0.94] md:tracking-[-0.05em]">
+    <div class="@container flex flex-col gap-5 md:gap-9 md:pb-16">
+      <h1
+        style={headingFit}
+        class="text-[52px] font-bold leading-[0.98] tracking-[-0.04em] text-balance md:text-[length:min(88px,var(--heading-fit))] md:leading-[0.94] md:tracking-[-0.05em]"
+      >
         {hero.lines.map((line, i) => (
           <>
             {i > 0 && <br class="hidden md:inline" />}

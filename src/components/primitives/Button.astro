@@ -32,10 +32,7 @@ const button = cva(
   {
     variants: {
       tone: {
-        // The board's hover (#b9a5df) has no token yet; this mix of two tokens
-        // stands in for it (ink on it: 8.00:1).
-        lilac:
-          'bg-lilac text-ink hover:bg-[color-mix(in_srgb,var(--color-lilac),var(--color-ink)_10%)]',
+        lilac: 'bg-lilac text-ink hover:bg-lilac-hover',
         ink: 'bg-ink text-bone hover:bg-sage',
       },
     },

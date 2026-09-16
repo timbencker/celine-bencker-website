@@ -11,6 +11,9 @@ import { container } from '../lib/styles';
  * Stand-in for pages whose board is not built yet: the page title and its
  * Markdown body inside the real chrome. Each page moves to its own view as it
  * is implemented, so this should shrink to nothing.
+ *
+ * The default slot renders after the body — stubs use it to keep link
+ * targets that other pages already point at.
  */
 interface Props {
   page: ResolvedPage;
@@ -31,6 +34,7 @@ const { Content } = await render(page.entry);
   <Section layout="stacked">
     <div class="max-w-[64ch] text-[16px] leading-[1.5] md:text-body">
       <Content />
+      <slot />
     </div>
   </Section>
 </PageLayout>

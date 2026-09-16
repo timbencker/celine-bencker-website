@@ -1,4 +1,6 @@
 ---
+import { getCollection } from 'astro:content';
+
 import type { ResolvedPage } from '../i18n/pages';
 import DraftView from './DraftView.astro';
 
@@ -6,6 +8,9 @@ import DraftView from './DraftView.astro';
  * Research — board 10b.
  * OWNER: the Research work unit. A stub that renders the draft view until the
  * board is built. See docs/plans/remaining-pages.md.
+ *
+ * It already carries the three line anchors Home links to, so those links
+ * resolve while the page is a stub.
  */
 interface Props {
   page: ResolvedPage;
@@ -13,6 +18,13 @@ interface Props {
 }
 
 const { page, allPages } = Astro.props;
+const lines = (await getCollection('research')).sort((a, b) => a.data.order - b.data.order);
 ---
 
-<DraftView page={page} allPages={allPages} />
+<DraftView page={page} allPages={allPages}>
+  <ul role="list">
+    {lines.map((line) => (
+      <li id={line.data.id}>{line.data.title[page.locale]}</li>
+    ))}
+  </ul>
+</DraftView>

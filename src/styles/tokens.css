@@ -23,6 +23,8 @@
 
   /* Band and button on light ground */
   --color-lilac: #c9b8ea;
+  /* The lilac button's hover (boards 7b, 10b). Ink on it: 7.95:1 */
+  --color-lilac-hover: #b9a5df;
   /* Surface: "Kurz gesagt", Studie, Redaktionen */
   --color-lilac-tint: #e9e4f1;
   /* Text: the serif word, active nav */

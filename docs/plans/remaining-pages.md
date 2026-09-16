@@ -95,7 +95,12 @@ the real test suite.
 15. From your worktree, all of these pass, and you paste their summary lines
     into your report:
     `npm run format` → `npm run format:check`, `npm run lint`, `npm run check`,
-    `npm run build`, and — in Wave 2 — `E2E_PORT=<your port> npm run test:e2e`.
+    `npm run build`, and — in Wave 2 — the suite for your page:
+    `E2E_PORT=<your port> npm run test:e2e -- --grep "<route>"` once per
+    route of your page, e.g. `--grep "de/forschung/"` and
+    `--grep "en/research/"`. That selects both the site checks and your
+    page spec. Other pages' specs fail until their units land — that is
+    expected and not yours.
 16. Commit with a conventional message that explains why. No AI attribution
     of any kind.
 17. Report: files changed; decisions; deviations from the board and why;
@@ -114,7 +119,24 @@ the real test suite.
   — one per collection, already registered in `src/content.config.ts`.
 - `resolvePage(to, locale, allPages)` / `pageHref()` / `homeHref()` in
   `src/i18n/pages.ts` — link to pages by translationKey.
-- `src/lib/styles.ts` — `container`, `arrow`, `EXTERNAL_GLYPH`, `heading`.
+- `src/lib/styles.ts` — `container`, `splitGrid`, `arrow`, `EXTERNAL_GLYPH`,
+  `heading` (levels `section`, `row`, `lookup`).
+- `src/components/primitives/` (from Unit A) — `PageHeader`, `PageTitle`,
+  `ListRow` (`default`, `static`, `date`, `publication`, `cv`; `edge`),
+  `Tile` (`row`, `card`), `Button` (one per page), `Callout`, `Section`
+  (`split`, `label`, `stacked`, `framed`), `MailLink` (`subject`, `label`),
+  `Portrait` (ratios, optional image), `TextLink` (with `download` for
+  "PDF ↓ (180 kB)" and BibTeX), `ExternalLink`, `Band`. Their props are
+  documented in each file; every variant is on the dev-only review page
+  `/dev/components/de/` (`npx astro dev --background --port <your port>`).
+  `links.ts` decides internal/external/mail from the URL and throws on `#`;
+  `format.ts` has `formatFileSize` and `dateParts`.
+- Stubs already carry link targets other pages use: the three research line
+  ids on Research, `#impressum` on Contact. Keep them when you replace the
+  stub.
+- The background's hero marks sit in the header gap on Home and Research, and
+  a small mark sits 96–114px from the top on phones. Page titles must stay
+  inside their column on desktop and start at or below 114px on phones.
 
 ---
 
@@ -150,7 +172,9 @@ CVA definition in `design/_Komponenten.dc.html` and the matching `ui-*` values.
   `<Picture>` with AVIF/WebP and `sizes`; placeholder otherwise.
 - `styles.ts` `heading` — add the h3 levels `row` (28/1.1, phone 22) and
   `lookup` (22/1.25, phone 18).
-- `src/pages/dev/components.astro` — every component and variant on one page,
+- `src/pages/dev/components/[locale].astro` (a locale segment, because the
+  site's locale routing answers 404 for page paths without one) — every
+  component and variant on one page,
   **built only in dev** (`getStaticPaths` returns nothing in production, or
   equivalent). Used for review.
 
@@ -274,6 +298,9 @@ of the three lines on the page.
   placeholders unless verified.
 - Paper links under lines use the verified DOIs.
 - The hormone-curve graphic is a page component, decorative, tokens only.
+- The question title wraps inside its column (no `nowrap`), keeping the
+  header's 7/5 split with a gap of at least 64px — the background's hero
+  marks sit in that gap.
 
 ### Unit P — Publications (board `design/boards/7a-publications.html`)
 
@@ -352,7 +379,9 @@ Owns `src/pages/404.astro` and the `notFound` collection instead of a view.
 
 - [x] Wave 0: canvas and sources on disk, shared files split, stubs registered,
       refactor proven output-identical.
-- [ ] Wave 1 dispatched · reviewed · merged · pre-existing E2E failures fixed
-- [ ] Page acceptance specs written (red)
+- [x] Wave 1 dispatched · reviewed · merged (Tim) · pre-existing E2E failures
+      fixed (icon declared, stub anchors) · worktrees removed.
+- [x] Page acceptance specs written (red): 42 failing, all on stub pages;
+      site and i18n suites green.
 - [ ] Wave 2 dispatched · reviewed · merged
 - [ ] Full suite green on `main`; browser pass at 375/768/1280; push

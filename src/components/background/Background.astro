@@ -104,8 +104,13 @@ interface Recipe {
   items: Piece[];
 }
 
-/** A length drawn on a `card`-wide board, as the same share of the viewport. */
-const vw = (px: number, card = 1280) => `calc(${px} / ${card} * 100vw)`;
+/**
+ * A length drawn on a `card`-wide board, as the same share of the viewport —
+ * up to a 1920px viewport, then it holds. Past that the motifs kept growing
+ * while the content stayed 1280 wide, and `kurvenPaar` climbed into the last
+ * research row on Home (measured: 9px clear of it at 1920).
+ */
+const vw = (px: number, card = 1280) => `calc(${px} / ${card} * min(100vw, 1920px))`;
 
 /** A length in the content column: scales with it up to 1280, then holds. */
 const column = (px: number) => `calc(${px} / 1280 * min(100%, 1280px))`;

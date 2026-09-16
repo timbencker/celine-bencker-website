@@ -177,6 +177,40 @@ The canvas has three layers that do not always agree: the brief, the
     "Neues Paper im British Journal of Psychiatry" and "Interview im Ö1
     Radiokolleg" are specific claims nobody has confirmed. `news.yaml` holds
     placeholders; the examples are kept there as comments.
+11. **Boards are not a source of facts.** Checked against Celine's public
+    ORCID record and Crossref (`design/sources/`), the CV board lists degrees
+    from Salzburg where ORCID has the University of Vienna, dates the ÖAW
+    funding a year late, and the Publications board dates the ISSAC protocol
+    2025 where it appeared in BMJ Open in 2026. Facts come only from verified
+    sources; the rest are placeholders.
+12. **Phone motifs at full size.** The canvas scales a large motif's box to the
+    phone board but draws the shape inside it unscaled, so the phone boards
+    show full-size circles clipped by the card. The port matches the boards.
+13. **Phone scale moved outward.** The canvas's own rule keeps edge marks 4px
+    inside the page margin; its phone scale breaks that. Long ticks sit 6px
+    further out and are cropped.
+14. **Decoration stops growing at 1920px.** Past that the motifs kept scaling
+    while the content stayed 1280 wide, and the curve pair on Home reached the
+    last research row.
+15. **Home's title is sized to its column.** Its desktop lines never wrap, and
+    the hero marks sit in the gap beside the column. The size follows the
+    column and the longest line (German 88px at 1280, English 82px); a line
+    may reach 16px into the gap, as on the board, leaving 8px before a mark.
+16. **Callout colours via tokens.** The board's #f1ecfa surface, #2e2a38 text
+    and lilac label have no tokens, and the label fails contrast (4.11:1) on
+    the tint. The callout uses the lilac tint and ink.
+17. **Favicon.** No icon is designed. `public/favicon.svg` is a placeholder in
+    the site colours (the Astro scaffold logo was removed).
+
+## Contrast over the background
+
+axe cannot compute contrast for text over the decorative layer, so it reports
+those nodes as "incomplete" rather than passing or failing them. They are
+covered by computed pairs instead: every text colour is checked against each
+surface and against every circle hue blended at its opacity (lowest:
+text-3 on the salbei circle, 4.63:1). The 8% circle outline lowers contrast
+only along its own 1.5px line (text-3 to 4.24:1 on the gelb circle) — accepted
+as a hairline, not a text background.
 
 ## Still to confirm before launch
 
@@ -184,8 +218,11 @@ The canvas has three layers that do not always agree: the brief, the
 - **Credit link** `https://timbencker.de` comes from an old WordPress export.
 - **English copy** on Home and the research teasers is a translation of the
   German draft.
-- **Profiles** — only ORCID has a known URL; Scholar, OSF, u:cris and LinkedIn
+- **Profiles** — ORCID and u:cris are verified; Scholar, OSF and LinkedIn
   appear once their addresses are in `site.yaml`.
+- **ÖAW position** ends 2026-09-30 per ORCID; the tagline "ÖAW DOC-Fellow"
+  needs updating after that date.
+- **Favicon** — a placeholder until an icon is designed.
 - **Nav at tablet width** — between 768px and roughly 1000px the five desktop
   links wrap to two rows. The spec allows one breakpoint only, so this is left
   as is.

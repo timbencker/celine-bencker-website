@@ -58,6 +58,9 @@ const xDefault = alternates.find((a) => a.locale === DEFAULT_LOCALE);
     <meta name="description" content={description} />
     {canonical && <link rel="canonical" href={canonical} />}
     {robots && <meta name="robots" content={robots} />}
+    {/* Declared explicitly: without it browsers ask for /favicon.ico at the
+        host root, which is outside the base path. */}
+    <link rel="icon" type="image/svg+xml" href={withBase('favicon.svg')} />
 
     {/* Reciprocal hreflang pairs, plus x-default pointing at the German version. */}
     {alternates.map((alt) => (
