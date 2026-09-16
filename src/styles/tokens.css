@@ -12,8 +12,14 @@
   --color-ink: #171a17;
   /* Page background */
   --color-paper: #f4f1ea;
-  /* Header surface (hairline below) and the second section surface */
+  /* Tiles and the second section surface */
   --color-bone: #efece4;
+  /*
+   * Footer and the open mobile menu. Not in the token list's "six colours",
+   * but four of the seven boards use it, distinctly from bone — the boards
+   * are the rendered state, so they win. See docs/design-inventory.md.
+   */
+  --color-bone-soft: #f2efe7;
 
   /* Band and button on light ground */
   --color-lilac: #c9b8ea;
@@ -27,8 +33,14 @@
 
   --color-text: #171a17;
   --color-text-2: #4a4e49;
-  /* Meta — holds >=4.5:1 on paper */
-  --color-text-3: #6b6d68;
+  /*
+   * Meta. The spec gives #6b6d68 and promises ">=4.5:1", but that value holds
+   * only on paper: 4.43 on bone, 4.19 on the lilac tint, ~4.3 over every
+   * verwoben circle hue — and the language switch and tagline sit on that
+   * circle. Five steps darker holds everywhere the site puts text
+   * (lowest: 4.52 on the tint). The nav component already used #676963.
+   */
+  --color-text-3: #666863;
 
   /* Hairline. Only between rows, and always this token, never rgba. */
   --color-line: #e1dcd1;
