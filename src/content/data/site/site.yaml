@@ -14,11 +14,14 @@ email: celine.bencker@univie.ac.at
 orcid: 0000-0002-3802-1339
 
 # Profile im Footer, in dieser Reihenfolge. Nur Einträge mit URL erscheinen.
-# Im Design außerdem vorgesehen: Google Scholar, OSF, u:cris, LinkedIn –
+# Im Design außerdem vorgesehen: Google Scholar, OSF, LinkedIn –
 # eintragen, sobald die Adressen feststehen.
+# ORCID und u:cris sind geprüft (u:cris-Adresse aus dem ORCID-Profil).
 profiles:
   - label: ORCID
     url: https://orcid.org/0000-0002-3802-1339
+  - label: u:cris
+    url: https://ucrisportal.univie.ac.at/en/persons/cdba83f5-11ee-4a47-88a9-e75d4f033632
 
 credit:
   label:

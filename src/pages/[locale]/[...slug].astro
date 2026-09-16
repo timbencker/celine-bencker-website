@@ -1,7 +1,12 @@
 ---
 import { assertTranslationsComplete, loadPages } from '../../i18n/pages';
+import ContactView from '../../views/ContactView.astro';
+import CvView from '../../views/CvView.astro';
 import DraftView from '../../views/DraftView.astro';
 import HomeView from '../../views/HomeView.astro';
+import PublicationsView from '../../views/PublicationsView.astro';
+import ResearchView from '../../views/ResearchView.astro';
+import TalksMediaView from '../../views/TalksMediaView.astro';
 
 /**
  * Every content page, in every language, from one route.
@@ -23,7 +28,15 @@ export async function getStaticPaths() {
   }));
 }
 
-const VIEWS = { home: HomeView } as const;
+/** One view per translationKey. Every page is registered; each view owns its own file. */
+const VIEWS = {
+  home: HomeView,
+  research: ResearchView,
+  publications: PublicationsView,
+  cv: CvView,
+  'talks-media': TalksMediaView,
+  contact: ContactView,
+} as const;
 
 const { page, allPages } = Astro.props;
 const View = Object.hasOwn(VIEWS, page.translationKey)

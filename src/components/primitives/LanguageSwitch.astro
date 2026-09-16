@@ -2,7 +2,6 @@
 import { cva } from 'class-variance-authority';
 
 import { LOCALE_LABELS, LOCALES, type Locale } from '../../i18n/config';
-import { pageHref, type ResolvedPage } from '../../i18n/pages';
 import { t } from '../../i18n/ui';
 
 /**
@@ -13,10 +12,11 @@ import { t } from '../../i18n/ui';
  */
 interface Props {
   locale: Locale;
-  counterpart: ResolvedPage | null;
+  /** The same page in the other language, or `null` when it does not exist. */
+  counterpartHref: string | null;
 }
 
-const { locale, counterpart } = Astro.props;
+const { locale, counterpartHref } = Astro.props;
 
 const item = cva('inline-flex min-h-[44px] items-center px-[7px] transition-colors', {
   variants: {
@@ -53,10 +53,10 @@ const underline = (on: boolean) =>
       );
     }
 
-    if (counterpart) {
+    if (counterpartHref) {
       return (
         <a
-          href={pageHref(counterpart)}
+          href={counterpartHref}
           lang={l}
           hreflang={l}
           data-language-choice={l}

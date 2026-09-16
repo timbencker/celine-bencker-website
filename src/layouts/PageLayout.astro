@@ -1,27 +1,13 @@
 ---
-import SiteFooter from '../components/primitives/SiteFooter.astro';
-import SiteNav from '../components/primitives/SiteNav.astro';
 import { LOCALES } from '../i18n/config';
-import {
-  backgroundPageFor,
-  findCounterpart,
-  homeHref,
-  navigationFor,
-  pageHref,
-  resolvePage,
-  type ResolvedPage,
-} from '../i18n/pages';
-import { getSite } from '../lib/site';
-import BaseLayout, { type Alternate } from './BaseLayout.astro';
+import { backgroundPageFor, findCounterpart, pageHref, type ResolvedPage } from '../i18n/pages';
+import type { Alternate } from './BaseLayout.astro';
+import SiteChrome from './SiteChrome.astro';
 
 /**
- * Page chrome — defined once and shared by every route in both languages, so
- * the German and English versions cannot drift apart.
- *
- * The header sits on paper with a hairline below, as on all seven boards, and
- * holds the navigation plus a `masthead` slot for the page's own title block.
- * Sections below the header manage their own width, so full-width surfaces
- * (the Home band, bone sections) can reach the edges.
+ * Chrome for a content page: derives title, hreflang alternates, canonical
+ * URL, language counterpart and background from the page's entry, then hands
+ * everything to SiteChrome.
  */
 interface Props {
   page: ResolvedPage;
@@ -31,11 +17,7 @@ interface Props {
 const { page, allPages } = Astro.props;
 const { locale, entry } = page;
 
-const site = await getSite();
-const nav = await navigationFor(locale, allPages);
 const counterpart = findCounterpart(page, allPages);
-const imprintHref = `${pageHref(resolvePage('contact', locale, allPages))}#impressum`;
-
 const absolute = (p: ResolvedPage) => new URL(pageHref(p), Astro.site).href;
 
 const alternates: Alternate[] = LOCALES.flatMap((l) => {
@@ -44,32 +26,18 @@ const alternates: Alternate[] = LOCALES.flatMap((l) => {
 });
 ---
 
-<BaseLayout
+<SiteChrome
   locale={locale}
   title={entry.data.title}
   description={entry.data.description}
+  currentHref={pageHref(page)}
+  counterpartHref={counterpart ? pageHref(counterpart) : null}
   background={entry.data.background}
   backgroundHue={entry.data.backgroundHue}
   backgroundPage={backgroundPageFor(page.translationKey)}
   alternates={alternates}
   canonical={absolute(page)}
 >
-  <header class="relative border-b border-line">
-    <SiteNav
-      locale={locale}
-      current={page}
-      nav={nav}
-      counterpart={counterpart}
-      homeHref={homeHref(locale)}
-      tagline={site.tagline[locale]}
-    />
-    <slot name="masthead" />
-  </header>
-
-  {/* tabindex lets the skip link move focus here; main itself is not interactive. */}
-  <main id="main" tabindex="-1" class="focus-visible:outline-none">
-    <slot />
-  </main>
-
-  <SiteFooter locale={locale} imprintHref={imprintHref} />
-</BaseLayout>
+  <slot name="masthead" slot="masthead" />
+  <slot />
+</SiteChrome>

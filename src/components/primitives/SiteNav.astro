@@ -21,15 +21,15 @@ import LanguageSwitch from './LanguageSwitch.astro';
  */
 interface Props {
   locale: Locale;
-  current: ResolvedPage;
+  /** Root-relative href of the current page; marks the active item. */
+  currentHref: string;
   nav: ResolvedPage[];
-  counterpart: ResolvedPage | null;
+  counterpartHref: string | null;
   homeHref: string;
   tagline: string;
 }
 
-const { locale, current, nav, counterpart, homeHref, tagline } = Astro.props;
-const currentHref = pageHref(current);
+const { locale, currentHref, nav, counterpartHref, homeHref, tagline } = Astro.props;
 const onHome = currentHref === homeHref;
 
 const navLink = cva('pb-0.5 text-[15px] transition-opacity hover:opacity-60', {
@@ -68,7 +68,7 @@ const navLink = cva('pb-0.5 text-[15px] transition-opacity hover:opacity-60', {
           );
         })}
       </ul>
-      <LanguageSwitch locale={locale} counterpart={counterpart} />
+      <LanguageSwitch locale={locale} counterpartHref={counterpartHref} />
     </div>
   </div>
 </nav>
@@ -123,7 +123,7 @@ const navLink = cva('pb-0.5 text-[15px] transition-opacity hover:opacity-60', {
     </nav>
 
     <div class={cn(container, 'flex justify-end pb-7 pt-4')}>
-      <LanguageSwitch locale={locale} counterpart={counterpart} />
+      <LanguageSwitch locale={locale} counterpartHref={counterpartHref} />
     </div>
   </details>
 </div>

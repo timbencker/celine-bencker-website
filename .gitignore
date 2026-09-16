@@ -25,3 +25,6 @@ pnpm-debug.log*
 
 # Reference copy of the Claude Design canvas (phase 1)
 design/
+
+# Per-agent git worktrees (parallel work units)
+.worktrees/

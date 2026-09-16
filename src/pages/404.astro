@@ -1,0 +1,42 @@
+---
+import { DEFAULT_LOCALE } from '../i18n/config';
+import { homeHref } from '../i18n/pages';
+import { t } from '../i18n/ui';
+import SiteChrome from '../layouts/SiteChrome.astro';
+import { container } from '../lib/styles';
+
+/**
+ * 404 — board 11a.
+ * OWNER: the 404 work unit. A minimal stub until the board is built.
+ *
+ * GitHub Pages serves this one file for every missing path in the project,
+ * whatever its language.
+ */
+const locale = DEFAULT_LOCALE;
+const home = homeHref(locale);
+---
+
+<SiteChrome
+  locale={locale}
+  title={t(locale, 'error.notFound.title')}
+  description={t(locale, 'error.notFound.body')}
+  currentHref=""
+  counterpartHref={homeHref('en')}
+  background="verwoben"
+  backgroundPage="notfound"
+  robots="noindex"
+>
+  <div slot="masthead" class={`${container} pb-10 pt-10 md:pb-[72px] md:pt-16`}>
+    <h1 class="text-[48px] font-bold leading-[0.98] tracking-[-0.045em] md:text-[72px]">
+      {t(locale, 'error.notFound.title')}
+    </h1>
+  </div>
+  <div class={`${container} py-14`}>
+    <p>
+      {t(locale, 'error.notFound.body')}{' '}
+      <a class="text-sage" href={home}>
+        {t(locale, 'nav.home')}
+      </a>
+    </p>
+  </div>
+</SiteChrome>

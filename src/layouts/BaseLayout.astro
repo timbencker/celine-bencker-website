@@ -29,6 +29,8 @@ interface Props {
   backgroundPage?: BackgroundPage;
   alternates?: Alternate[];
   canonical?: string;
+  /** e.g. `noindex` for the 404 page. */
+  robots?: string;
 }
 
 const {
@@ -40,6 +42,7 @@ const {
   backgroundPage = 'home',
   alternates = [],
   canonical,
+  robots,
 } = Astro.props;
 
 const xDefault = alternates.find((a) => a.locale === DEFAULT_LOCALE);
@@ -54,6 +57,7 @@ const xDefault = alternates.find((a) => a.locale === DEFAULT_LOCALE);
     <title>{title}</title>
     <meta name="description" content={description} />
     {canonical && <link rel="canonical" href={canonical} />}
+    {robots && <meta name="robots" content={robots} />}
 
     {/* Reciprocal hreflang pairs, plus x-default pointing at the German version. */}
     {alternates.map((alt) => (

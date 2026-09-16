@@ -1,0 +1,71 @@
+---
+import type {
+  BackgroundHue,
+  BackgroundPage,
+  BackgroundVariant,
+} from '../components/background/Background.astro';
+import SiteFooter from '../components/primitives/SiteFooter.astro';
+import SiteNav from '../components/primitives/SiteNav.astro';
+import type { Locale } from '../i18n/config';
+import { homeHref, loadPages, navigationFor, pageHref, resolvePage } from '../i18n/pages';
+import { getSite } from '../lib/site';
+import BaseLayout, { type Alternate } from './BaseLayout.astro';
+
+/**
+ * The site's chrome — document shell, header with navigation, main, footer —
+ * defined once and shared by every page in both languages, so the German and
+ * English versions cannot drift apart.
+ *
+ * It takes plain values rather than a content entry, so pages that are not
+ * content entries (the 404) get the same chrome. Content pages go through
+ * PageLayout, which derives these values from their entry.
+ *
+ * The header sits on paper with a hairline below, as on all seven boards, and
+ * holds the navigation plus a `masthead` slot for the page's own title block.
+ * Sections below the header manage their own width, so full-width surfaces
+ * (the Home band, bone sections) can reach the edges.
+ */
+interface Props {
+  locale: Locale;
+  title: string;
+  description: string;
+  /** Root-relative href of this page; marks the active nav item. */
+  currentHref: string;
+  /** Where the other-language control leads. `null` renders it disabled. */
+  counterpartHref: string | null;
+  background?: BackgroundVariant;
+  backgroundHue?: BackgroundHue;
+  backgroundPage?: BackgroundPage;
+  alternates?: Alternate[];
+  canonical?: string;
+  robots?: string;
+}
+
+const { locale, currentHref, counterpartHref, ...document } = Astro.props;
+
+const allPages = await loadPages();
+const site = await getSite();
+const nav = await navigationFor(locale, allPages);
+const imprintHref = `${pageHref(resolvePage('contact', locale, allPages))}#impressum`;
+---
+
+<BaseLayout locale={locale} {...document}>
+  <header class="relative border-b border-line">
+    <SiteNav
+      locale={locale}
+      currentHref={currentHref}
+      nav={nav}
+      counterpartHref={counterpartHref}
+      homeHref={homeHref(locale)}
+      tagline={site.tagline[locale]}
+    />
+    <slot name="masthead" />
+  </header>
+
+  {/* tabindex lets the skip link move focus here; main itself is not interactive. */}
+  <main id="main" tabindex="-1" class="focus-visible:outline-none">
+    <slot />
+  </main>
+
+  <SiteFooter locale={locale} imprintHref={imprintHref} />
+</BaseLayout>

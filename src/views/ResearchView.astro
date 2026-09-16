@@ -1,0 +1,18 @@
+---
+import type { ResolvedPage } from '../i18n/pages';
+import DraftView from './DraftView.astro';
+
+/**
+ * Research — board 10b.
+ * OWNER: the Research work unit. A stub that renders the draft view until the
+ * board is built. See docs/plans/remaining-pages.md.
+ */
+interface Props {
+  page: ResolvedPage;
+  allPages: ResolvedPage[];
+}
+
+const { page, allPages } = Astro.props;
+---
+
+<DraftView page={page} allPages={allPages} />
