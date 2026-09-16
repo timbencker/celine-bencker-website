@@ -1,11 +1,33 @@
 ---
+import { getCollection } from 'astro:content';
+
+import { shortAuthors } from '../components/cv/authors';
+import CvGroup from '../components/cv/CvGroup.astro';
+import { cvGroupsGrid } from '../components/cv/grid';
+import { cvPdf, type CvPdf } from '../components/cv/pdf';
+import { formatPeriod, formatYears } from '../components/cv/period';
+import Button from '../components/primitives/Button.astro';
+import ListRow from '../components/primitives/ListRow.astro';
+import PageHeader from '../components/primitives/PageHeader.astro';
+import PageTitle from '../components/primitives/PageTitle.astro';
+import Section from '../components/primitives/Section.astro';
+import TextLink from '../components/primitives/TextLink.astro';
+import { LOCALE_LABELS, otherLocale } from '../i18n/config';
 import type { ResolvedPage } from '../i18n/pages';
-import DraftView from './DraftView.astro';
+import PageLayout from '../layouts/PageLayout.astro';
+import { cn } from '../lib/cn';
+import { getSite } from '../lib/site';
+import { heading } from '../lib/styles';
 
 /**
- * CV — board 7b.
- * OWNER: the CV work unit. A stub that renders the draft view until the
- * board is built. See docs/plans/remaining-pages.md.
+ * CV — board 7b, "PDF-Download oben; Was ich mitbringe".
+ * Who: appointment and selection committees, funders.
+ * Job: a quick read of the record, then the PDF.
+ *
+ * Title with the PDF controls beside it, "Was ich mitbringe" on bone, then the
+ * record in label groups. Facts come from cv.yaml (ORCID only) and, for
+ * publications, from the publications collection; nothing is retyped here.
+ * Unconfirmed rows are placeholders, set in grey.
  */
 interface Props {
   page: ResolvedPage;
@@ -13,6 +35,187 @@ interface Props {
 }
 
 const { page, allPages } = Astro.props;
+const { locale } = page;
+const { title, cv } = page.entry.data;
+
+if (!cv) {
+  throw new Error(`src/content/pages/${page.entry.id}.md needs a \`cv\` block in its frontmatter.`);
+}
+
+// --- PDF: the page's own language first; a control only for a file that exists.
+const pdfs = [cvPdf(locale), cvPdf(otherLocale(locale))].filter((pdf) => pdf !== null);
+const [primaryPdf] = pdfs;
+/** "Lebenslauf, " for screen readers, then the file's language in that language. */
+const pdfLabel = (pdf: CvPdf) => ({
+  spoken: `${title}, `,
+  lang: pdf.locale,
+  text: LOCALE_LABELS[pdf.locale],
+});
+
+// --- The record -----------------------------------------------------------
+interface Row {
+  order: number;
+  period: string;
+  title: string;
+  detail?: string;
+  placeholder: boolean;
+}
+
+const records = (await getCollection('cv')).map((item) => item.data);
+
+const entryRows = new Map<string, Row[]>();
+for (const item of records) {
+  if (item.section === 'review') continue;
+  const rows = entryRows.get(item.section) ?? [];
+  rows.push({
+    order: item.order,
+    period: formatPeriod(item, cv.since),
+    title: item.title[locale],
+    detail: item.detail?.[locale],
+    placeholder: item.placeholder,
+  });
+  entryRows.set(item.section, rows);
+}
+
+// Peer review: one row that sums every record, journals in their order.
+const reviews = records
+  .filter((item) => item.section === 'review')
+  .sort((a, b) => a.order - b.order);
+if (reviews.length > 0) {
+  const total = reviews.reduce((sum, item) => sum + item.years.length, 0);
+  const plural = new Intl.PluralRules(locale).select(total) === 'one' ? 'one' : 'other';
+  const journals = new Intl.ListFormat(locale, { type: 'conjunction' }).format(
+    reviews.map((item) => `${item.journal} (${item.years.length})`),
+  );
+  const service = entryRows.get('service') ?? [];
+  service.push({
+    order: Math.min(...reviews.map((item) => item.order)),
+    period: formatYears(reviews.flatMap((item) => item.years)),
+    title: cv.reviews.title,
+    detail: `${cv.reviews[plural].replace('{n}', String(total))}: ${journals}`,
+    placeholder: false,
+  });
+  entryRows.set('service', service);
+}
+
+// Publications: derived from the publication list, newest first.
+const site = await getSite();
+const ownFamilyName = site.siteName.trim().split(/\s+/).at(-1) ?? site.siteName;
+const publicationRows: Row[] = (await getCollection('publications'))
+  .map((item) => item.data)
+  .filter((item) => (item.kind as string) !== 'talk')
+  .sort((a, b) => b.year - a.year)
+  .map((item, i) => ({
+    order: i,
+    period: String(item.year),
+    title: shortAuthors(item.authors, ownFamilyName),
+    detail: [item.venue ?? item.title, item.kind === 'preprint' && `(${cv.preprint})`]
+      .filter(Boolean)
+      .join(' '),
+    placeholder: false,
+  }));
+
+const groups = (
+  [
+    ['education', entryRows.get('education')],
+    ['positions', entryRows.get('positions')],
+    ['funding', entryRows.get('funding')],
+    ['publications', publicationRows],
+    ['talks', entryRows.get('talks')],
+    ['teaching', entryRows.get('teaching')],
+    ['service', entryRows.get('service')],
+  ] as const
+)
+  .map(([key, rows = []]) => ({
+    key,
+    title: cv.sections[key],
+    rows: [...rows].sort((a, b) => a.order - b.order),
+  }))
+  // An empty group is left out rather than shown as a bare heading.
+  .filter((group) => group.rows.length > 0);
+
+const lastStrength = cv.strengths.items.length - 1;
 ---
 
-<DraftView page={page} allPages={allPages} />
+<PageLayout page={page} allPages={allPages}>
+  <PageHeader slot="masthead">
+    <PageTitle title={title} intro={primaryPdf ? cv.introWithPdf : cv.intro} />
+    {primaryPdf && (
+      <div
+        slot="aside"
+        class="flex flex-wrap items-center gap-x-5 gap-y-3 md:justify-end md:gap-x-6"
+      >
+        {/*
+          The file's language names the control; the components add
+          "↓ (PDF, 180 kB)". Screen readers hear the page title first
+          ("Lebenslauf, English"), so the link makes sense on its own.
+        */}
+        {pdfs.map((pdf, i) => {
+          const label = pdfLabel(pdf);
+          const content = (
+            <span>
+              {[
+                <span class="visually-hidden">{label.spoken}</span>,
+                <span lang={label.lang}>{label.text}</span>,
+              ]}
+            </span>
+          );
+          return i === 0 ? (
+            <Button href={pdf.href} locale={locale} download={{ format: 'PDF', bytes: pdf.bytes }}>
+              {content}
+            </Button>
+          ) : (
+            <TextLink
+              href={pdf.href}
+              download={{ format: 'PDF', bytes: pdf.bytes, locale }}
+              class="text-[15px]"
+            >
+              {content}
+            </TextLink>
+          );
+        })}
+      </div>
+    )}
+  </PageHeader>
+
+  <div class="bg-bone-soft">
+    <Section labelledby="cv-strengths" space="compact">
+      <div class="flex flex-col gap-1.5 md:gap-3">
+        <h2 id="cv-strengths" class={heading({ level: 'section' })}>
+          {cv.strengths.heading}
+        </h2>
+        <p class="text-[14px] leading-[1.5] text-text-3 md:text-meta">{cv.strengths.note}</p>
+      </div>
+      <ul role="list" class="flex flex-col">
+        {cv.strengths.items.map((item, i) => (
+          <li>
+            <ListRow
+              kind="static"
+              title={item.title}
+              sub={item.text}
+              edge={i === 0 ? 'first' : i === lastStrength ? 'last' : undefined}
+            />
+          </li>
+        ))}
+      </ul>
+    </Section>
+  </div>
+
+  <Section layout="stacked" space="none" class={cn('pb-14 pt-5 md:pb-24 md:pt-14', cvGroupsGrid)}>
+    {groups.map((group) => (
+      <CvGroup id={`cv-${group.key}`} title={group.title}>
+        {group.rows.map((row) => (
+          <li>
+            <ListRow
+              kind="cv"
+              period={row.period}
+              title={row.title}
+              detail={row.detail}
+              class={row.placeholder ? 'text-text-3' : undefined}
+            />
+          </li>
+        ))}
+      </CvGroup>
+    ))}
+  </Section>
+</PageLayout>
