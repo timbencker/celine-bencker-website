@@ -1,0 +1,27 @@
+---
+import { cn } from '../../lib/cn';
+
+/**
+ * A term and its definition — `ui-Term` on the canvas: one paragraph on a pale
+ * lilac surface, the term in bold, the definition after it.
+ *
+ * The board's surface is #f1ecfa, which has no token; the lilac tint is the
+ * nearest one (ink on it: 14.1:1).
+ */
+interface Props {
+  term: string;
+  definition: string;
+  class?: string;
+}
+
+const { term, definition, class: className } = Astro.props;
+---
+
+<p
+  class={cn(
+    'max-w-[62ch] rounded-[8px] bg-lilac-tint px-4 py-3 text-[15.5px] leading-[1.55] text-ink',
+    className,
+  )}
+>
+  <strong class="font-bold">{term}</strong> {definition}
+</p>

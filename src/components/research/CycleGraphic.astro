@@ -1,0 +1,98 @@
+---
+import { cn } from '../../lib/cn';
+
+/**
+ * The schematic cycle in the study block (board 10b): estradiol and
+ * progesterone over 28 days, and one dot per check-in. Decoration — the
+ * caption beside it says what it shows — so it is hidden from assistive
+ * technology.
+ *
+ * Curves as on the board. The board draws four dots a day; the study protocol
+ * has five check-ins a day in the first cycle, so this draws five.
+ *
+ * The labels are HTML over the drawing rather than SVG text: SVG text scales
+ * with the drawing and would shrink to about 6px in the narrow tablet column.
+ * Colours are tokens: lilac text and sage for the curves (4.55:1 and 5.42:1 on
+ * paper), text-3 for the day labels (5.0:1).
+ */
+interface Props {
+  labels: {
+    start: string;
+    ovulation: string;
+    end: string;
+    estradiol: string;
+    progesterone: string;
+  };
+  class?: string;
+}
+
+const { labels, class: className } = Astro.props;
+
+/** Drawing units, as on the board: the axis runs from x 20 to 620. */
+const WIDTH = 640;
+const HEIGHT = 172;
+const X0 = 20;
+const X1 = 620;
+const DAYS = 28;
+const PER_DAY = 5;
+
+const step = (X1 - X0) / (DAYS - 1);
+const dots = Array.from({ length: DAYS }, (_, day) =>
+  Array.from({ length: PER_DAY }, (_, k) => ({
+    cx: (X0 + day * step).toFixed(1),
+    cy: (154 + k * 3.5).toFixed(1),
+  })),
+).flat();
+
+/** A label's left edge, as a share of the drawing width. */
+const at = (x: number) => `${((x / WIDTH) * 100).toFixed(2)}%`;
+/** A label's top edge, as a share of the drawing height. */
+const top = (y: number) => `${((y / HEIGHT) * 100).toFixed(2)}%`;
+---
+
+<div class={cn('flex flex-col gap-1', className)} aria-hidden="true">
+  <div class="relative">
+    <svg
+      viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
+      class="block h-auto w-full overflow-visible"
+      focusable="false"
+    >
+      <line x1={X0} y1="160" x2={X1} y2="160" stroke-opacity=".35" class="stroke-lilac-text" />
+      <path
+        d="M20,150 C120,150 220,40 320,60 C360,68 400,120 440,110 C500,100 560,120 620,150"
+        fill="none"
+        stroke-width="2.5"
+        class="stroke-lilac-text"
+      ></path>
+      <path
+        d="M20,155 C200,155 280,150 340,130 C400,90 440,70 480,80 C540,95 590,140 620,155"
+        fill="none"
+        stroke-width="2.5"
+        stroke-dasharray="6 5"
+        class="stroke-sage"
+      ></path>
+      <g class="fill-ink">
+        {dots.map((dot) => (
+          <circle cx={dot.cx} cy={dot.cy} r="1.4" />
+        ))}
+      </g>
+    </svg>
+    <span
+      class="absolute whitespace-nowrap text-[12px] leading-none text-lilac-text"
+      style={{ left: at(330), top: top(38) }}
+    >
+      {labels.estradiol}
+    </span>
+    <span
+      class="absolute whitespace-nowrap text-[12px] leading-none text-sage"
+      style={{ left: at(486), top: top(56) }}
+    >
+      {labels.progesterone}
+    </span>
+  </div>
+  <div class="grid grid-cols-3 px-[3.125%] text-[12px] leading-[1.4] text-text-3">
+    <span>{labels.start}</span>
+    <span class="text-center">{labels.ovulation}</span>
+    <span class="text-right">{labels.end}</span>
+  </div>
+</div>

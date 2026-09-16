@@ -1,0 +1,150 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import type { ComponentProps } from 'astro/types';
+
+import Button from '../primitives/Button.astro';
+import ExternalLink from '../primitives/ExternalLink.astro';
+import Section from '../primitives/Section.astro';
+import { doiUrl } from '../../content/schemas/research';
+import type { Locale } from '../../i18n/config';
+import { cn } from '../../lib/cn';
+import { heading, splitGrid } from '../../lib/styles';
+import CycleGraphic from './CycleGraphic.astro';
+import { expertOnly, plainOnly } from './register';
+import Term from './Term.astro';
+
+/**
+ * One research line on Research (board 10b): title on the left, text on the
+ * right (5/7), in both registers.
+ *
+ * - A plain line sits on paper; the board spaces the first 96px below the
+ *   header and the last 96px above Methods, 80px elsewhere.
+ * - A line with a `study` is the `framed` block: the same row, then the cycle
+ *   graphic with its caption beside the study's facts (5/7). That second row
+ *   follows its own width, not the viewport: below 1024px it stacks, and the
+ *   facts take three columns only from 576px — in the tablet's 7/12 column
+ *   they would be 100px wide and break words apart.
+ *
+ * The wrapper carries the line id, which Home links to.
+ *
+ * Registers: the specialist text always renders; where the line has plain text
+ * in this language, each version is tied to its register. Otherwise the
+ * specialist text shows in both. The two definitions follow the same rule.
+ */
+interface Props {
+  line: CollectionEntry<'research'>['data'];
+  locale: Locale;
+  graphic: ComponentProps<typeof CycleGraphic>['labels'];
+  first: boolean;
+  last: boolean;
+}
+
+const { line, locale, graphic, first, last } = Astro.props;
+const { study } = line;
+
+const headingId = `${line.id}-title`;
+const plain = line.textPlain[locale];
+const term = line.term?.[locale];
+const termPlain = line.termPlain?.[locale];
+const participate = study?.participate;
+
+const text = cn('text-[17px] leading-[1.5]', study ? 'md:text-[20px]' : 'md:text-[22px]');
+const paperLink = cn(
+  'text-[15px] font-semibold text-sage transition-colors hover:text-ink',
+  study ? 'md:text-[16px]' : 'md:text-[17px]',
+);
+
+// The frame brings its own padding; a study at either end of the list also
+// needs the room a plain line would have had there.
+const outer = (study && cn(first && 'pt-14 md:pt-24', last && 'pb-14 md:pb-24')) || undefined;
+const spacing = cn(
+  first ? 'pt-14 md:pt-24' : 'pt-10 md:pt-20',
+  last ? 'pb-14 md:pb-24' : 'pb-10 md:pb-20',
+);
+---
+
+<div id={line.id} class={outer}>
+  <Section
+    labelledby={headingId}
+    layout={study ? 'framed' : 'stacked'}
+    space="none"
+    class={study ? undefined : spacing}
+  >
+    <div class={cn(splitGrid, 'gap-3.5')}>
+      <div class="flex flex-col gap-1 md:gap-2">
+        <h2 id={headingId} class={heading({ level: 'row' })}>
+          {line.title[locale]}
+        </h2>
+        {study && (
+          <p class="text-[13px] leading-[1.5] text-text-3 md:text-meta">
+            {`${study.name[locale]} · ${study.status[locale]}`}
+          </p>
+        )}
+      </div>
+
+      <div class="flex flex-col gap-3.5 md:gap-4">
+        <p class={cn(text, plain && expertOnly)}>{line.text[locale]}</p>
+        {plain && <p class={cn(text, plainOnly)}>{plain}</p>}
+
+        {(participate || line.papers.length > 0) && (
+          <div class={cn('flex flex-wrap items-center gap-x-6 gap-y-4', participate && 'md:pt-2')}>
+            {participate && (
+              <Button href={participate.href} locale={locale}>
+                {participate.label[locale]}
+              </Button>
+            )}
+            {line.papers.length > 0 && (
+              <ul role="list" class="flex flex-wrap gap-x-6 gap-y-2">
+                {line.papers.map((paper) => (
+                  <li class="flex">
+                    <ExternalLink href={doiUrl(paper.doi)} locale={locale} class={paperLink}>
+                      {paper.label[locale]}
+                    </ExternalLink>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        )}
+
+        {term && (
+          <Term
+            term={term.term}
+            definition={term.definition}
+            class={termPlain ? expertOnly : undefined}
+          />
+        )}
+        {termPlain && (
+          <Term term={termPlain.term} definition={termPlain.definition} class={plainOnly} />
+        )}
+      </div>
+    </div>
+
+    {study && (
+      <div class="@container">
+        <div class="flex flex-col gap-7 @5xl:grid @5xl:grid-cols-12 @5xl:items-end @5xl:gap-16">
+          <div class="flex max-w-[640px] flex-col gap-2.5 @5xl:col-span-5">
+            <CycleGraphic labels={graphic} />
+            <p class="max-w-[60ch] text-[13px] leading-[1.5] text-text-3">
+              {study.caption[locale]}
+            </p>
+          </div>
+          {study.facts.length > 0 && (
+            <div class="@container @5xl:col-span-7">
+              <dl class="flex flex-col @xl:grid @xl:grid-cols-3 @xl:gap-8">
+                {study.facts.map((fact) => (
+                  <div class="flex flex-col gap-1 border-t border-line py-3 @xl:gap-1.5 @xl:pb-0 @xl:pt-4">
+                    <dt class="text-[12px] leading-[1.5] text-text-3 md:text-[13px]">
+                      {fact.label[locale]}
+                    </dt>
+                    <dd class="text-[15px] leading-[1.4] md:text-[17px]">{fact.value[locale]}</dd>
+                  </div>
+                ))}
+              </dl>
+            </div>
+          )}
+        </div>
+      </div>
+    )}
+  </Section>
+</div>
