@@ -383,5 +383,12 @@ Owns `src/pages/404.astro` and the `notFound` collection instead of a view.
       fixed (icon declared, stub anchors) · worktrees removed.
 - [x] Page acceptance specs written (red): 42 failing, all on stub pages;
       site and i18n suites green.
-- [ ] Wave 2 dispatched · reviewed · merged
+- [x] Wave 2 dispatched · reviewed · merged (Tim): 404, Contact, Talks &
+      Media, Publications, CV, Research.
+- [x] Integration fixes: split grid below 800px, Home teaser and exit lines,
+      download wording, unused strings, 404 in the site suite; open questions
+      collected in `docs/design-inventory.md`.
 - [ ] Full suite green on `main`; browser pass at 375/768/1280; push
+
+Status: **integration** — the work units are done; this file is kept as the
+record of how the pages were built.

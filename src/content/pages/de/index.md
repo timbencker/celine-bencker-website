@@ -24,10 +24,14 @@ home:
   # Die Forschungslinien darunter kommen aus src/content/data/research.yaml.
   researchHeading: Forschung
   exits:
+    # Die Zeilen versprechen nur, was die Seiten zeigen. Sobald Pressekit und
+    # CV-PDF unter public/ liegen, gelten wieder die Texte aus dem Design:
+    #   „Vorträge, Interviews, Pressekit mit Fotos & Bio"
+    #   „Vollständiger CV als PDF, DE / EN"
     - to: talks-media
       title: Presse & Medien
-      meta: Vorträge, Interviews, Pressekit mit Fotos & Bio
+      meta: Vorträge und Themen für Redaktionen
     - to: cv
       title: Lebenslauf
-      meta: Vollständiger CV als PDF, DE / EN
+      meta: Ausbildung, Positionen, Förderung und Publikationen
 ---

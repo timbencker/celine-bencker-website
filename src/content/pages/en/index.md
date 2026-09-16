@@ -21,10 +21,13 @@ home:
       label: Publications
   researchHeading: Research
   exits:
+    # Only what the pages show. Once the press kit and CV PDFs exist, the
+    # design's lines apply again: "Talks, interviews, press kit with photos &
+    # bio" and "Full CV as PDF, German / English".
     - to: talks-media
       title: Press & media
-      meta: Talks, interviews, press kit with photos & bio
+      meta: Talks and topics for editors
     - to: cv
       title: CV
-      meta: Full CV as PDF, German / English
+      meta: Education, positions, funding and publications
 ---

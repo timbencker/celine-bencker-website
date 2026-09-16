@@ -26,9 +26,6 @@ const de = {
   'image.pending': 'Bild folgt',
   'footer.profiles': 'Profile',
   'footer.imprint': 'Impressum',
-  'error.notFound.title': 'Seite nicht gefunden',
-  'error.notFound.body':
-    'Diese Seite existiert nicht (mehr). Vielleicht hilft die Startseite weiter.',
 } as const;
 
 const en: Record<keyof typeof de, string> = {
@@ -48,8 +45,6 @@ const en: Record<keyof typeof de, string> = {
   'image.pending': 'Image to follow',
   'footer.profiles': 'Profiles',
   'footer.imprint': 'Imprint',
-  'error.notFound.title': 'Page not found',
-  'error.notFound.body': 'This page does not exist. The home page may help.',
 };
 
 export type UIKey = keyof typeof de;

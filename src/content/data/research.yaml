@@ -96,12 +96,12 @@
   title:
     de: Stress im Alltag über den Zyklus
     en: Everyday stress across the cycle
-  # Achtung: „einen ganzen Zyklus lang" widerspricht dem Studienprotokoll (zwei
-  # Zyklen), „Handy" nennt es nicht. Der Teaser erscheint auf der Startseite und
-  # bleibt deshalb vorerst unverändert – von Celine zu prüfen.
+  # An das Studienprotokoll angepasst (zwei Zyklen; ein Handy nennt es nicht).
+  # Design: „Handy-Abfragen und Speichelproben, einen ganzen Zyklus lang."
+  # Entwurf – von Celine zu prüfen. EN: Übersetzung – von Celine zu prüfen.
   teaser:
-    de: Handy-Abfragen und Speichelproben, einen ganzen Zyklus lang.
-    en: Smartphone check-ins and saliva samples, across a whole cycle.
+    de: Kurze Abfragen im Alltag und Speichelproben, über zwei Zyklen.
+    en: Short check-ins in daily life and saliva samples, across two cycles.
   # Entwurf aus dem Design, gegen das Studienprotokoll korrigiert – von Celine zu
   # prüfen. Der ausgeschriebene Studienname stammt aus dem Protokoll (Design:
   # „Interactions in Stress and Symptoms Across the Menstrual Cycle"); das

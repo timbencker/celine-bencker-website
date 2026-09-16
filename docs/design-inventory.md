@@ -201,6 +201,19 @@ The canvas has three layers that do not always agree: the brief, the
     the tint. The callout uses the lilac tint and ink.
 17. **Favicon.** No icon is designed. `public/favicon.svg` is a placeholder in
     the site colours (the Astro scaffold logo was removed).
+18. **The ISSAC study follows its published protocol.** The Research board
+    says one cycle, "4 × täglich ~2 Min am Handy" and "Frauen 18–45"; the
+    protocol (BMJ Open 2026) says two cycles, five check-ins a day in the first
+    and one at bedtime in the second, ages 21–45 with and without symptoms,
+    and expands the acronym differently. The page and Home's teaser follow the
+    protocol.
+19. **Promises only for what exists.** Buttons and lines that promise a CV PDF
+    or a press kit appear only once the file is under `public/`; until then
+    Home's two exit lines describe what the pages actually show.
+20. **The split grid is two tracks.** `_Komponenten` defines `split` as
+    12 columns with 64px gaps; below 800px the gaps alone exceed the content
+    width and the columns collapsed. The first track is the same 5 columns
+    plus 4 gaps, written so it stays positive at every width.
 
 ## Contrast over the background
 
@@ -214,15 +227,50 @@ as a hairline, not a text background.
 
 ## Still to confirm before launch
 
+Everything marked `PLATZHALTER`, `# Entwurf …` or `# EN: Übersetzung …` in
+`src/content/` is waiting for Celine. The decisions behind them:
+
+**Legal — needs a review before the site is public**
+
+- Impressum and privacy note on Contact are drafts, visibly marked. Open:
+  whether ECG § 5 applies on top of § 25 MedienG, which address the Impressum
+  must name, whether the short privacy note suffices (controller, legal
+  basis, rights, US transfer via GitHub), and whether the English version
+  should defer to the German one.
+
+**Facts only Celine can give**
+
+- Addresses: the Impressum address and the department's postal address.
+- Name form ("Celine Bencker, MSc"), the doctorate (subject, start), and what
+  follows the ÖAW position, which ends 2026-09-30 per ORCID. The tagline
+  "ÖAW DOC-Fellow", the Contact institute block and "Ich arbeite am Institut"
+  on Research all depend on it.
+- ISSAC: is the study running and recruiting, and is there a sign-up address
+  (the Research "Teilnehmen" button and the Contact tile wait for it)?
+- Talks: the ICBM 2025 date (ORCID gives 5 and 6 August) and city; whether the
+  ISSAC abstract was also presented; upcoming talks.
+- Media pieces, an approved quote with audio, a press photo, the press kit, and
+  the CV PDFs (`public/cv-de.pdf`, `public/cv-en.pdf`).
+- Publications: whether to list the eClinicalMedicine haematology trial (a real
+  co-authorship from the Hanusch role); the DOI of the Happiness-Increasing
+  Strategies Scale paper (Crossref found only a PsycTESTS record); the BJPsych
+  volume once in print; any submitted manuscripts.
+- CV: teaching, prizes, memberships, research stays; the German name of the
+  Hanusch department; whether public peer-review counts are fine.
+- Research: prevalence figures for "Wie häufig ist das?" with a source; the
+  wording "Kooperationen unter anderem nach Uppsala" (it rests on a co-author's
+  affiliation); "Frauen" vs "menstruierende Personen".
+- Profiles: Google Scholar, OSF and LinkedIn addresses (ORCID and u:cris are
+  verified).
+
+**Checks for Tim**
+
 - **Email** `celine.bencker@univie.ac.at` comes from the footer design.
 - **Credit link** `https://timbencker.de` comes from an old WordPress export.
-- **English copy** on Home and the research teasers is a translation of the
-  German draft.
-- **Profiles** — ORCID and u:cris are verified; Scholar, OSF and LinkedIn
-  appear once their addresses are in `site.yaml`.
-- **ÖAW position** ends 2026-09-30 per ORCID; the tagline "ÖAW DOC-Fellow"
-  needs updating after that date.
+- **English copy** throughout is a translation of the German draft.
 - **Favicon** — a placeholder until an icon is designed.
 - **Nav at tablet width** — between 768px and roughly 1000px the five desktop
   links wrap to two rows. The spec allows one breakpoint only, so this is left
   as is.
+- **Talk list goes stale** — "upcoming" vs "past" is decided at build time, so
+  the site needs a rebuild (or a scheduled deploy) after a talk date passes.
