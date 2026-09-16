@@ -2,9 +2,20 @@
 #   title       – Titel der Linie
 #   teaser      – ein Satz; erscheint auf der Startseite unter dem Titel
 #   text        – die fachliche Fassung (Forschungsseite, Register „Fachlich")
-#   textPlain   – „Einfach erklärt" (Deutsch nötig, Englisch optional)
+#   textPlain   – „Einfach erklärt" (Deutsch nötig, Englisch optional; fehlt
+#                 eine Sprache, zeigt die Seite dort in beiden Registern `text`)
+#   papers      – Paper unter der Linie; `doi` muss einer der geprüften DOIs
+#                 sein (src/content/schemas/research.ts), `label` nennt das Journal
+#   term        – Begriffserklärung zur fachlichen Fassung
+#   termPlain   – Begriffserklärung zur einfachen Fassung (ersetzt `term` dort)
+#   study       – macht die Linie zum Studienkasten mit Grafik und Eckdaten
+#
 # Titel und Teaser stammen aus dem Design-Entwurf; die englischen Fassungen sind
 # Übersetzungen und brauchen noch Celines Durchsicht.
+#
+# Quellen der Fakten: Celines ORCID-Eintrag und die Crossref-Daten zu ihren DOIs
+# (design/sources/). „Studienprotokoll" meint unten immer BMJ Open 2026,
+# DOI 10.1136/bmjopen-2026-123210, Abschnitt „Methods and analysis" des Abstracts.
 
 - id: pms-stress
   order: 0
@@ -14,25 +25,193 @@
   teaser:
     de: Warum reagieren manche Körper vor der Periode stärker auf Stress?
     en: Why do some bodies react more strongly to stress before their period?
+  # Entwurf aus dem Design – von Celine zu prüfen
+  # EN: Übersetzung – von Celine zu prüfen
   text:
-    de: PLATZHALTER – fachliche Beschreibung dieser Forschungslinie.
-    en: PLACEHOLDER – specialist description of this research line.
+    de: >-
+      Systematische Reviews und Multilevel-Meta-Analysen zum Zusammenhang
+      prämenstrueller Symptome und Störungen (PMS, PMDS/PMDD) mit akutem,
+      chronischem und traumatischem Stress. Fokus auf Effektstärken, Moderatoren
+      und methodische Heterogenität der Primärstudien.
+    en: >-
+      Systematic reviews and multilevel meta-analyses of how premenstrual
+      symptoms and disorders (PMS, PMDD) relate to acute, chronic and traumatic
+      stress. The focus is on effect sizes, moderators and the methodological
+      heterogeneity of the primary studies.
+  # Entwurf aus dem Design – von Celine zu prüfen
+  # EN: Übersetzung – von Celine zu prüfen
   textPlain:
-    de: PLATZHALTER – dieselbe Linie, so einfach wie möglich und immer noch richtig.
+    de: >-
+      Viele Frauen fühlen sich in den Tagen vor der Periode gestresster,
+      gereizter oder erschöpfter. Ich untersuche, ob Stress – auch belastende
+      Erlebnisse aus der Vergangenheit – diese Beschwerden verstärkt, und
+      umgekehrt. Dafür fasse ich die Ergebnisse vieler Studien zusammen. Bei
+      manchen sind die Beschwerden so stark, dass sie den Alltag bestimmen – dann
+      spricht man nicht mehr von PMS, sondern von einer prämenstruellen
+      dysphorischen Störung, kurz PMDS.
+    en: >-
+      Many women feel more stressed, irritable or exhausted in the days before
+      their period. I study whether stress – including distressing experiences
+      in the past – makes these symptoms worse, and the other way round. To find
+      out, I bring together the results of many studies. For some women the
+      symptoms are so strong that they shape everyday life – then it is no
+      longer called PMS but premenstrual dysphoric disorder, or PMDD.
+  papers:
+    # ORCID + Crossref: The British Journal of Psychiatry, 2025.
+    - doi: 10.1192/bjp.2025.10311
+      label:
+        de: Paper im British Journal of Psychiatry
+        en: Paper in the British Journal of Psychiatry
+  # Entwurf aus dem Design – von Celine zu prüfen
+  # EN: Übersetzung – von Celine zu prüfen
+  term:
+    de:
+      term: PMDS / PMDD –
+      definition: >-
+        die klinisch bedeutsame Form prämenstrueller Störungen. Ausgeprägte
+        Stimmungs- und Belastungssymptome in der zweiten Zyklushälfte, die mit
+        dem Einsetzen der Blutung abklingen – im Deutschen PMDS, international
+        PMDD.
+    en:
+      term: PMDD –
+      definition: >-
+        premenstrual dysphoric disorder, the clinically significant form of
+        premenstrual disorders. Marked mood and distress symptoms in the second
+        half of the cycle that subside once bleeding begins.
+  termPlain:
+    # Die Frage ist Entwurf aus dem Design; die Antwort nennt Zahlen, die keine
+    # geprüfte Quelle belegt. Design: „Die meisten Frauen bemerken vor der
+    # Periode körperliche oder seelische Veränderungen. Deutlich belastend sind
+    # sie bei etwa jeder fünften – die schwere Form PMDS betrifft rund 3 bis 8
+    # Prozent."
+    de:
+      term: Wie häufig ist das?
+      definition: PLATZHALTER – Angaben zur Häufigkeit, mit Quelle.
+    en:
+      term: How common is it?
+      definition: PLACEHOLDER – how common it is, with a source.
 
 - id: stress-im-alltag
   order: 1
   title:
     de: Stress im Alltag über den Zyklus
     en: Everyday stress across the cycle
+  # Achtung: „einen ganzen Zyklus lang" widerspricht dem Studienprotokoll (zwei
+  # Zyklen), „Handy" nennt es nicht. Der Teaser erscheint auf der Startseite und
+  # bleibt deshalb vorerst unverändert – von Celine zu prüfen.
   teaser:
     de: Handy-Abfragen und Speichelproben, einen ganzen Zyklus lang.
     en: Smartphone check-ins and saliva samples, across a whole cycle.
+  # Entwurf aus dem Design, gegen das Studienprotokoll korrigiert – von Celine zu
+  # prüfen. Der ausgeschriebene Studienname stammt aus dem Protokoll (Design:
+  # „Interactions in Stress and Symptoms Across the Menstrual Cycle"); das
+  # Design nennt „einen vollständigen Menstruationszyklus", das Protokoll zwei
+  # Zyklen mit fünf Abfragen täglich im ersten und einer vor dem Schlafengehen
+  # im zweiten.
+  # EN: Übersetzung – von Celine zu prüfen
   text:
-    de: PLATZHALTER – fachliche Beschreibung dieser Forschungslinie.
-    en: PLACEHOLDER – specialist description of this research line.
+    de: >-
+      Interactions between premenstrual Symptoms and Stress Across the menstrual
+      Cycle (ISSAC): Ecological Momentary Assessment über zwei aufeinanderfolgende
+      Menstruationszyklen – im ersten fünf Abfragen täglich, im zweiten eine vor
+      dem Schlafengehen – zu subjektivem Stress, Affekt und prämenstruellen
+      Symptomen, kombiniert mit Speichelcortisol und Alpha-Amylase als
+      psychobiologischen Stressmarkern. Mehrebenenmodelle für intra- und
+      interindividuelle Zusammenhänge.
+    en: >-
+      Interactions between premenstrual Symptoms and Stress Across the menstrual
+      Cycle (ISSAC): ecological momentary assessment over two consecutive
+      menstrual cycles – five prompts a day in the first, one at bedtime in the
+      second – of subjective stress, affect and premenstrual symptoms, combined
+      with salivary cortisol and alpha-amylase as psychobiological stress
+      markers. Multilevel models for within- and between-person associations.
+  # Entwurf aus dem Design, gegen das Studienprotokoll korrigiert – von Celine zu
+  # prüfen. Design: „Teilnehmerinnen beantworten mehrmals täglich kurze Fragen am
+  # Handy und geben Speichelproben ab. So sehen wir, wie Stress und Hormone sich
+  # Tag für Tag verändern – und wo sie zusammenhängen."
+  # EN: Übersetzung – von Celine zu prüfen
   textPlain:
-    de: PLATZHALTER – dieselbe Linie, einfach erklärt.
+    de: >-
+      Statt Menschen ins Labor zu holen, begleite ich sie durch ihren Alltag:
+      Teilnehmerinnen beantworten über zwei Zyklen kurze Fragen – im ersten
+      mehrmals am Tag – und geben Speichelproben ab. So sehen wir, wie sich
+      Stress, Stresshormone und Beschwerden von Tag zu Tag verändern – und wo sie
+      zusammenhängen.
+    en: >-
+      Instead of bringing people into the lab, I follow them through their
+      everyday lives: over two cycles, participants answer short questions –
+      several times a day in the first – and give saliva samples. This shows how
+      stress, stress hormones and symptoms change from day to day – and where
+      they are linked.
+  papers:
+    # ORCID + Crossref: BMJ Open 16(9), 2026 – das Studienprotokoll.
+    - doi: 10.1136/bmjopen-2026-123210
+      label:
+        de: Studienprotokoll
+        en: Study protocol
+  study:
+    # Name: ORCID und Studienprotokoll.
+    name:
+      de: ISSAC-Studie
+      en: ISSAC study
+    # Design: „läuft". Ob die Studie noch läuft oder Teilnehmende sucht, belegt
+    # keine Quelle.
+    status:
+      de: PLATZHALTER – Stand
+      en: PLACEHOLDER – status
+    # Eckdaten aus dem Studienprotokoll – von Celine zu prüfen, ob sie so für
+    # Teilnehmende gelten. Das Design nannte andere Werte, die dem Protokoll
+    # widersprechen:
+    #   Dauer:   „ein vollständiger Zyklus, ca. 28 Tage"
+    #   Aufwand: „4 × täglich ~2 Min am Handy, dazu Speichelproben"
+    #   Gesucht: „Frauen 18–45 mit regelmäßigem Zyklus"
+    # „Gesucht" heißt hier „Teilnehmende": ob gerade rekrutiert wird, ist offen.
+    # EN: Übersetzung – von Celine zu prüfen
+    facts:
+      # Protokoll: „Following a follicular-phase baseline visit, participants
+      # will complete an EMA protocol across two menstrual cycles (ovulation to
+      # ovulation)"
+      - label:
+          de: Dauer
+          en: Duration
+        value:
+          de: ein erster Termin, dann zwei Zyklen von Eisprung zu Eisprung
+          en: a first appointment, then two cycles from ovulation to ovulation
+      # Protokoll: „five daily assessments during cycle 1 … and a bedtime-only
+      # prompt during cycle 2" · „Saliva will be collected on awakening, +30 min
+      # and at 19:00"
+      - label:
+          de: Aufwand
+          en: Effort
+        value:
+          de: im ersten Zyklus fünf Abfragen am Tag, im zweiten eine vor dem Schlafengehen, dazu Speichelproben
+          en: five check-ins a day in the first cycle, one at bedtime in the second, plus saliva samples
+      # Protokoll: „80 menstruating individuals aged 21–45 years with regular
+      # cycles, spanning the full spectrum of premenstrual symptom severity"
+      - label:
+          de: Teilnehmende
+          en: Participants
+        value:
+          de: menstruierende Personen von 21 bis 45 Jahren mit regelmäßigem Zyklus, mit und ohne prämenstruelle Beschwerden
+          en: people aged 21 to 45 who menstruate regularly, with or without premenstrual symptoms
+    # Entwurf aus dem Design, gegen das Studienprotokoll korrigiert – von Celine
+    # zu prüfen. Design: „jeder Punkt eine Messung (4 × täglich: Stress,
+    # Stimmung, Speichelprobe)". Die Grafik zeichnet deshalb fünf Punkte am Tag.
+    # EN: Übersetzung – von Celine zu prüfen
+    caption:
+      de: >-
+        Schematisch: Hormonverlauf über einen Zyklus. Jeder Punkt steht für eine
+        Abfrage im Alltag – im ersten Studienzyklus fünf am Tag.
+      en: >-
+        Schematic: hormone levels across one cycle. Each dot stands for one
+        check-in in daily life – five a day in the first study cycle.
+    # Der Button „Teilnehmen" erscheint erst mit einer echten Adresse
+    # (Anmeldeformular oder Studienseite). Im Design ohne Ziel:
+    # participate:
+    #   label:
+    #     de: Teilnehmen
+    #     en: Take part
+    #   href: https://…
 
 - id: hormone-gehirn-stimmung
   order: 2
@@ -42,8 +221,34 @@
   teaser:
     de: Was Progesteron mit Stimmung, Stressempfinden und Denken macht.
     en: What progesterone does to mood, stress perception and thinking.
+  # Entwurf aus dem Design – von Celine zu prüfen
+  # EN: Übersetzung – von Celine zu prüfen
   text:
-    de: PLATZHALTER – fachliche Beschreibung dieser Forschungslinie.
-    en: PLACEHOLDER – specialist description of this research line.
+    de: >-
+      Übersicht zu Progestagenen und Progesteronrezeptor-Modulation: Effekte auf
+      Gehirnstruktur und -funktion, Affekt, Stressreaktivität und Kognition bei
+      Frauen, einschließlich synthetischer Progestine in hormonellen
+      Kontrazeptiva.
+    en: >-
+      A review of progestagens and progesterone receptor modulation: effects on
+      brain structure and function, affect, stress reactivity and cognition in
+      females, including synthetic progestins in hormonal contraceptives.
+  # Entwurf aus dem Design – von Celine zu prüfen
+  # EN: Übersetzung – von Celine zu prüfen
   textPlain:
-    de: PLATZHALTER – dieselbe Linie, einfach erklärt.
+    de: >-
+      Progesteron ist ein Hormon, das nach dem Eisprung ansteigt und im Gehirn
+      wirkt. Ich trage zusammen, was die Forschung darüber weiß, wie es
+      Stimmung, Stressempfinden und Denken beeinflusst – auch bei hormoneller
+      Verhütung.
+    en: >-
+      Progesterone is a hormone that rises after ovulation and acts on the
+      brain. I bring together what research knows about how it affects mood,
+      the experience of stress and thinking – including with hormonal
+      contraception.
+  papers:
+    # ORCID + Crossref: Frontiers in Neuroendocrinology 76, 2025.
+    - doi: 10.1016/j.yfrne.2024.101160
+      label:
+        de: Paper in Frontiers in Neuroendocrinology
+        en: Paper in Frontiers in Neuroendocrinology

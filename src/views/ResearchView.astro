@@ -1,16 +1,29 @@
 ---
 import { getCollection } from 'astro:content';
 
+import ListRow from '../components/primitives/ListRow.astro';
+import MailLink from '../components/primitives/MailLink.astro';
+import PageHeader from '../components/primitives/PageHeader.astro';
+import PageTitle from '../components/primitives/PageTitle.astro';
+import Section from '../components/primitives/Section.astro';
+import RegisterToggle from '../components/research/RegisterToggle.astro';
+import ResearchLine from '../components/research/ResearchLine.astro';
+import { doiUrl } from '../content/schemas/research';
 import type { ResolvedPage } from '../i18n/pages';
-import DraftView from './DraftView.astro';
+import PageLayout from '../layouts/PageLayout.astro';
+import { cn } from '../lib/cn';
+import { getSite } from '../lib/site';
+import { heading } from '../lib/styles';
 
 /**
- * Research — board 10b.
- * OWNER: the Research work unit. A stub that renders the draft view until the
- * board is built. See docs/plans/remaining-pages.md.
+ * Research — board 10b, "Frage + Toggle im Hero".
+ * Who: researchers and collaborators; journalists through "Einfach erklärt".
+ * Job: show depth and where to connect (methods, collaboration).
  *
- * It already carries the three line anchors Home links to, so those links
- * resolve while the page is a stub.
+ * The question as the title, the register toggle beside it, the three research
+ * lines (the second is the ISSAC study, framed), Methods, and Collaboration on
+ * bone. The toggle switches every line between specialist and plain text
+ * without JavaScript — see components/research/register.ts.
  */
 interface Props {
   page: ResolvedPage;
@@ -18,13 +31,92 @@ interface Props {
 }
 
 const { page, allPages } = Astro.props;
+const { locale } = page;
+const { research } = page.entry.data;
+
+if (!research) {
+  throw new Error(`src/content/pages/${page.entry.id}.md needs a \`research\` block.`);
+}
+
+const site = await getSite();
 const lines = (await getCollection('research')).sort((a, b) => a.data.order - b.data.order);
+
+/**
+ * The question wraps inside its column, and the hero marks sit in the gap
+ * beside it, so its longest word must fit the column: on a tablet the 7/12
+ * column is 355px, where "prämenstruelle" at 72px (486px) would break
+ * mid-word. From md the size follows the column (container query units) and
+ * the longest word, and never exceeds the spec's 72px.
+ *
+ * WORD_FIT is the width one character takes at this weight and tracking, in
+ * em, with a margin: measured in Chrome, "prämenstruelle" is 6.75em (0.48 per
+ * character), "zusammenhängen?" 0.58 and "Symptome" 0.60. Measured: German
+ * 72px at 1280 and 42px at 768; English 72px and 49px.
+ */
+const WORD_FIT = 0.6;
+const longestWord = Math.max(...research.question.split(/\s+/).map((word) => [...word].length));
+const titleFit = `--title-fit: calc(100cqi / ${(longestWord * WORD_FIT).toFixed(2)})`;
 ---
 
-<DraftView page={page} allPages={allPages}>
-  <ul role="list">
-    {lines.map((line) => (
-      <li id={line.data.id}>{line.data.title[page.locale]}</li>
-    ))}
-  </ul>
-</DraftView>
+<PageLayout page={page} allPages={allPages}>
+  <PageHeader slot="masthead">
+    <div class="@container" style={titleFit}>
+      <PageTitle
+        size="question"
+        title={research.question}
+        class="md:[&_h1]:text-[length:min(72px,var(--title-fit))]"
+      />
+    </div>
+    <RegisterToggle slot="aside" {...research.register} />
+  </PageHeader>
+
+  {lines.map((line, i) => (
+    <ResearchLine
+      line={line.data}
+      locale={locale}
+      graphic={research.graphic}
+      first={i === 0}
+      last={i === lines.length - 1}
+    />
+  ))}
+
+  <Section layout="stacked" space="compact" labelledby="research-methods">
+    <h2 id="research-methods" class={cn(heading({ level: 'section' }), 'mb-6')}>
+      {research.methods.heading}
+    </h2>
+    <ul role="list" class="flex flex-col">
+      {research.methods.items.map((item) => (
+        <li>
+          <ListRow
+            kind="publication"
+            columns
+            locale={locale}
+            title={item.title}
+            sub={item.text}
+            href={doiUrl(item.doi)}
+            linkLabel={item.label}
+          />
+        </li>
+      ))}
+    </ul>
+  </Section>
+
+  <Section surface="bone" space="compact" labelledby="research-collaboration">
+    <h2 id="research-collaboration" class={heading({ level: 'section' })}>
+      {research.collaboration.heading}
+    </h2>
+    <div class="flex flex-col gap-6">
+      <p class="max-w-[56ch] text-[17px] leading-[1.5] md:text-[20px]">
+        {research.collaboration.text}
+      </p>
+      {site.email && (
+        <p>
+          <MailLink
+            email={site.email}
+            class="break-all text-[18px] font-bold tracking-[-0.02em] text-sage transition-colors hover:text-ink md:break-normal md:text-[20px]"
+          />
+        </p>
+      )}
+    </div>
+  </Section>
+</PageLayout>
