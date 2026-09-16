@@ -6,6 +6,8 @@ import { collectPageErrors } from './support/errors';
 import {
   type Alternate,
   BASE_PATH,
+  BASE_URL,
+  PRODUCTION_BASE_URL,
   type Route,
   loadSitemapRoutes,
   routePathOf,
@@ -50,17 +52,43 @@ async function readAlternates(page: Page): Promise<Alternate[]> {
 
 const byHreflang = (a: Alternate, b: Alternate) => a.hreflang.localeCompare(b.hreflang);
 
-for (const route of loadSitemapRoutes()) {
+interface CheckedRoute extends Route {
+  /** The HTTP status the page is served with. */
+  status: number;
+}
+
+/**
+ * The 404 page is not in the sitemap, but every visitor who follows a broken
+ * link sees it, so it gets the same checks — served with 404, and without
+ * hreflang alternates (it has no language counterpart).
+ */
+const NOT_FOUND_PATH = '/de/diese-seite-gibt-es-nicht/';
+const NOT_FOUND: CheckedRoute = {
+  path: NOT_FOUND_PATH,
+  locale: 'de',
+  expectedLang: GERMAN,
+  url: new URL(NOT_FOUND_PATH.slice(1), BASE_URL).href,
+  productionUrl: new URL(NOT_FOUND_PATH.slice(1), PRODUCTION_BASE_URL).href,
+  alternates: [],
+  status: 404,
+};
+
+const ROUTES: CheckedRoute[] = [
+  ...loadSitemapRoutes().map((route) => ({ ...route, status: 200 })),
+  NOT_FOUND,
+];
+
+for (const route of ROUTES) {
   for (const viewport of VIEWPORTS) {
     test.describe(`${route.path} @ ${viewport.width}px`, () => {
       test.use({ viewport });
 
-      test('responds 200 with its language, one h1, the landmarks and an icon', async ({
+      test(`responds ${route.status} with its language, one h1, the landmarks and an icon`, async ({
         page,
       }) => {
         const response = await open(page, route);
 
-        expect.soft(response?.status(), 'HTTP status').toBe(200);
+        expect.soft(response?.status(), 'HTTP status').toBe(route.status);
         expect
           .soft(route.expectedLang, `"${route.locale}" in the path is not a locale of this site`)
           .not.toBeNull();
@@ -163,7 +191,15 @@ for (const route of loadSitemapRoutes()) {
         await open(page, route);
         await page.waitForLoadState('networkidle');
 
-        expect(errors.length, report('errors while loading the page', errors)).toBe(0);
+        // A page served with an error status logs that status for its own
+        // document; that one entry is the page doing its job, not a fault.
+        const unexpected =
+          route.status === 200
+            ? errors
+            : errors.filter(
+                (e) => !(e.includes('Failed to load resource') && e.includes(`(${route.url}:`)),
+              );
+        expect(unexpected.length, report('errors while loading the page', unexpected)).toBe(0);
       });
 
       test('has no axe violations (WCAG 2.2 A and AA)', async ({ page }, testInfo) => {
@@ -224,6 +260,22 @@ for (const route of loadSitemapRoutes()) {
           const raw = link.raw.trim();
           if (raw === '' || raw === '#') {
             problems.add(`${label}: placeholder link without a target`);
+            continue;
+          }
+
+          // A fragment on this very page (the skip link) is checked in the page
+          // already open. Fetching the URL again would ask the 404 page for
+          // itself and get its 404.
+          if (raw.startsWith('#')) {
+            let id = raw.slice(1);
+            try {
+              id = decodeURIComponent(id);
+            } catch {
+              /* keep the raw fragment */
+            }
+            if ((await page.locator(`[id="${id.replace(/"/g, '\\"')}"]`).count()) === 0) {
+              problems.add(`${label}: this page has no element id="${id}"`);
+            }
             continue;
           }
 
@@ -288,6 +340,7 @@ for (const route of loadSitemapRoutes()) {
         request,
         context,
       }) => {
+        test.skip(route === NOT_FOUND, 'The 404 page has no language counterpart.');
         await open(page, route);
         const alternates = await readAlternates(page);
         const problems: string[] = [];

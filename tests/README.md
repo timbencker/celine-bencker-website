@@ -42,7 +42,8 @@ suite and uploads the report when it fails.
 
 ## What the checks guarantee
 
-`site.spec.ts` covers every URL in `dist/sitemap.xml`, at 375, 768 and 1280px.
+`site.spec.ts` covers every URL in `dist/sitemap.xml`, plus the 404 page (at a
+missing path, expecting status 404 and no hreflang), at 375, 768 and 1280px.
 Test titles start with the page path.
 
 - **Document** — HTTP 200; `html[lang]` matches the locale in the path; exactly
