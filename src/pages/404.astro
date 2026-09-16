@@ -1,42 +1,103 @@
 ---
+import { getEntry } from 'astro:content';
+
+import { onwardRows } from '../components/not-found/onward';
+import ListRow from '../components/primitives/ListRow.astro';
+import MailLink from '../components/primitives/MailLink.astro';
+import PageHeader from '../components/primitives/PageHeader.astro';
+import PageTitle from '../components/primitives/PageTitle.astro';
+import Section from '../components/primitives/Section.astro';
+import TextLink from '../components/primitives/TextLink.astro';
 import { DEFAULT_LOCALE } from '../i18n/config';
-import { homeHref } from '../i18n/pages';
-import { t } from '../i18n/ui';
+import { homeHref, loadPages, navigationFor } from '../i18n/pages';
 import SiteChrome from '../layouts/SiteChrome.astro';
-import { container } from '../lib/styles';
+import { cn } from '../lib/cn';
+import { getSite } from '../lib/site';
+import { heading } from '../lib/styles';
 
 /**
- * 404 — board 11a.
- * OWNER: the 404 work unit. A minimal stub until the board is built.
+ * 404 — board 11a, "kein Sackgassen-Layout".
+ * Who: old links, typos, search hits. Job: back onto a useful path in one
+ * click — a small error label, then every page of the site.
  *
  * GitHub Pages serves this one file for every missing path in the project,
- * whatever its language.
+ * whatever its language. So the page is German, speaks to English readers in
+ * one paragraph, and its language control leads to the English home. It is
+ * not a content entry, so it uses SiteChrome directly; its copy is in
+ * `src/content/data/not-found.yaml`.
  */
 const locale = DEFAULT_LOCALE;
-const home = homeHref(locale);
+const entry = await getEntry('notFound', 'not-found');
+if (!entry) {
+  throw new Error('src/content/data/not-found.yaml needs one entry with id "not-found".');
+}
+const { de, en } = entry.data;
+
+const { email } = await getSite();
+const allPages = await loadPages();
+const rows = onwardRows(await navigationFor(locale, allPages), de.onward.descriptions);
+
+/**
+ * "Kaputter Link gefunden?" sits beside the title from md and below the list
+ * on phones, as the two artboards place it. It is rendered in both places;
+ * `display: none` keeps the hidden copy out of the reading and tab order.
+ * Without an address in site.yaml there is no link, as in the footer.
+ */
+const report = 'text-[15px] text-text-2 transition-colors hover:text-ink';
 ---
 
 <SiteChrome
   locale={locale}
-  title={t(locale, 'error.notFound.title')}
-  description={t(locale, 'error.notFound.body')}
+  title={de.title}
+  description={de.intro}
   currentHref=""
   counterpartHref={homeHref('en')}
   background="verwoben"
   backgroundPage="notfound"
   robots="noindex"
 >
-  <div slot="masthead" class={`${container} pb-10 pt-10 md:pb-[72px] md:pt-16`}>
-    <h1 class="text-[48px] font-bold leading-[0.98] tracking-[-0.045em] md:text-[72px]">
-      {t(locale, 'error.notFound.title')}
-    </h1>
-  </div>
-  <div class={`${container} py-14`}>
-    <p>
-      {t(locale, 'error.notFound.body')}{' '}
-      <a class="text-sage" href={home}>
-        {t(locale, 'nav.home')}
-      </a>
+  {/* On phones the aside holds nothing visible, so it must not add a gap. */}
+  <PageHeader slot="masthead" class="gap-0">
+    <p class="font-mono text-[12px] uppercase tracking-[0.1em] text-text-3 md:text-[13px]">
+      {de.label}
     </p>
-  </div>
+    <PageTitle title={de.title} intro={de.intro} />
+    <p lang="en" class="max-w-[44ch] text-meta text-text-2">
+      {en.text} <TextLink href={homeHref('en')}>{en.link}</TextLink>
+    </p>
+    {email && (
+      <MailLink
+        slot="aside"
+        email={email}
+        label={de.report}
+        class={cn(report, 'hidden md:block')}
+      />
+    )}
+  </PageHeader>
+
+  <Section
+    labelledby="not-found-onward"
+    space="none"
+    class="gap-5 pb-12 pt-10 md:gap-16 md:pb-[88px] md:pt-[72px]"
+  >
+    <h2 id="not-found-onward" class={heading({ level: 'section' })}>
+      {de.onward.heading}
+    </h2>
+    <div>
+      <ul role="list" class="flex flex-col">
+        {rows.map((row) => (
+          <li>
+            <ListRow href={row.href} title={row.title} sub={row.sub} />
+          </li>
+        ))}
+      </ul>
+      {email && (
+        <MailLink
+          email={email}
+          label={de.report}
+          class={cn(report, 'mt-7 inline-block md:hidden')}
+        />
+      )}
+    </div>
+  </Section>
 </SiteChrome>
