@@ -1,42 +1,157 @@
 ---
 import { cva } from 'class-variance-authority';
 
+import type { Locale } from '../../i18n/config';
+import { t } from '../../i18n/ui';
 import { cn } from '../../lib/cn';
-import { arrow } from '../../lib/styles';
+import { arrow, EXTERNAL_GLYPH } from '../../lib/styles';
+import { linkKind, parseMailto } from './links';
+import MailLink from './MailLink.astro';
 
 /**
  * A bone tile on paper that tints lilac on hover — `tile` in _Komponenten.
  * Tiles mean finished, comparable units; research lines, publications and
  * anything with its own page use ListRow instead.
  *
- * Only `row` is built so far (the two exits at the bottom of Home). `card`
- * arrives with Talks & Media and Contact.
+ * - `row` — title and meta left, arrow right: the two exits at the bottom of
+ *   Home. Internal links only.
+ * - `card` — the three-up grid: media pieces (Talks) and the reasons to write
+ *   (Contact). Put cards in `<ul role="list" class="grid gap-3 md:grid-cols-3
+ *   md:gap-5">`; they fill the row height.
+ *
+ * A card's target decides its glyph, as everywhere: internal "→", external
+ * "↗" with a new tab, mail none (and the address stays entity-encoded). The
+ * glyph trails the last line — `action` if given, else `meta`.
+ *
+ * Card geometry is the CVA's (28px padding, 16px gap, 240px tall); the two
+ * boards disagree with each other there. Phones: 22px padding, 12px gap.
  */
 const tile = cva('group rounded-card bg-bone text-ink transition-colors hover:bg-lilac-tint', {
   variants: {
     kind: {
       row: 'flex items-center justify-between gap-4 px-5 py-[18px] md:gap-6 md:px-8 md:py-6',
+      card: 'flex h-full flex-col gap-3 p-[22px] md:min-h-60 md:gap-4 md:p-7',
     },
   },
   defaultVariants: { kind: 'row' },
 });
 
-interface Props {
+interface RowTile {
+  kind?: 'row';
   href: string;
   title: string;
   meta?: string;
   class?: string;
 }
 
-const { href, title, meta, class: className } = Astro.props;
+interface CardTile {
+  kind: 'card';
+  href: string;
+  locale: Locale;
+  title: string;
+  /** Small line above the title — the reason to write on Contact. */
+  eyebrow?: string;
+  /** Outlet · format · date, at the bottom. */
+  meta?: string;
+  /** A sage call to action at the bottom ("Mail schreiben", "Zur Studie"). */
+  action?: string;
+  /**
+   * Reserve the logo line (media pieces): renders the `logo` slot, or a
+   * neutral bar until the outlet's logo exists.
+   */
+  logo?: boolean;
+  class?: string;
+}
+
+type Props = RowTile | CardTile;
+
+const props = Astro.props;
+const card = props.kind === 'card' ? props : null;
+const target = card ? linkKind(card.href) : 'internal';
+const mail = card && target === 'mail' ? parseMailto(card.href) : null;
+const cardClass = card ? cn(tile({ kind: 'card' }), card.class) : '';
 ---
 
-<a href={href} class={cn(tile(), className)}>
-  <span class="flex flex-col gap-[3px] md:gap-[5px]">
-    <span class="text-[18px] font-bold tracking-[-0.03em] md:text-[21px]">{title}</span>
-    {meta && <span class="text-[13px] text-text-3 md:text-meta">{meta}</span>}
-  </span>
-  <span class={cn(arrow, 'text-[20px] md:text-[22px]')} aria-hidden="true">
-    →
-  </span>
-</a>
+{!card && (
+  <a href={props.href} class={cn(tile(), props.class)}>
+    <span class="flex flex-col gap-[3px] md:gap-[5px]">
+      <span class="text-[18px] font-bold tracking-[-0.03em] md:text-[21px]">{props.title}</span>
+      {props.meta && <span class="text-[13px] text-text-3 md:text-meta">{props.meta}</span>}
+    </span>
+    <span class={cn(arrow, 'text-[20px] md:text-[22px]')} aria-hidden="true">
+      →
+    </span>
+  </a>
+)}
+
+{card &&
+  (() => {
+    const glyph =
+      target === 'internal' ? (
+        <>
+          {' '}
+          <span class={arrow} aria-hidden="true">
+            →
+          </span>
+        </>
+      ) : target === 'external' ? (
+        <>
+          {' '}
+          <span aria-hidden="true">{EXTERNAL_GLYPH}</span>
+          <span class="visually-hidden"> {t(card.locale, 'link.newTab')}</span>
+        </>
+      ) : null;
+
+    const body = (
+      <>
+        {card.logo &&
+          (Astro.slots.has('logo') ? (
+            <span class="flex h-[22px] items-center md:h-[26px]">
+              <slot name="logo" />
+            </span>
+          ) : (
+            <span
+              class="block h-[22px] w-[90px] rounded-image bg-line md:h-[26px] md:w-[110px]"
+              aria-hidden="true"
+            />
+          ))}
+        {card.eyebrow && <span class="text-[13px] text-text-3 md:text-meta">{card.eyebrow}</span>}
+        <span class="text-[19px] font-bold leading-[1.2] tracking-[-0.03em] md:text-[22px]">
+          {card.title}
+        </span>
+        {(card.meta || card.action) && (
+          <span class="flex flex-col gap-1 md:mt-auto">
+            {card.meta && (
+              <span class="text-[14px] text-text-2 md:text-meta">
+                {card.meta}
+                {!card.action && glyph}
+              </span>
+            )}
+            {card.action && (
+              <span class="text-[14px] font-semibold text-sage md:text-meta">
+                {card.action}
+                {glyph}
+              </span>
+            )}
+          </span>
+        )}
+      </>
+    );
+
+    if (mail) {
+      return (
+        <MailLink email={mail.email} subject={mail.subject} class={cardClass}>
+          {body}
+        </MailLink>
+      );
+    }
+    return target === 'external' ? (
+      <a href={card.href} target="_blank" rel="noopener" class={cardClass}>
+        {body}
+      </a>
+    ) : (
+      <a href={card.href} class={cardClass}>
+        {body}
+      </a>
+    );
+  })()}

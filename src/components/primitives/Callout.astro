@@ -1,0 +1,38 @@
+---
+import type { Locale } from '../../i18n/config';
+import { t } from '../../i18n/ui';
+import { cn } from '../../lib/cn';
+
+/**
+ * "Kurz gesagt" — `callout` in _Komponenten: one or two plain sentences under
+ * a publication, on the lilac tint. Only in a `publication` ListRow, only when
+ * the work has a plain summary; no toggle, always visible.
+ *
+ * Built as the 7a board lays it out (label above the text). The surface is the
+ * CVA's `lilac-tint` and card radius — the board's #f1ecfa and 10px have no
+ * token. The label is ink rather than the board's lilac text, which reaches
+ * only 4.11:1 on the tint.
+ */
+interface Props {
+  locale: Locale;
+  /** Defaults to "Kurz gesagt" / "In short". */
+  label?: string;
+  class?: string;
+}
+
+const { locale, label, class: className } = Astro.props;
+---
+
+<div
+  class={cn(
+    'flex max-w-[62ch] flex-col gap-1 rounded-card bg-lilac-tint px-5 py-4 text-ink',
+    className,
+  )}
+>
+  <p class="text-[13px] font-bold uppercase leading-[1.2] tracking-[0.14em]">
+    {label ?? t(locale, 'callout.label')}
+  </p>
+  <div class="text-[16px] leading-[1.55]">
+    <slot />
+  </div>
+</div>

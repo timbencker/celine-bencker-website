@@ -1,0 +1,99 @@
+---
+import { cva, type VariantProps } from 'class-variance-authority';
+
+import type { Locale } from '../../i18n/config';
+import { t } from '../../i18n/ui';
+import { cn } from '../../lib/cn';
+import { arrow, EXTERNAL_GLYPH } from '../../lib/styles';
+import { formatFileSize } from './format';
+import { linkKind } from './links';
+
+/**
+ * The pill — `button` in "Button & Link", _Komponenten. At most one per page
+ * (Research: Teilnehmen · CV: PDF · Talks: press kit); everything else is a
+ * text link. None on Home, Publications or Contact.
+ *
+ * The tone follows the ground, never the author's taste:
+ * - `lilac` on paper and bone.
+ * - `ink` only on the lilac tint — ink on a light ground is too heavy.
+ *
+ * What it does follows from the URL:
+ * - a root-relative path or #fragment → internal, "→", same tab;
+ * - http(s) → external, "↗", a new tab and a spoken warning;
+ * - `download` given → "↓" plus "(PDF, 180 kB)" after the label. The caller
+ *   measures the file; render the button only when the file exists.
+ * Mail addresses are MailLink, never a button.
+ *
+ * Geometry is the boards' (13/20 padding from md, 12/18 on phones); the pill
+ * stays inline on phones and never drops below 44px.
+ */
+const button = cva(
+  'group inline-flex min-h-[44px] flex-wrap items-center gap-x-2 rounded-pill px-[18px] py-3 text-[15px] font-bold leading-[1.5] transition-colors md:px-5 md:py-[13px]',
+  {
+    variants: {
+      tone: {
+        // The board's hover (#b9a5df) has no token yet; this mix of two tokens
+        // stands in for it (ink on it: 8.00:1).
+        lilac:
+          'bg-lilac text-ink hover:bg-[color-mix(in_srgb,var(--color-lilac),var(--color-ink)_10%)]',
+        ink: 'bg-ink text-bone hover:bg-sage',
+      },
+    },
+    defaultVariants: { tone: 'lilac' },
+  },
+);
+
+type Props = VariantProps<typeof button> & {
+  href: string;
+  locale: Locale;
+  /** A file on this site. `format` is shown as given ("PDF", "ZIP"). */
+  download?: { format: string; bytes: number };
+  class?: string;
+};
+
+const { href, locale, tone, download, class: className } = Astro.props;
+
+const target = linkKind(href);
+if (target === 'mail') {
+  throw new Error(`Button cannot send mail (${href}); use MailLink.`);
+}
+if (download && target !== 'internal') {
+  throw new Error(
+    `Button download must point at a file on this site, got "${href}". Browsers ignore \`download\` across origins.`,
+  );
+}
+const kind = download ? 'download' : target;
+// "(PDF, 180 kB)" on screen; "(Download, PDF, 180 kB)" for screen readers.
+const fileMeta = download ? `${download.format}, ${formatFileSize(download.bytes, locale)}` : '';
+const spokenKind = `${t(locale, 'link.download')}, `;
+---
+
+<a
+  href={href}
+  class={cn(button({ tone }), className)}
+  target={kind === 'external' ? '_blank' : undefined}
+  rel={kind === 'external' ? 'noopener' : undefined}
+  download={kind === 'download' ? true : undefined}
+>
+  <slot />
+  {kind === 'internal' && (
+    <span class={arrow} aria-hidden="true">
+      →
+    </span>
+  )}
+  {kind === 'external' && (
+    <>
+      <span aria-hidden="true">{EXTERNAL_GLYPH}</span>
+      <span class="visually-hidden"> {t(locale, 'link.newTab')}</span>
+    </>
+  )}
+  {kind === 'download' && (
+    <>
+      <span aria-hidden="true">↓</span>
+      <span class="font-normal">
+        {/* One expression, so no template whitespace lands inside the parentheses. */}
+        {['(', <span class="visually-hidden">{spokenKind}</span>, fileMeta, ')']}
+      </span>
+    </>
+  )}
+</a>
