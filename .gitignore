@@ -28,3 +28,8 @@ design/
 
 # Per-agent git worktrees (parallel work units)
 .worktrees/
+
+# Playwright output (tests/README.md)
+test-results/
+playwright-report/
+blob-report/
