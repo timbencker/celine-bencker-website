@@ -1,11 +1,30 @@
 ---
+import Callout from '../components/primitives/Callout.astro';
+import ExternalLink from '../components/primitives/ExternalLink.astro';
+import ListRow from '../components/primitives/ListRow.astro';
+import PageHeader from '../components/primitives/PageHeader.astro';
+import PageTitle from '../components/primitives/PageTitle.astro';
+import Section from '../components/primitives/Section.astro';
+import TextLink from '../components/primitives/TextLink.astro';
+import { BIBTEX_FILE, publicationsBibtex } from '../components/publications/bibtex';
+import Citation from '../components/publications/Citation.astro';
+import { groupByYear, loadPublications } from '../components/publications/data';
 import type { ResolvedPage } from '../i18n/pages';
-import DraftView from './DraftView.astro';
+import { withBase } from '../i18n/urls';
+import PageLayout from '../layouts/PageLayout.astro';
+import { cn } from '../lib/cn';
+import { getSite } from '../lib/site';
+import { heading } from '../lib/styles';
 
 /**
- * Publications — board 7a.
- * OWNER: the Publications work unit. A stub that renders the draft view until the
- * board is built. See docs/plans/remaining-pages.md.
+ * Publications — board 7a, "Jahresgruppen, Erstautorenschaft fett, ‚Kurz
+ * gesagt' nur bei ausgewählten Arbeiten".
+ * Who: researchers, committees, reviewers.
+ * Job: complete, citable, fast — and a plain summary for non-specialists.
+ *
+ * Title with the profiles and the BibTeX download beside it, then one group
+ * per year on the 3/9 label grid, newest first. Each work: title, authors
+ * with Celine in bold, journal, and its DOI. No filters.
  */
 interface Props {
   page: ResolvedPage;
@@ -13,6 +32,119 @@ interface Props {
 }
 
 const { page, allPages } = Astro.props;
+const { locale } = page;
+const { title, publications: copy } = page.entry.data;
+
+if (!copy) {
+  throw new Error(
+    `src/content/pages/${page.entry.id}.md needs a \`publications\` block in its frontmatter.`,
+  );
+}
+
+const [site, works, bibtex] = await Promise.all([
+  getSite(),
+  loadPublications(),
+  publicationsBibtex(),
+]);
+const years = groupByYear(works);
+
+/*
+ * Space between the groups, as the board sets it by hand: 96px above the
+ * first, 72px after the manuscripts group, 48px between years, 96px below the
+ * last; 40px above each on phones. The rows bring their own padding.
+ */
+const groupCount = years.length + (copy.submitted ? 1 : 0);
+const groupSpace = (index: number) =>
+  cn(
+    'gap-2 pb-2 pt-10 md:gap-12',
+    index === 0 ? 'md:pt-24' : index === 1 && copy.submitted ? 'md:pt-[72px]' : 'md:pt-12',
+    index === groupCount - 1 && 'pb-16 md:pb-24',
+  );
+const firstYear = copy.submitted ? 1 : 0;
+
+const linkClass = 'text-sage transition-colors hover:text-ink';
 ---
 
-<DraftView page={page} allPages={allPages} />
+<PageLayout page={page} allPages={allPages}>
+  <PageHeader slot="masthead" layout="compact">
+    <PageTitle title={title} />
+    <ul
+      slot="aside"
+      role="list"
+      class="flex flex-wrap gap-x-[18px] gap-y-2 text-[14px] font-semibold md:gap-6 md:text-meta"
+    >
+      {site.profiles.map((profile) => (
+        <li>
+          <ExternalLink href={profile.url} locale={locale} class={linkClass}>
+            {profile.label}
+          </ExternalLink>
+        </li>
+      ))}
+      <li>
+        <TextLink
+          href={withBase(BIBTEX_FILE)}
+          download={{ format: copy.bibtex.format, bytes: bibtex.bytes, locale }}
+        >
+          {copy.bibtex.label}
+        </TextLink>
+      </li>
+    </ul>
+  </PageHeader>
+
+  {copy.submitted && (
+    <Section labelledby="submitted" layout="label" space="none" class={groupSpace(0)}>
+      <h2 id="submitted" class={cn(heading({ level: 'section' }), 'text-text-3')}>
+        {copy.submitted.heading}
+      </h2>
+      <ul role="list" class="flex flex-col">
+        {copy.submitted.items.map((item) => (
+          <li>
+            <ListRow
+              kind="publication"
+              locale={locale}
+              title={item.title}
+              sub={item.sub}
+              status={item.status}
+            />
+          </li>
+        ))}
+      </ul>
+    </Section>
+  )}
+
+  {years.map(({ year, works: group }, i) => (
+    <Section
+      labelledby={`year-${year}`}
+      layout="label"
+      space="none"
+      class={groupSpace(firstYear + i)}
+    >
+      <h2 id={`year-${year}`} class={heading({ level: 'section' })}>
+        {year}
+      </h2>
+      <ul role="list" class="flex flex-col">
+        {group.map((work) => {
+          const href = `https://doi.org/${work.doi}`;
+          const summary = work.summaryPlain?.[locale];
+          // Two branches: an empty default slot would still add the callout's spacing.
+          return (
+            <li>
+              {summary ? (
+                <ListRow kind="publication" locale={locale} title={work.title} href={href}>
+                  <Citation slot="sub" work={work} />
+                  <Callout locale={locale}>
+                    <p>{summary}</p>
+                  </Callout>
+                </ListRow>
+              ) : (
+                <ListRow kind="publication" locale={locale} title={work.title} href={href}>
+                  <Citation slot="sub" work={work} />
+                </ListRow>
+              )}
+            </li>
+          );
+        })}
+      </ul>
+    </Section>
+  ))}
+</PageLayout>
