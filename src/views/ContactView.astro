@@ -1,15 +1,27 @@
 ---
-import type { ResolvedPage } from '../i18n/pages';
+import ExternalLink from '../components/primitives/ExternalLink.astro';
+import MailLink from '../components/primitives/MailLink.astro';
+import PageHeader from '../components/primitives/PageHeader.astro';
+import PageTitle from '../components/primitives/PageTitle.astro';
+import Section from '../components/primitives/Section.astro';
+import Tile from '../components/primitives/Tile.astro';
+import { pageHref, resolvePage, type ResolvedPage } from '../i18n/pages';
 import { t } from '../i18n/ui';
-import DraftView from './DraftView.astro';
+import PageLayout from '../layouts/PageLayout.astro';
+import { toHtmlEntities } from '../lib/obfuscate';
+import { getSite } from '../lib/site';
+import { heading } from '../lib/styles';
 
 /**
- * Contact — board 9b.
- * OWNER: the Contact work unit. A stub that renders the draft view until the
- * board is built. See docs/plans/remaining-pages.md.
+ * Contact — board 9b, "eine Seite, drei Wege: Mail (mit Anliegen), Institut,
+ * Profile".
+ * Who: everyone who wants to write, with a clear request.
+ * Job: one address, three ways, and the Impressum.
  *
- * It already carries the `#impressum` target the footer links to on every
- * page, so that link resolves while the page is a stub.
+ * The address sits large in the header slot — this page has no pill button.
+ * Below it, three tiles (a mail with a subject, the Talks page, the study on
+ * Research), the department with the profiles, and the Impressum the footer
+ * links to (`#impressum`, on its heading).
  */
 interface Props {
   page: ResolvedPage;
@@ -17,8 +29,144 @@ interface Props {
 }
 
 const { page, allPages } = Astro.props;
+const { locale } = page;
+const { contact } = page.entry.data;
+
+if (!contact) {
+  throw new Error(`src/content/pages/${page.entry.id}.md needs a \`contact\` block.`);
+}
+
+const site = await getSite();
+const { email } = site;
+if (!email) {
+  throw new Error('The Contact page needs `email` in src/content/data/site/site.yaml.');
+}
+
+const { institute, imprint } = contact;
+const intro = [contact.intro, contact.replyNote].filter(Boolean).join(' ');
+
+// The large address may break after the "@" (a <wbr>) before it breaks
+// anywhere else. Both parts stay entity-encoded, as MailLink writes them.
+const at = email.indexOf('@');
+const largeAddress = `${toHtmlEntities(email.slice(0, at + 1))}<wbr>${toHtmlEntities(email.slice(at + 1))}`;
+
+// A reason is either a mail with a pre-filled subject or a page on this site.
+// The mailto target never reaches the HTML as written: Tile hands mail
+// targets to MailLink, which encodes them.
+const reasons = contact.reasons.map((reason) => {
+  if ('subject' in reason) {
+    return { ...reason, href: `mailto:${email}?subject=${encodeURIComponent(reason.subject)}` };
+  }
+  const target = pageHref(resolvePage(reason.to, locale, allPages));
+  return { ...reason, href: reason.anchor ? `${target}#${reason.anchor}` : target };
+});
+
+// The board shows the ORCID iD next to its label; it is in site.yaml already.
+const orcidUrl = site.orcid ? `https://orcid.org/${site.orcid}` : null;
+const profiles = site.profiles.map((profile) => ({
+  ...profile,
+  label: profile.url === orcidUrl ? `${profile.label} ${site.orcid}` : profile.label,
+}));
 ---
 
-<DraftView page={page} allPages={allPages}>
-  <h2 id="impressum">{t(page.locale, 'footer.imprint')}</h2>
-</DraftView>
+<PageLayout page={page} allPages={allPages}>
+  <PageHeader slot="masthead">
+    <PageTitle title={page.entry.data.title} intro={intro} />
+    {/*
+      The page's primary control. The padding makes the target 44px tall; the
+      negative margin keeps the board's spacing. `wrap-anywhere` breaks a part
+      that does not fit on its own line, so the address never overflows.
+    */}
+    <MailLink
+      slot="aside"
+      email={email}
+      class="-my-2 py-2 text-[20px] font-bold leading-[1.4] tracking-[-0.03em] wrap-anywhere text-sage transition-colors hover:text-ink md:text-[28px]"
+    >
+      <Fragment set:html={largeAddress} />
+    </MailLink>
+  </PageHeader>
+
+  <Section layout="stacked" space="compact">
+    <ul role="list" aria-label={contact.reasonsLabel} class="grid gap-3 md:grid-cols-3 md:gap-6">
+      {reasons.map((reason) => (
+        <li>
+          <Tile
+            kind="card"
+            locale={locale}
+            href={reason.href}
+            eyebrow={reason.eyebrow}
+            title={reason.title}
+            action={reason.action}
+          />
+        </li>
+      ))}
+    </ul>
+  </Section>
+
+  <Section labelledby="contact-institute" surface="bone" space="compact">
+    <h2 id="contact-institute" class={heading({ level: 'section' })}>
+      {institute.heading}
+    </h2>
+    <div class="grid gap-5 text-[16px] leading-[1.5] md:grid-cols-2 md:gap-8 md:text-body">
+      <div class="flex flex-col gap-1">
+        <p class="font-bold">{institute.organisation}</p>
+        <p class="text-text-2">
+          {institute.department}
+          <br />
+          {institute.address}
+        </p>
+      </div>
+      {profiles.length > 0 && (
+        <div class="flex flex-col gap-1.5 md:gap-2">
+          <p id="contact-profiles" class="font-bold">
+            {institute.profilesHeading}
+          </p>
+          <ul
+            role="list"
+            aria-labelledby="contact-profiles"
+            class="flex flex-col gap-1 text-[15px] font-semibold text-sage md:text-body"
+          >
+            {profiles.map((profile) => (
+              <li>
+                <ExternalLink
+                  href={profile.url}
+                  locale={locale}
+                  class="transition-colors hover:text-ink"
+                >
+                  {profile.label}
+                </ExternalLink>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </div>
+  </Section>
+
+  <Section labelledby="impressum" space="compact">
+    <h2 id="impressum" class={heading({ level: 'section' })}>
+      {t(locale, 'footer.imprint')}
+    </h2>
+    {/* The same text on every width: legal text is never shortened for phones. */}
+    <div class="flex max-w-[60ch] flex-col gap-3.5 text-[14px] leading-[1.6] text-text-2 md:gap-5 md:text-meta">
+      {imprint.reviewNote && <p class="font-semibold text-ink">{imprint.reviewNote}</p>}
+      <p>
+        <strong class="font-bold text-ink">{imprint.ownerLabel}</strong>
+        <br />
+        {imprint.ownerName} <span aria-hidden="true">·</span> {imprint.ownerAddress}{' '}
+        <span aria-hidden="true">·</span>{' '}
+        {/* Underlined: in running text, colour alone would not mark it as a link. */}
+        <MailLink
+          email={email}
+          class="underline decoration-1 underline-offset-[3px] transition-colors hover:text-sage"
+        />
+      </p>
+      <p>{imprint.mediaLaw.join(' ')}</p>
+      <p>
+        <strong class="font-bold text-ink">{imprint.privacyLabel}</strong>
+        <br />
+        {imprint.privacy.join(' ')}
+      </p>
+    </div>
+  </Section>
+</PageLayout>
