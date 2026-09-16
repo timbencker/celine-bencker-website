@@ -1,10 +1,23 @@
 ---
 translationKey: publications
 title: Publications
-description: Peer-reviewed work, preprints and talks, grouped by year.
+description: Celine Bencker's journal articles by year, with DOI links and a BibTeX file.
 navOrder: 2
-background: aus
+background: verwoben
 backgroundHue: gelb
----
 
-PLACEHOLDER – content follows from the design canvas and Celine's material.
+# The works themselves live in src/content/data/publications.yaml.
+publications:
+  bibtex:
+    label: BibTeX
+    format: .bib
+
+  # Placeholders, as in the German version – see the examples noted there.
+  # EN: Übersetzung – von Celine zu prüfen
+  submitted:
+    heading: Submitted
+    items:
+      - title: PLACEHOLDER – title of a submitted manuscript
+        sub: PLACEHOLDER – role · type of work
+        status: PLACEHOLDER
+---

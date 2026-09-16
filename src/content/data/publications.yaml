@@ -1,4 +1,101 @@
 # Publikationen. Sprachneutral: einmal pflegen, in beiden Sprachen sichtbar.
-# Quelle: Zotero-/BibTeX- oder u:cris-Export von Celine.
-# summaryPlain ist optional und nur für ausgewählte Arbeiten („Kurz gesagt“).
-[]
+# Die Seite gruppiert nach `year` (neueste zuerst) und ordnet innerhalb eines
+# Jahres nach `month`. Aus denselben Einträgen entsteht beim Build
+# `publications.bib`.
+#
+#   id           – zugleich der BibTeX-Schlüssel (Erstautor, Jahr, erstes Titelwort)
+#   authors      – alle Autor:innen im APA-Stil; „Bencker, C.“ wird fett gesetzt.
+#                  Der Build prüft die Schreibweise („Name, I. I.“, „, & “ vor dem letzten).
+#   firstAuthor  – true, wenn die Liste mit „Bencker, C.“ beginnt (wird geprüft)
+#   pages        – Seitenbereich oder Artikelnummer
+#   summaryPlain – „Kurz gesagt“, nur bei ausgewählten Arbeiten
+#
+# Quelle aller Angaben: Celines öffentliches ORCID-Profil (Werkliste) und die
+# Crossref-Metadaten der DOIs (design/sources/, Stand 2026-09-16).
+#
+# Nicht aufgeführt:
+# - Preprints, deren Zeitschriftenfassung unten steht:
+#     10.31234/osf.io/z4uce (PsyArXiv 2024) → 10.1192/bjp.2025.10311
+#     10.2139/ssrn.4437883  (SSRN 2023)     → 10.1016/j.eclinm.2023.102318
+# - Konferenzbeiträge (ICBM 2025; Abstract im International Journal of
+#   Behavioral Medicine 2025) – sie gehören auf die Seite „Vorträge & Medien“.
+# - „Replication and Validation of the Happiness-Increasing Strategies Scale in
+#   a German-speaking sample“ (European Journal of Applied Positive Psychology,
+#   2023, laut ORCID): ORCID nennt keine DOI, und Crossref findet den Artikel
+#   unter diesem Titel nicht (nur den Test-Eintrag 10.1037/t96521-000 in
+#   PsycTESTS). Aufnehmen, sobald Celine Band, Seiten und DOI bestätigt.
+
+- id: bencker2026psychobiological
+  # Crossref 10.1136/bmjopen-2026-123210 – online 2026-09-01, Band 16, Heft 9
+  year: 2026
+  month: 9
+  title: 'Psychobiological stress and premenstrual symptoms across the menstrual cycle: protocol for an ecological momentary assessment (ISSAC) study'
+  authors: Bencker, C., Schmalenberger, K. M., Comasco, E., & Nater, U. M.
+  firstAuthor: true
+  venue: BMJ Open
+  volume: '16'
+  issue: '9'
+  pages: e123210
+  doi: 10.1136/bmjopen-2026-123210
+
+- id: bencker2025associations
+  # Crossref 10.1192/bjp.2025.10311 – online 2025-08-11. Crossref nennt noch
+  # keinen Band; die Seitenzählung der Online-Fassung (1–11) ist deshalb nicht
+  # übernommen. Band und Seiten ergänzen, sobald die Heftfassung erscheint.
+  year: 2025
+  month: 8
+  title: 'Associations between premenstrual symptoms and (traumatic) stress: a systematic review and three multilevel meta-analyses'
+  authors: Bencker, C., Tran, U. S., Roth, L. H. O., Nayman, S., & Nater, U. M.
+  firstAuthor: true
+  venue: The British Journal of Psychiatry
+  doi: 10.1192/bjp.2025.10311
+  summaryPlain:
+    # Entwurf aus dem Design – von Celine zu prüfen
+    de: Wer mehr Stress erlebt – besonders nach belastenden Erfahrungen – berichtet im Schnitt stärkere prämenstruelle Beschwerden. Der Zusammenhang ist konsistent, die Richtung noch offen.
+    # EN: Übersetzung – von Celine zu prüfen
+    en: People who experience more stress – especially after distressing experiences – report stronger premenstrual symptoms on average. The link is consistent; its direction is still open.
+
+- id: bencker2025progestagens
+  # Crossref 10.1016/j.yfrne.2024.101160 – Heft Januar 2025, Band 76,
+  # Artikel 101160 (die DOI trägt 2024, das Jahr der Online-Vorabfassung)
+  year: 2025
+  month: 1
+  title: 'Progestagens and progesterone receptor modulation: Effects on the brain, mood, stress, and cognition in females'
+  authors: Bencker, C., Gschwandtner, L., Nayman, S., Grikšienė, R., Nguyen, B., Nater, U. M., Guennoun, R., Sundström-Poromaa, I., Pletzer, B., Bixo, M., & Comasco, E.
+  firstAuthor: true
+  venue: Frontiers in Neuroendocrinology
+  volume: '76'
+  pages: '101160'
+  doi: 10.1016/j.yfrne.2024.101160
+  summaryPlain:
+    # Entwurf aus dem Design – von Celine zu prüfen
+    de: Progesteron und seine synthetischen Verwandten wirken im Gehirn – auf Stimmung, Stressreaktion und Denken. Wie stark, hängt von Dosis, Zeitpunkt und Person ab.
+    # EN: Übersetzung – von Celine zu prüfen
+    en: Progesterone and its synthetic relatives act on the brain – on mood, the stress response and thinking. How strongly depends on dose, timing and the person.
+
+- id: roth2024testing
+  # Crossref 10.3389/fpsyg.2024.1405272 – online 2024-09-24, Band 15, Artikel 1405272.
+  # Titel wörtlich wie bei Crossref und ORCID („broaden-and build“, ohne
+  # zweiten Bindestrich); das Design schreibt „broaden-and-build“.
+  year: 2024
+  month: 9
+  title: 'Testing the validity of the broaden-and build theory of positive emotions: a network analytic approach'
+  authors: Roth, L. H. O., Bencker, C., Lorenz, J., & Laireiter, A.-R.
+  venue: Frontiers in Psychology
+  volume: '15'
+  pages: '1405272'
+  doi: 10.3389/fpsyg.2024.1405272
+
+- id: keil2023bendaeam
+  # Crossref 10.1016/j.eclinm.2023.102318 – Heft Dezember 2023, Band 66,
+  # Artikel 102318. Ko-Autorschaft aus Celines Zeit als Studienkoordinatorin
+  # (ORCID: Hanusch Hospital, 3rd Medical Department for Hematology and
+  # Oncology, 2022–2023) – mit Celine klären, ob die Arbeit hier stehen soll.
+  year: 2023
+  month: 12
+  title: 'BendaEAM versus BEAM as conditioning regimen for ASCT in patients with relapsed lymphoma (BEB): a multicentre, randomised, phase 2 trial'
+  authors: Keil, F., Müller, A. M. S., Berghold, A., Riedl, R., Buxhofer-Ausch, V., Schuster, J., Vorburger, C., Böhm, A., Panny, M., Nösslinger, T., Greil, R., Samaras, P., Bencker, C., Rütti, M., & Pabst, T.
+  venue: eClinicalMedicine
+  volume: '66'
+  pages: '102318'
+  doi: 10.1016/j.eclinm.2023.102318

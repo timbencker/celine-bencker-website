@@ -1,0 +1,35 @@
+---
+import { parseAuthors, SELF_AUTHOR } from '../../content/schemas/publications';
+import type { Work } from './data';
+
+/**
+ * The line under a work's title, as board 7a sets it: every author, Celine in
+ * bold, then the journal in italics, volume(issue) and pages — "Bencker, C.,
+ * Tran, U. S., & Nater, U. M. · The British Journal of Psychiatry".
+ *
+ * Built as one expression, so no template whitespace lands before a comma.
+ */
+interface Props {
+  work: Work;
+}
+
+const { work } = Astro.props;
+
+const authors = parseAuthors(work.authors);
+if (!authors) {
+  throw new Error(`Publication "${work.id}" has an author list the schema should have rejected.`);
+}
+const last = authors.length - 1;
+
+const volume = work.volume && (work.issue ? `${work.volume}(${work.issue})` : work.volume);
+const locator = [volume, work.pages].filter(Boolean).join(', ');
+---
+
+{[
+  ...authors.map(({ family, initials }, i) => {
+    const name = `${family}, ${initials}`;
+    const separator = i === 0 ? '' : i === last ? ', & ' : ', ';
+    return [separator, name === SELF_AUTHOR ? <strong>{name}</strong> : name];
+  }),
+  work.venue && [' · ', <em>{work.venue}</em>, locator && `, ${locator}`],
+]}
