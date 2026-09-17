@@ -1,6 +1,7 @@
 import { defineCollection } from 'astro:content';
-import { file, glob } from 'astro/loaders';
+import { glob } from 'astro/loaders';
 
+import { strictFile, type StrictFileOptions } from './content/loaders/strictFile';
 import { cvSchema } from './content/schemas/cv';
 import { mediaSchema } from './content/schemas/media';
 import { newsSchema } from './content/schemas/news';
@@ -26,10 +27,14 @@ import { talksSchema } from './content/schemas/talks';
  *   field is localized rather than the whole record being duplicated.
  *
  * `.strict()` throughout, so a misspelled key fails the build instead of being
- * silently ignored.
+ * silently ignored. The data files load through `strictFile`
+ * (`src/content/loaders/strictFile.ts`): a YAML typo, a missing or duplicate
+ * `id`, or an empty list fails the build too, naming the file. Only `media`
+ * may be empty (`[]`) — its page shows a placeholder until the first entry.
  */
 
-const data = (name: string) => file(`./src/content/data/${name}.yaml`);
+const data = (name: string, options?: StrictFileOptions) =>
+  strictFile(`./src/content/data/${name}.yaml`, options);
 
 export const collections = {
   pages: defineCollection({
@@ -39,7 +44,7 @@ export const collections = {
   research: defineCollection({ loader: data('research'), schema: researchSchema }),
   publications: defineCollection({ loader: data('publications'), schema: publicationsSchema }),
   talks: defineCollection({ loader: data('talks'), schema: talksSchema }),
-  media: defineCollection({ loader: data('media'), schema: mediaSchema }),
+  media: defineCollection({ loader: data('media', { allowEmpty: true }), schema: mediaSchema }),
   cv: defineCollection({ loader: data('cv'), schema: cvSchema }),
   news: defineCollection({ loader: data('news'), schema: newsSchema }),
   notFound: defineCollection({ loader: data('not-found'), schema: notFoundSchema }),

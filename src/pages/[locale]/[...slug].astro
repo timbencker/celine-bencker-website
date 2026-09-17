@@ -1,12 +1,8 @@
 ---
+import { assertNoIgnoredBodies } from '../../content/checks';
 import { assertTranslationsComplete, loadPages } from '../../i18n/pages';
-import ContactView from '../../views/ContactView.astro';
-import CvView from '../../views/CvView.astro';
 import DraftView from '../../views/DraftView.astro';
-import HomeView from '../../views/HomeView.astro';
-import PublicationsView from '../../views/PublicationsView.astro';
-import ResearchView from '../../views/ResearchView.astro';
-import TalksMediaView from '../../views/TalksMediaView.astro';
+import { VIEWS } from '../../views/registry';
 
 /**
  * Every content page, in every language, from one route.
@@ -14,29 +10,23 @@ import TalksMediaView from '../../views/TalksMediaView.astro';
  * Localized slugs come from the file name, so `/de/forschung` and
  * `/en/research` are the same page in two languages — linked by the
  * `translationKey` in their frontmatter. The translationKey also picks the
- * view: one view per board, composed from the shared components.
+ * view (src/views/registry.ts): one view per board, composed from the shared
+ * components.
  */
 export async function getStaticPaths() {
   const allPages = await loadPages();
 
   // Fails the build on a missing translation or a duplicated translationKey.
   assertTranslationsComplete(allPages);
+  // Fails the build on text below the front matter of a page whose view never
+  // renders it.
+  assertNoIgnoredBodies(allPages, Object.keys(VIEWS));
 
   return allPages.map((page) => ({
     params: { locale: page.locale, slug: page.slug || undefined },
     props: { page, allPages },
   }));
 }
-
-/** One view per translationKey. Every page is registered; each view owns its own file. */
-const VIEWS = {
-  home: HomeView,
-  research: ResearchView,
-  publications: PublicationsView,
-  cv: CvView,
-  'talks-media': TalksMediaView,
-  contact: ContactView,
-} as const;
 
 const { page, allPages } = Astro.props;
 const View = Object.hasOwn(VIEWS, page.translationKey)

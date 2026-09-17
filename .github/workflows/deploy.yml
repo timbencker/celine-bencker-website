@@ -2,18 +2,21 @@ name: Deploy to GitHub Pages
 
 # Manual only, deliberately.
 #
-# Publishing is an outward-facing act: the site carries Celine's name, and
-# every page currently reads "PLATZHALTER". Deploying on each push would put
-# that in public under her name before she has seen any of it, and a Pages URL
-# is indexable the moment it exists.
+# Publishing is an outward-facing act: the site carries Celine's name, and a
+# Pages URL is indexable the moment it exists. So this runs only when someone
+# asks for it (Actions -> Deploy to GitHub Pages -> Run workflow), never on a
+# push.
 #
-# So this runs only when someone asks for it. To go live once the real content
-# has landed, enable Pages on the repository:
+# Before anything is built for publishing, the `gate` job runs every check CI
+# runs, and then `npm run check:launch`: publishing is refused while any page
+# still shows PLATZHALTER / PLACEHOLDER text, or while the draft legal note on
+# the contact page (`imprint.reviewNote`) is there — it goes once the legal
+# text has been reviewed. README.md -> "Veröffentlichen" explains it for
+# editors.
+#
+# Pages must be enabled on the repository once before the first run:
 #
 #   gh api -X POST repos/timbencker/celine-bencker-website/pages -f build_type=workflow
-#
-# then run this workflow (Actions -> Deploy to GitHub Pages -> Run workflow),
-# and restore the `push` trigger below if continuous deployment is wanted.
 on:
   workflow_dispatch:
 
@@ -28,7 +31,33 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+        env:
+          # The e2e suite drives the runner's preinstalled Google Chrome
+          # (`channel: 'chrome'`); nothing downloads a browser.
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1'
+      - run: npm run format:check
+      - run: npm run lint
+      - run: npm run check
+      - run: npm run test:unit
+      # Builds the site, serves it, and runs the accessibility and integrity
+      # checks (tests/README.md).
+      - run: npm run test:e2e
+      # Reads the dist/ the e2e run just built; fails while placeholder text or
+      # a launch blocker (the unreviewed legal note) is left.
+      - run: npm run check:launch
+
   build:
+    needs: gate
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7

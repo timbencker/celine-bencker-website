@@ -18,7 +18,9 @@ jobs:
       - run: npm run format:check
       - run: npm run lint
       - run: npm run check
-      # Also enforces translation completeness — see src/i18n/pages.ts
+      - run: npm run test:unit
+      # Also enforces translation completeness — see src/i18n/pages.ts — and
+      # fails on a broken data file (src/content/loaders/strictFile.ts).
       - run: npm run build
 
   e2e:

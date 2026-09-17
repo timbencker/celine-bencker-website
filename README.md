@@ -21,7 +21,8 @@ src/content/pages/
 **Der Dateiname bestimmt die Adresse der Seite.** `forschung.md` wird zu
 `/de/forschung`. Datei umbenennen heißt Adresse ändern.
 
-Jede Datei beginnt mit einem Kopfbereich zwischen `---`-Zeilen:
+Jede Datei besteht aus einem Kopfbereich zwischen zwei `---`-Zeilen. Dort
+stehen die Angaben zur Seite und, in benannten Blöcken, der Seitentext selbst:
 
 ```markdown
 ---
@@ -30,13 +31,40 @@ title: Forschung # Überschrift und Browser-Titel
 description: Kurzbeschreibung # für Google und beim Teilen von Links
 navOrder: 1 # Position im Menü (weglassen = nicht im Menü)
 background: verwoben # "aus" oder "verwoben"
----
+backgroundHue: salbei # Farbe des Kreises: gelb, salbei, sand oder flieder
 
-Hier steht der eigentliche Text.
+# Der Seitentext steht im Block der Seite (hier: research).
+research:
+  question: Wie hängen Stress, Hormone und prämenstruelle Symptome zusammen?
+  # … und die übrigen Felder der Seite (gekürzt)
+---
 ```
+
+Jede Seite hat ihren eigenen Block: `home`, `research`, `publications`, `cv`,
+`talksMedia` oder `contact`. Welche Felder darin stehen, zeigen die
+Kommentare in der jeweiligen Datei.
+
+**Unter der zweiten `---`-Zeile bleibt die Datei leer.** Text dort erscheint
+nicht auf der Website. Damit er nicht unbemerkt verloren geht, bricht der Build
+ab und nennt die Datei — der Text gehört in den passenden Block im Kopfbereich.
 
 Zeilen, die mit `#` beginnen, sind Kommentare — sie erscheinen nicht auf der
 Website.
+
+### Listen: Publikationen, Vorträge, Lebenslauf …
+
+Forschungslinien, Publikationen, Vorträge, Medienbeiträge, Lebenslauf und
+Neuigkeiten stehen einmal für beide Sprachen in `src/content/data/*.yaml`.
+Oben in jeder Datei erklären Kommentare die Felder und zeigen eine Vorlage.
+
+**Ein Tippfehler in einer dieser Dateien stoppt den Build**, und
+`npm run dev` startet nicht. Die Meldung nennt die Datei und meist die Stelle,
+z. B. `(4:1)` für Zeile 4, Spalte 1. Genauso stoppt ein Eintrag ohne `id` oder
+eine `id`, die zweimal vorkommt. Läuft `npm run dev` schon, erscheint die
+Meldung im Terminal.
+
+Eine leere Liste bleibt `[]` — eine Datei nur mit Kommentaren reicht nicht.
+Leer sein darf derzeit nur `media.yaml`.
 
 ### Zwei Sprachen
 
@@ -57,17 +85,19 @@ npm install
 npm run dev        # lokaler Server
 ```
 
-| Befehl               | Zweck                                                       |
-| -------------------- | ----------------------------------------------------------- |
-| `npm run dev`        | Entwicklungsserver                                          |
-| `npm run build`      | Produktions-Build nach `dist/`                              |
-| `npm run preview`    | Build lokal ansehen                                         |
-| `npm run check`      | Typen und Inhalts-Schemata prüfen                           |
-| `npm run lint`       | ESLint inkl. Accessibility-Regeln                           |
-| `npm run format`     | Prettier                                                    |
-| `npm run verify`     | check + lint + build                                        |
-| `npm run test:e2e`   | Barrierefreiheit und Links prüfen (siehe `tests/README.md`) |
-| `npm run lighthouse` | Lighthouse-Werte jeder Seite prüfen, Ziel ≥ 95              |
+| Befehl                 | Zweck                                                              |
+| ---------------------- | ------------------------------------------------------------------ |
+| `npm run dev`          | Entwicklungsserver                                                 |
+| `npm run build`        | Produktions-Build nach `dist/`                                     |
+| `npm run preview`      | Build lokal ansehen                                                |
+| `npm run check`        | Typen und Inhalts-Schemata prüfen                                  |
+| `npm run lint`         | ESLint inkl. Accessibility-Regeln                                  |
+| `npm run format`       | Prettier                                                           |
+| `npm run verify`       | check + lint + test:unit + build                                   |
+| `npm run test:unit`    | Prüfregeln für Datendateien, Seitentexte und Veröffentlichungsziel |
+| `npm run test:e2e`     | Barrierefreiheit und Links prüfen (siehe `tests/README.md`)        |
+| `npm run lighthouse`   | Lighthouse-Werte jeder Seite prüfen, Ziel ≥ 95                     |
+| `npm run check:launch` | Zeigt, was vor dem Veröffentlichen noch fehlt (liest `dist/`)      |
 
 Node-Version siehe `.nvmrc`.
 
@@ -77,7 +107,8 @@ Node-Version siehe `.nvmrc`.
 | ------------------------------ | ----------------------------------------- |
 | `src/content/pages/<sprache>/` | Seiteninhalte                             |
 | `src/content/data/`            | strukturierte Daten (YAML)                |
-| `src/content.config.ts`        | Schema — prüft die Inhalte beim Build     |
+| `src/content/schemas/`         | Schemata — prüfen die Inhalte beim Build  |
+| `src/content.config.ts`        | verbindet Inhalte und Schemata            |
 | `src/i18n/`                    | Sprachlogik, Übersetzungs-Prüfung         |
 | `src/layouts/`                 | Seitengerüst (einmal, für beide Sprachen) |
 | `src/components/`              | Bausteine                                 |
@@ -86,5 +117,12 @@ Node-Version siehe `.nvmrc`.
 
 ## Veröffentlichen
 
-Jeder Push auf `main` baut und veröffentlicht die Seite automatisch
+Veröffentlicht wird nur von Hand, nie durch einen Push: auf GitHub unter
+**Actions → „Deploy to GitHub Pages“ → „Run workflow“**
 (`.github/workflows/deploy.yml`).
+
+Der Ablauf führt zuerst alle Prüfungen aus. Er veröffentlicht nichts, solange
+die Website noch `PLATZHALTER`-Text enthält oder den Hinweis, dass das
+Impressum noch nicht rechtlich geprüft ist (`imprint.reviewNote` in
+`kontakt.md` und `contact.md` — nach der Prüfung entfernen). Was noch fehlt,
+zeigt `npm run check:launch` nach einem `npm run build`, Datei für Datei.

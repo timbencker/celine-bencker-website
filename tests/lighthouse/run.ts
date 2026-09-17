@@ -36,18 +36,16 @@ import { fileURLToPath } from 'node:url';
 
 import { preview } from 'astro';
 
+import { deployment } from '../../src/config/deployment.ts';
+
 const LHCI = '@lhci/cli@0.15.1';
 
 const ROOT = fileURLToPath(new URL('../../', import.meta.url));
 const WORK = `${ROOT}.lighthouse/`;
 
-/** Same env vars and defaults as astro.config.mjs. */
-const base =
-  `/${(process.env.BASE_PATH ?? '/celine-bencker-website').replace(/^\/+|\/+$/g, '')}/`.replace(
-    /^\/\/$/,
-    '/',
-  );
-const productionBase = new URL(base, process.env.SITE ?? 'https://timbencker.github.io').href;
+/** The deployment target astro.config.mjs builds for (src/config/deployment.ts). */
+const base = deployment.basePath;
+const productionBase = deployment.productionBaseUrl;
 
 const runs = Number(process.env.LHCI_RUNS ?? 3);
 if (!Number.isInteger(runs) || runs < 1) {

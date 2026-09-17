@@ -1,22 +1,22 @@
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
+import { deployment } from '../../../src/config/deployment.ts';
 import { LOCALE_HTML_LANG, isLocale } from '../../../src/i18n/config';
 
 /**
  * Where the suite points, and what the built site says it contains.
  *
- * `SITE` and `BASE_PATH` mirror `astro.config.mjs` (same env vars, same
- * defaults), so the suite follows the deployment target if it ever moves to a
- * custom domain.
+ * `SITE` and `BASE_PATH` come from `src/config/deployment.ts`, which
+ * `astro.config.mjs` reads too, so the suite follows the deployment target if
+ * it ever moves to a custom domain.
  */
 export const ROOT_DIR = fileURLToPath(new URL('../../../', import.meta.url));
 export const DIST_DIR = fileURLToPath(new URL('../../../dist/', import.meta.url));
 
-export const SITE = process.env.SITE ?? 'https://timbencker.github.io';
-const rawBase = process.env.BASE_PATH ?? '/celine-bencker-website';
+export const SITE = deployment.site;
 /** The deployment base with leading and trailing slash, e.g. `/celine-bencker-website/`. */
-export const BASE_PATH = `/${rawBase.replace(/^\/+|\/+$/g, '')}/`.replace(/^\/\/$/, '/');
+export const BASE_PATH = deployment.basePath;
 
 export const E2E_PORT = Number(process.env.E2E_PORT ?? 4330);
 if (!Number.isInteger(E2E_PORT) || E2E_PORT < 1 || E2E_PORT > 65535) {
@@ -27,7 +27,7 @@ export const LOCAL_ORIGIN = `http://localhost:${E2E_PORT}`;
 /** `http://localhost:<port>/celine-bencker-website/` — the Playwright baseURL. */
 export const BASE_URL = `${LOCAL_ORIGIN}${BASE_PATH}`;
 /** `https://timbencker.github.io/celine-bencker-website/` — what the sitemap and hreflang use. */
-export const PRODUCTION_BASE_URL = new URL(BASE_PATH, SITE).href;
+export const PRODUCTION_BASE_URL = deployment.productionBaseUrl;
 
 /** Where the per-run site index (see global-setup.ts) is written. */
 export const SITE_INDEX_PATH = fileURLToPath(

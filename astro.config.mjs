@@ -2,25 +2,24 @@
 import tailwindcss from '@tailwindcss/vite';
 import { defineConfig } from 'astro/config';
 
+import { deployment } from './src/config/deployment.ts';
 import { fontsource } from './src/fonts/fontsource.ts';
 import { DEFAULT_LOCALE, LOCALES } from './src/i18n/config.ts';
 
-/**
- * Deployment target.
- *
- * GitHub Pages serves project sites from a sub-path, so `base` must match the
- * repository name. When a custom domain is added later, set `SITE` to that
- * domain and `BASE_PATH` to '/' — nothing else needs to change.
- */
-const site = process.env.SITE ?? 'https://timbencker.github.io';
-const base = process.env.BASE_PATH ?? '/celine-bencker-website';
-
 export default defineConfig({
-  site,
-  base,
+  // Deployment target from the SITE and BASE_PATH environment variables —
+  // defaults, validation and the custom-domain switch are explained in
+  // src/config/deployment.ts, which the e2e and Lighthouse runners share.
+  site: deployment.site,
+  base: deployment.astroBase,
 
   // GitHub Pages has no server: every route is pre-rendered to a file.
   output: 'static',
+
+  // Two entries with the same id — two pages at one URL, or a duplicated `id`
+  // in a data file — stop the build instead of one silently replacing the
+  // other (Astro's default is a warning).
+  prerenderConflictBehavior: 'error',
 
   build: {
     // The whole stylesheet is ~11 kB (about 3 kB compressed). Inlined, a page

@@ -149,7 +149,15 @@ const profiles = site.profiles.map((profile) => ({
     </h2>
     {/* The same text on every width: legal text is never shortened for phones. */}
     <div class="flex max-w-[60ch] flex-col gap-3.5 text-[14px] leading-[1.6] text-text-2 md:gap-5 md:text-meta">
-      {imprint.reviewNote && <p class="font-semibold text-ink">{imprint.reviewNote}</p>}
+      {
+        /* Marked so `npm run check:launch` (and with it the deploy workflow)
+           refuses to publish while the legal text is unreviewed. */
+        imprint.reviewNote && (
+          <p class="font-semibold text-ink" data-launch-blocker>
+            {imprint.reviewNote}
+          </p>
+        )
+      }
       <p>
         <strong class="font-bold text-ink">{imprint.ownerLabel}</strong>
         <br />
