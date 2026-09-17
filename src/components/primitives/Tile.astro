@@ -16,8 +16,9 @@ import MailLink from './MailLink.astro';
  * - `row` — title and meta left, arrow right: the two exits at the bottom of
  *   Home. Internal links only.
  * - `card` — the three-up grid: media pieces (Talks) and the reasons to write
- *   (Contact). Put cards in `<ul role="list" class="grid gap-3 md:grid-cols-3
- *   md:gap-5">`; they fill the row height.
+ *   (Contact). Put cards in `<ul role="list" class="grid gap-3
+ *   desktop:grid-cols-3 desktop:gap-5">`; they fill the row height. Below
+ *   desktop they stack.
  *
  * A card's target decides its glyph, as everywhere: internal "→", external
  * "↗" with a new tab, mail none (and the address stays entity-encoded). The
@@ -25,12 +26,14 @@ import MailLink from './MailLink.astro';
  *
  * Card geometry is the CVA's (28px padding, 16px gap, 240px tall); the two
  * boards disagree with each other there. Phones: 22px padding, 12px gap.
+ * Padding, gap and type switch at tablet; the 240px height and the meta
+ * pinned to the bottom only from desktop, where cards share a row.
  */
 const tile = cva('group rounded-card bg-bone text-ink transition-colors hover:bg-lilac-tint', {
   variants: {
     kind: {
-      row: 'flex items-center justify-between gap-4 px-5 py-[18px] md:gap-6 md:px-8 md:py-6',
-      card: 'flex h-full flex-col gap-3 p-[22px] md:min-h-60 md:gap-4 md:p-7',
+      row: 'flex items-center justify-between gap-4 px-5 py-[18px] tablet:gap-6 tablet:px-8 tablet:py-6',
+      card: 'flex h-full flex-col gap-3 p-[22px] tablet:gap-4 tablet:p-7 desktop:min-h-60',
     },
   },
   defaultVariants: { kind: 'row' },
@@ -74,11 +77,11 @@ const cardClass = card ? cn(tile({ kind: 'card' }), card.class) : '';
 
 {!card && (
   <a href={props.href} class={cn(tile(), props.class)}>
-    <span class="flex flex-col gap-[3px] md:gap-[5px]">
-      <span class="text-[18px] font-bold tracking-[-0.03em] md:text-[21px]">{props.title}</span>
-      {props.meta && <span class="text-[13px] text-text-3 md:text-meta">{props.meta}</span>}
+    <span class="flex flex-col gap-[3px] tablet:gap-[5px]">
+      <span class="text-[18px] font-bold tracking-[-0.03em] tablet:text-[21px]">{props.title}</span>
+      {props.meta && <span class="text-[13px] text-text-3 tablet:text-meta">{props.meta}</span>}
     </span>
-    <span class={cn(arrow, 'text-[20px] md:text-[22px]')} aria-hidden="true">
+    <span class={cn(arrow, 'text-[20px] tablet:text-[22px]')} aria-hidden="true">
       →
     </span>
   </a>
@@ -106,29 +109,31 @@ const cardClass = card ? cn(tile({ kind: 'card' }), card.class) : '';
       <>
         {card.logo &&
           (Astro.slots.has('logo') ? (
-            <span class="flex h-[22px] items-center md:h-[26px]">
+            <span class="flex h-[22px] items-center tablet:h-[26px]">
               <slot name="logo" />
             </span>
           ) : (
             <span
-              class="block h-[22px] w-[90px] rounded-image bg-line md:h-[26px] md:w-[110px]"
+              class="block h-[22px] w-[90px] rounded-image bg-line tablet:h-[26px] tablet:w-[110px]"
               aria-hidden="true"
             />
           ))}
-        {card.eyebrow && <span class="text-[13px] text-text-3 md:text-meta">{card.eyebrow}</span>}
-        <span class="text-[19px] font-bold leading-[1.2] tracking-[-0.03em] md:text-[22px]">
+        {card.eyebrow && (
+          <span class="text-[13px] text-text-3 tablet:text-meta">{card.eyebrow}</span>
+        )}
+        <span class="text-[19px] font-bold leading-[1.2] tracking-[-0.03em] tablet:text-[22px]">
           {card.title}
         </span>
         {(card.meta || card.action) && (
-          <span class="flex flex-col gap-1 md:mt-auto">
+          <span class="flex flex-col gap-1 desktop:mt-auto">
             {card.meta && (
-              <span class="text-[14px] text-text-2 md:text-meta">
+              <span class="text-[14px] text-text-2 tablet:text-meta">
                 {card.meta}
                 {!card.action && glyph}
               </span>
             )}
             {card.action && (
-              <span class="text-[14px] font-semibold text-sage md:text-meta">
+              <span class="text-[14px] font-semibold text-sage tablet:text-meta">
                 {card.action}
                 {glyph}
               </span>

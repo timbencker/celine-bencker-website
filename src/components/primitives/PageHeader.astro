@@ -7,7 +7,7 @@ import { container } from '../../lib/styles';
 /**
  * The subpage masthead — `pageHeader` in _Komponenten, as the boards draw it:
  * on paper inside the site header (which supplies the hairline), 64px above
- * and 72px below from md, 40/40 on phones.
+ * and 72px below from tablet, 40/40 on phones.
  *
  * Put it in the layout's `masthead` slot. The default slot is the title side
  * (a PageTitle, plus anything that belongs above it, like the 404's small
@@ -21,13 +21,16 @@ import { container } from '../../lib/styles';
  * - `compact` — title and aside on one line, baselines aligned, no intro
  *   (Publications). Its phone padding is the board's tighter 32/36.
  *
- * On phones everything stacks: title, then aside, left-aligned.
+ * Both layouts start at desktop. On phones and tablets everything stacks:
+ * title, then aside, left-aligned, 20px apart — the 64px between them is the
+ * gap of the side-by-side layout. A `class` that changes that gap uses the
+ * tier of the one it replaces (src/lib/styles.ts).
  */
-const header = cva('flex flex-col gap-5 pb-10 pt-10 md:gap-16 md:pb-[72px] md:pt-16', {
+const header = cva('flex flex-col gap-5 pb-10 pt-10 tablet:pb-[72px] tablet:pt-16 desktop:gap-16', {
   variants: {
     layout: {
-      split: 'md:grid md:items-end',
-      compact: 'pb-9 pt-8 md:flex-row md:items-baseline md:justify-between',
+      split: 'desktop:grid desktop:items-end',
+      compact: 'pb-9 pt-8 desktop:flex-row desktop:items-baseline desktop:justify-between',
     },
     ratio: {
       '7/5': '',
@@ -35,8 +38,8 @@ const header = cva('flex flex-col gap-5 pb-10 pt-10 md:gap-16 md:pb-[72px] md:pt
     },
   },
   compoundVariants: [
-    { layout: 'split', ratio: '7/5', class: 'md:grid-cols-[minmax(0,7fr)_minmax(0,5fr)]' },
-    { layout: 'split', ratio: '6/6', class: 'md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]' },
+    { layout: 'split', ratio: '7/5', class: 'desktop:grid-cols-[minmax(0,7fr)_minmax(0,5fr)]' },
+    { layout: 'split', ratio: '6/6', class: 'desktop:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]' },
   ],
   defaultVariants: { layout: 'split', ratio: '7/5' },
 });
@@ -53,7 +56,7 @@ const { layout, ratio, class: className } = Astro.props;
     <slot />
   </div>
   {Astro.slots.has('aside') && (
-    <div class="flex min-w-0 flex-col items-start gap-2 md:items-end md:gap-2.5 md:text-right">
+    <div class="flex min-w-0 flex-col items-start gap-2 tablet:gap-2.5 desktop:items-end desktop:text-right">
       <slot name="aside" />
     </div>
   )}

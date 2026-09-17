@@ -39,8 +39,8 @@ const options = [
 ];
 ---
 
-<div class="hidden flex-col items-start gap-2 supports-[selector(:has(*))]:flex md:items-end md:gap-2.5">
-  <span id={labelId} class="text-[13px] leading-[1.4] text-text-3 md:text-meta">
+<div class="hidden flex-col items-start gap-2 supports-[selector(:has(*))]:flex tablet:gap-2.5 desktop:items-end">
+  <span id={labelId} class="text-[13px] leading-[1.4] text-text-3 tablet:text-meta">
     {label}
   </span>
   <div role="radiogroup" aria-labelledby={labelId} class="inline-flex rounded-pill bg-line p-1">
@@ -62,7 +62,7 @@ const options = [
   </div>
   <p
     class={cn(
-      'min-h-[20px] text-[13px] italic leading-[1.5] text-text-3 md:min-h-[21px] md:text-[14px]',
+      'min-h-[20px] text-[13px] italic leading-[1.5] text-text-3 tablet:min-h-[21px] tablet:text-[14px]',
       plainVisible,
     )}
   >

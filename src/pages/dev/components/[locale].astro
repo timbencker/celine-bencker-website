@@ -90,7 +90,7 @@ const frame = 'border-y border-line';
   </Section>
 
   {/* --- PageHeader + PageTitle ----------------------------------------- */}
-  <Section labelledby="dev-header" layout="stacked" space="none" class="pt-14 md:pt-24">
+  <Section labelledby="dev-header" layout="stacked" space="none" class="pt-14 tablet:pt-24">
     <h2 id="dev-header" class={heading({ level: 'section' })}>
       PageHeader & PageTitle
     </h2>
@@ -98,7 +98,7 @@ const frame = 'border-y border-line';
 
   <div class="flex flex-col gap-10 py-10">
     <div>
-      <p class:list={['mx-auto max-w-content px-5 md:px-12', specimen]}>
+      <p class:list={['mx-auto max-w-content px-5 tablet:px-12', specimen]}>
         split · 7/5 · title + intro · aside: Button download + TextLink
       </p>
       <div class={frame}>
@@ -124,7 +124,7 @@ const frame = 'border-y border-line';
     </div>
 
     <div>
-      <p class:list={['mx-auto max-w-content px-5 md:px-12', specimen]}>
+      <p class:list={['mx-auto max-w-content px-5 tablet:px-12', specimen]}>
         split · 6/6 · title as slot with a line break · aside: question list
       </p>
       <div class={frame}>
@@ -136,7 +136,7 @@ const frame = 'border-y border-line';
           <ul
             slot="aside"
             role="list"
-            class="flex flex-col gap-3 text-[18px] font-semibold leading-[1.3] tracking-[-0.02em] md:gap-[18px] md:text-[22px]"
+            class="flex flex-col gap-3 text-[18px] font-semibold leading-[1.3] tracking-[-0.02em] tablet:gap-[18px] tablet:text-[22px]"
           >
             <li>Eine Beispielfrage für Redaktionen?</li>
             <li>Noch eine Frage, etwas länger formuliert?</li>
@@ -146,7 +146,7 @@ const frame = 'border-y border-line';
     </div>
 
     <div>
-      <p class:list={['mx-auto max-w-content px-5 md:px-12', specimen]}>
+      <p class:list={['mx-auto max-w-content px-5 tablet:px-12', specimen]}>
         compact · title only · aside: external links
       </p>
       <div class={frame}>
@@ -155,7 +155,7 @@ const frame = 'border-y border-line';
           <ul
             slot="aside"
             role="list"
-            class="flex flex-wrap gap-x-[18px] gap-y-2 text-[14px] font-semibold md:gap-6 md:text-meta"
+            class="flex flex-wrap gap-x-[18px] gap-y-2 text-[14px] font-semibold tablet:text-meta desktop:gap-6"
           >
             <li>
               <ExternalLink
@@ -181,12 +181,12 @@ const frame = 'border-y border-line';
     </div>
 
     <div>
-      <p class:list={['mx-auto max-w-content px-5 md:px-12', specimen]}>
+      <p class:list={['mx-auto max-w-content px-5 tablet:px-12', specimen]}>
         split · small label above · PageTitle size="question" · aside: MailLink with label
       </p>
       <div class={frame}>
         <PageHeader>
-          <p class="font-mono text-[12px] uppercase tracking-[0.1em] text-text-3 md:text-[13px]">
+          <p class="font-mono text-[12px] uppercase tracking-[0.1em] text-text-3 tablet:text-[13px]">
             Kleines Label
           </p>
           <PageTitle size="question" title="Wie sieht ein Titel aus, der eine ganze Frage ist?" />
@@ -291,7 +291,7 @@ const frame = 'border-y border-line';
         <p class={specimen}>MailLink · large address, break-all on phones</p>
         <MailLink
           email={email}
-          class="break-all text-[20px] font-bold tracking-[-0.03em] text-sage transition-colors hover:text-ink md:text-[28px]"
+          class="break-all text-[20px] font-bold tracking-[-0.03em] text-sage transition-colors hover:text-ink tablet:text-[28px]"
         />
       </li>
     </ul>
@@ -322,7 +322,7 @@ const frame = 'border-y border-line';
   <Section surface="bone" layout="split">
     <div class="flex flex-col gap-3">
       <p class={heading({ level: 'section' })}>static</p>
-      <p class={specimen}>edge first · plain · edge last (edges from md only)</p>
+      <p class={specimen}>edge first · plain · edge last (edges from desktop only)</p>
     </div>
     <ul role="list" class="flex flex-col">
       <li>
@@ -464,9 +464,9 @@ const frame = 'border-y border-line';
   </Section>
 
   <Section layout="stacked" space="compact">
-    <div class="grid gap-3 border-t border-line py-7 md:grid-cols-[minmax(0,3fr)_minmax(0,9fr)] md:gap-12 md:py-10">
+    <div class="grid gap-3 border-t border-line py-7 tablet:py-10 desktop:grid-cols-[minmax(0,3fr)_minmax(0,9fr)] desktop:gap-12">
       <p class={heading({ level: 'row' })}>cv</p>
-      <ul role="list" class="flex flex-col md:gap-5">
+      <ul role="list" class="flex flex-col desktop:gap-5">
         <li>
           <ListRow
             kind="cv"
@@ -496,7 +496,7 @@ const frame = 'border-y border-line';
       Tile
     </h2>
     <p class={specimen}>row · two exits</p>
-    <ul role="list" class="grid gap-3 md:grid-cols-2 md:gap-6">
+    <ul role="list" class="grid gap-3 desktop:grid-cols-2 desktop:gap-6">
       <li>
         <Tile href={talksHref} title="Erster Ausgang" meta="Eine Zeile Meta" />
       </li>
@@ -506,7 +506,7 @@ const frame = 'border-y border-line';
     </ul>
 
     <p class={specimen}>card · media: logo placeholder / logo slot, external</p>
-    <ul role="list" class="grid gap-3 md:grid-cols-3 md:gap-5">
+    <ul role="list" class="grid gap-3 desktop:grid-cols-3 desktop:gap-5">
       <li>
         <Tile
           kind="card"
@@ -544,7 +544,7 @@ const frame = 'border-y border-line';
     </ul>
 
     <p class={specimen}>card · contact: mail with subject / internal / anchor</p>
-    <ul role="list" class="grid gap-3 md:grid-cols-3 md:gap-6">
+    <ul role="list" class="grid gap-3 desktop:grid-cols-3 desktop:gap-6">
       <li>
         <Tile
           kind="card"
@@ -601,7 +601,8 @@ const frame = 'border-y border-line';
       Section · split · bone
     </h2>
     <p class="text-body text-text-2">
-      Titel links auf fünf Spalten, Prosa rechts auf sieben. Auf Telefonen untereinander.
+      Titel links auf fünf Spalten, Prosa rechts auf sieben. Auf Telefonen und Tablets
+      untereinander.
     </p>
   </Section>
   <Section layout="label" space="compact">
@@ -634,7 +635,7 @@ const frame = 'border-y border-line';
       Portrait
     </h2>
     <p class={specimen}>placeholder · 4/5 default · 16/9 with label · 1/1 compact</p>
-    <div class="grid items-start gap-6 md:grid-cols-3">
+    <div class="grid items-start gap-6 desktop:grid-cols-3">
       <Portrait locale={locale} />
       <Portrait locale={locale} ratio="16/9" label="grafik — beispiel, 16:9" />
       <Portrait locale={locale} ratio="1/1" compact label="pressefoto — 1:1" />
@@ -643,38 +644,38 @@ const frame = 'border-y border-line';
       src · picture with AVIF and WebP · 4/5 · 16/9 · 1/1 (generated sample, not a photo)
     </p>
     {sample && (
-      <div class="grid items-start gap-6 md:grid-cols-3">
+      <div class="grid items-start gap-6 desktop:grid-cols-3">
         <Portrait
           locale={locale}
           src={sample}
           alt="Beispielbild: zwei Farbflächen, diagonal geteilt"
-          sizes="(min-width: 768px) 33vw, 100vw"
+          sizes="(min-width: 1120px) 33vw, 100vw"
         />
         <Portrait
           locale={locale}
           ratio="16/9"
           src={sample}
           alt="Dasselbe Beispielbild, auf 16:9 zugeschnitten"
-          sizes="(min-width: 768px) 33vw, 100vw"
+          sizes="(min-width: 1120px) 33vw, 100vw"
         />
         <Portrait
           locale={locale}
           ratio="1/1"
           src={sample}
           alt=""
-          sizes="(min-width: 768px) 33vw, 100vw"
+          sizes="(min-width: 1120px) 33vw, 100vw"
         />
       </div>
     )}
   </Section>
 
   {/* --- Band ----------------------------------------------------------- */}
-  <Section labelledby="dev-band" layout="stacked" space="none" class="pt-14 md:pt-24">
+  <Section labelledby="dev-band" layout="stacked" space="none" class="pt-14 tablet:pt-24">
     <h2 id="dev-band" class={heading({ level: 'section' })}>
       Band
     </h2>
     <p class:list={['pb-6 pt-2', specimen]}>Home only · reads news.yaml</p>
   </Section>
   <Band locale={locale} />
-  <div class="h-14 md:h-24"></div>
+  <div class="h-14 tablet:h-24"></div>
 </SiteChrome>

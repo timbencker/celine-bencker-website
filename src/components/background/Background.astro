@@ -20,7 +20,11 @@
  * `mobile` to pick the pieces. It sizes the large motifs by
  * `sc = cardWidth / 1280`, so on either card a motif's box is `px / 1280` of
  * the card: a fixed share of the width, which is what a `vw` unit is. Both
- * sets are rendered below as layers; the one `md` breakpoint hides the other.
+ * sets are rendered below as layers; the `desktop` breakpoint (1120px) hides
+ * one or the other. Below 1120px the phone recipe is shown, scaled against
+ * 390, so on tablets its large shapes grow with the viewport; the desktop
+ * recipe's hero marks assume the side-by-side header and would sit on the
+ * stacked title.
  *
  * On the phone card the canvas scales only a motif's box, not its SVG:
  * `svgBox` keeps the unscaled width and height, so a 920px circle overflows
@@ -31,7 +35,9 @@
  * The marks are placed in plain pixels, never scaled by `sc`, because they
  * rely on bands that are fixed in pixels: the page margin (48px, 20px on
  * phones) for the scale, and the gap between the phone nav and the title for
- * the phone mark. They stay in pixels here. The desktop hero marks sit in the
+ * the phone mark. They stay in pixels here. On tablets the phone layer keeps
+ * its phone placement: the margin there is 48px and the title starts lower,
+ * so its marks stay clear of text. The desktop hero marks sit in the
  * header's column gap, and that gap is fluid, so they follow the content
  * column: scaled against 1280 below that width, fixed and centred with the
  * column above it. Their top stays in pixels, like the nav and padding above
@@ -221,8 +227,9 @@ function bausteine(mobile: boolean): Record<BackgroundPage, Recipe> {
     `<rect x="30" y="30" width="500" height="500" rx="28" transform="rotate(9 280 280)" style="fill:${FLAECHE}"/>`,
   );
 
-  // A warm, filled mark: the hero's strong accent. On phones, one small
-  // rhombus at the right edge, between the nav and the title.
+  // A warm, filled mark: the hero's strong accent. In the phone layer (phones
+  // and tablets), one small rhombus at the right edge, between the nav and the
+  // title.
   const heroMobil: Piece[] = [
     {
       name: 'heroMobil',
@@ -345,8 +352,8 @@ function bausteine(mobile: boolean): Record<BackgroundPage, Recipe> {
 const layers =
   variant === 'verwoben'
     ? [
-        { name: 'desktop', class: 'hidden md:block', recipe: bausteine(false)[page] },
-        { name: 'phone', class: 'md:hidden', recipe: bausteine(true)[page] },
+        { name: 'desktop', class: 'hidden desktop:block', recipe: bausteine(false)[page] },
+        { name: 'phone', class: 'desktop:hidden', recipe: bausteine(true)[page] },
       ]
         .map(({ recipe, ...layer }) => ({
           ...layer,

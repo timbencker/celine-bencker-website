@@ -217,6 +217,24 @@ The canvas has three layers that do not always agree: the brief, the
     publication list 24px further left, and collapsed below 800px, where the
     gaps alone were wider than the content. The label track keeps a 232px
     minimum so "Eingereicht" never breaks.
+21. **Three breakpoints.** `_Komponenten` allows one breakpoint (768px), and
+    the boards show only phone (390) and desktop (1280). With one breakpoint
+    the desktop grids reached down to 768px, where talk titles, the quote, the
+    Methods titles and "Zusammenarbeit" split mid-word and the nav wrapped to
+    two rows. The site has three tiers (`src/styles/tokens.css`; rules in the
+    header of `src/lib/styles.ts`):
+    - **phone** — the phone boards.
+    - **tablet, from 768px** — still one column, with desktop type, 48px
+      margins and desktop spacing.
+    - **desktop, from 1120px** — the board layouts, the desktop nav and the
+      desktop background. 1120px is the narrowest width at which every board
+      layout fits with room to spare.
+
+    Below 1120px the phone background is shown. Its shapes are sized against
+    the 390px phone board, so on tablets they grow with the screen; the
+    desktop recipe's marks assume the side-by-side header and would sit on the
+    stacked title. `tests/e2e/layout.spec.ts` checks the tiers at eight
+    widths, including that no word breaks mid-word.
 
 ## Contrast over the background
 
@@ -272,8 +290,5 @@ Everything marked `PLATZHALTER`, `# Entwurf …` or `# EN: Übersetzung …` in
 - **Credit link** `https://timbencker.de` comes from an old WordPress export.
 - **English copy** throughout is a translation of the German draft.
 - **Favicon** — a placeholder until an icon is designed.
-- **Nav at tablet width** — between 768px and roughly 1000px the five desktop
-  links wrap to two rows. The spec allows one breakpoint only, so this is left
-  as is.
 - **Talk list goes stale** — "upcoming" vs "past" is decided at build time, so
   the site needs a rebuild (or a scheduled deploy) after a talk date passes.

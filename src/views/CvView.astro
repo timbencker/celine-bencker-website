@@ -143,7 +143,7 @@ const lastStrength = cv.strengths.items.length - 1;
     {primaryPdf && (
       <div
         slot="aside"
-        class="flex flex-wrap items-center gap-x-5 gap-y-3 md:justify-end md:gap-x-6"
+        class="flex flex-wrap items-center gap-x-5 gap-y-3 tablet:gap-x-6 desktop:justify-end"
       >
         {/*
           The file's language names the control; the components add
@@ -180,11 +180,11 @@ const lastStrength = cv.strengths.items.length - 1;
 
   <div class="bg-bone-soft">
     <Section labelledby="cv-strengths" space="compact">
-      <div class="flex flex-col gap-1.5 md:gap-3">
+      <div class="flex flex-col gap-1.5 tablet:gap-3">
         <h2 id="cv-strengths" class={heading({ level: 'section' })}>
           {cv.strengths.heading}
         </h2>
-        <p class="text-[14px] leading-[1.5] text-text-3 md:text-meta">{cv.strengths.note}</p>
+        <p class="text-[14px] leading-[1.5] text-text-3 tablet:text-meta">{cv.strengths.note}</p>
       </div>
       <ul role="list" class="flex flex-col">
         {cv.strengths.items.map((item, i) => (
@@ -201,7 +201,11 @@ const lastStrength = cv.strengths.items.length - 1;
     </Section>
   </div>
 
-  <Section layout="stacked" space="none" class={cn('pb-14 pt-5 md:pb-24 md:pt-14', cvGroupsGrid)}>
+  <Section
+    layout="stacked"
+    space="none"
+    class={cn('pb-14 pt-5 tablet:pb-24 tablet:pt-14', cvGroupsGrid)}
+  >
     {groups.map((group) => (
       <CvGroup id={`cv-${group.key}`} title={group.title}>
         {group.rows.map((row) => (

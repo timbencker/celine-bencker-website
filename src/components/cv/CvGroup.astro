@@ -4,17 +4,18 @@ import { heading } from '../../lib/styles';
 /**
  * One group of the CV — "Ausbildung", "Positionen" and the rest on board 7b:
  * the heading on the left, the rows on the right (3fr / 9fr, 48px apart), a
- * hairline above. On phones the heading sits above the rows and the rows
- * carry the hairlines.
+ * hairline above. Below desktop the heading sits above the rows and the rows
+ * carry the hairlines, as on phones.
  *
  * Not a Section: the groups share one container, and each group's hairline
  * has to stop at the page margin, which a Section's own container would not.
  *
- * From md the groups sit in one grid with `cvGroupsGrid` and take its columns
- * as a subgrid, so every group's rows start at the same line. That column is
- * never narrower than the longest heading word ("Mitgliedschaften"), so no
- * heading runs into the rows between 768 and ~1000px; at the board's 1280 the
- * columns are exactly 3fr / 9fr.
+ * From desktop the groups sit in one grid with `cvGroupsGrid` and take its
+ * columns as a subgrid, so every group's rows start at the same line. That
+ * column is never narrower than the longest heading word ("Mitgliedschaften"),
+ * so no heading runs into the rows in a narrow desktop window; at the board's
+ * 1280 the columns are exactly 3fr / 9fr. The hairline scheme switches with
+ * the grid, so its classes are `desktop:` too; the padding is `tablet:`.
  *
  * Put `<li><ListRow kind="cv" … /></li>` items in the default slot.
  */
@@ -29,12 +30,12 @@ const { id, title } = Astro.props;
 
 <section
   aria-labelledby={id}
-  class="flex flex-col gap-3 py-7 md:col-span-2 md:grid md:grid-cols-subgrid md:items-start md:gap-x-[normal] md:border-t md:border-line md:py-10"
+  class="flex flex-col gap-3 py-7 tablet:py-10 desktop:col-span-2 desktop:grid desktop:grid-cols-subgrid desktop:items-start desktop:gap-x-[normal] desktop:border-t desktop:border-line"
 >
   <h2 id={id} class={heading({ level: 'row' })}>
     {title}
   </h2>
-  <ul role="list" class="flex flex-col md:gap-5">
+  <ul role="list" class="flex flex-col desktop:gap-5">
     <slot />
   </ul>
 </section>

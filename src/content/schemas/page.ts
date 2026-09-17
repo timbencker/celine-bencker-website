@@ -16,8 +16,9 @@ import { talksMediaBlock } from './blocks/talks-media';
  */
 
 /**
- * The large heading in a page header. `lines` break only on desktop; on phones
- * the heading wraps naturally.
+ * The large heading in a page header. `lines` are forced line breaks from
+ * tablet on Home and from desktop on Talks & Media (see their views); below
+ * that the heading wraps naturally.
  */
 const hero = z
   .object({

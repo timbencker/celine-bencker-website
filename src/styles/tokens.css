@@ -7,6 +7,25 @@
  */
 
 @theme {
+  /* --- Breakpoints ----------------------------------------------------- */
+  /*
+   * Three tiers (what goes where: src/lib/styles.ts):
+   * - phone, no prefix: one column, phone type, 20px margins.
+   * - `tablet:` from 768px: still one column, desktop type, 48px margins,
+   *   desktop section and header spacing.
+   * - `desktop:` from 1120px: the board layouts — every side-by-side or
+   *   multi-column structure, the desktop nav, the desktop background.
+   * 1120 is the smallest width where every board layout fits with 48px
+   * margins and a 15px scrollbar: talk title column >=400px, quote column
+   * >=520px, the 5fr split track >=380px, the German nav on one row.
+   * The reset comes first and both sizes are in rem, or Tailwind sorts the
+   * tiers wrongly. It switches off Tailwind's default names (`sm`, `md`,
+   * `lg` …); tests/guards/breakpoints.ts keeps them out.
+   */
+  --breakpoint-*: initial;
+  --breakpoint-tablet: 48rem;
+  --breakpoint-desktop: 70rem;
+
   /* --- Colour ---------------------------------------------------------- */
   /* Text, and buttons ONLY on lilac-tint. There are no ink surfaces. */
   --color-ink: #171a17;

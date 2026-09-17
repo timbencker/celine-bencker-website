@@ -21,9 +21,10 @@ import Term from './Term.astro';
  *   header and the last 96px above Methods, 80px elsewhere.
  * - A line with a `study` is the `framed` block: the same row, then the cycle
  *   graphic with its caption beside the study's facts (5/7). That second row
- *   follows its own width, not the viewport: below 1024px it stacks, and the
- *   facts take three columns only from 576px — in the tablet's 7/12 column
- *   they would be 100px wide and break words apart.
+ *   follows its own width, not the viewport: below 1024px it stacks, which
+ *   covers every width below desktop (the frame is 1024px wide at 1120, a
+ *   little less beside a scrollbar). The facts take three columns only from
+ *   576px; on a phone they would be 100px wide and break words apart.
  *
  * The wrapper carries the line id, which Home links to.
  *
@@ -48,18 +49,19 @@ const term = line.term?.[locale];
 const termPlain = line.termPlain?.[locale];
 const participate = study?.participate;
 
-const text = cn('text-[17px] leading-[1.5]', study ? 'md:text-[20px]' : 'md:text-[22px]');
+const text = cn('text-[17px] leading-[1.5]', study ? 'tablet:text-[20px]' : 'tablet:text-[22px]');
 const paperLink = cn(
   'text-[15px] font-semibold text-sage transition-colors hover:text-ink',
-  study ? 'md:text-[16px]' : 'md:text-[17px]',
+  study ? 'tablet:text-[16px]' : 'tablet:text-[17px]',
 );
 
 // The frame brings its own padding; a study at either end of the list also
 // needs the room a plain line would have had there.
-const outer = (study && cn(first && 'pt-14 md:pt-24', last && 'pb-14 md:pb-24')) || undefined;
+const outer =
+  (study && cn(first && 'pt-14 tablet:pt-24', last && 'pb-14 tablet:pb-24')) || undefined;
 const spacing = cn(
-  first ? 'pt-14 md:pt-24' : 'pt-10 md:pt-20',
-  last ? 'pb-14 md:pb-24' : 'pb-10 md:pb-20',
+  first ? 'pt-14 tablet:pt-24' : 'pt-10 tablet:pt-20',
+  last ? 'pb-14 tablet:pb-24' : 'pb-10 tablet:pb-20',
 );
 ---
 
@@ -71,23 +73,25 @@ const spacing = cn(
     class={study ? undefined : spacing}
   >
     <div class={cn(splitGrid, 'gap-3.5')}>
-      <div class="flex flex-col gap-1 md:gap-2">
+      <div class="flex flex-col gap-1 tablet:gap-2">
         <h2 id={headingId} class={heading({ level: 'row' })}>
           {line.title[locale]}
         </h2>
         {study && (
-          <p class="text-[13px] leading-[1.5] text-text-3 md:text-meta">
+          <p class="text-[13px] leading-[1.5] text-text-3 tablet:text-meta">
             {`${study.name[locale]} · ${study.status[locale]}`}
           </p>
         )}
       </div>
 
-      <div class="flex flex-col gap-3.5 md:gap-4">
+      <div class="flex flex-col gap-3.5 tablet:gap-4">
         <p class={cn(text, plain && expertOnly)}>{line.text[locale]}</p>
         {plain && <p class={cn(text, plainOnly)}>{plain}</p>}
 
         {(participate || line.papers.length > 0) && (
-          <div class={cn('flex flex-wrap items-center gap-x-6 gap-y-4', participate && 'md:pt-2')}>
+          <div
+            class={cn('flex flex-wrap items-center gap-x-6 gap-y-4', participate && 'tablet:pt-2')}
+          >
             {participate && (
               <Button href={participate.href} locale={locale}>
                 {participate.label[locale]}
@@ -134,10 +138,12 @@ const spacing = cn(
               <dl class="flex flex-col @xl:grid @xl:grid-cols-3 @xl:gap-8">
                 {study.facts.map((fact) => (
                   <div class="flex flex-col gap-1 border-t border-line py-3 @xl:gap-1.5 @xl:pb-0 @xl:pt-4">
-                    <dt class="text-[12px] leading-[1.5] text-text-3 md:text-[13px]">
+                    <dt class="text-[12px] leading-[1.5] text-text-3 tablet:text-[13px]">
                       {fact.label[locale]}
                     </dt>
-                    <dd class="text-[15px] leading-[1.4] md:text-[17px]">{fact.value[locale]}</dd>
+                    <dd class="text-[15px] leading-[1.4] tablet:text-[17px]">
+                      {fact.value[locale]}
+                    </dd>
                   </div>
                 ))}
               </dl>

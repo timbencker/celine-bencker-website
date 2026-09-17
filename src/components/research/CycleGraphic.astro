@@ -11,7 +11,9 @@ import { cn } from '../../lib/cn';
  * has five check-ins a day in the first cycle, so this draws five.
  *
  * The labels are HTML over the drawing rather than SVG text: SVG text scales
- * with the drawing and would shrink to about 6px in the narrow tablet column.
+ * with the drawing and would shrink to about 6px on a phone, where the drawing
+ * is about half its 640 units wide. Stacked, as on phones and tablets, it takes
+ * the frame's width up to 640px; side by side on desktop, the 5/12 column.
  * Colours are tokens: lilac text and sage for the curves (4.55:1 and 5.42:1 on
  * paper), text-3 for the day labels (5.0:1).
  */

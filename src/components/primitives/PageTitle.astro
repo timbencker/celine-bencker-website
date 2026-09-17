@@ -12,9 +12,11 @@ import { cn } from '../../lib/cn';
  * Talks board breaks "Vorträge<br>& Medien"). The intro works the same way
  * through `intro` or the `intro` slot. The serif accent word is Home's alone.
  *
+ * The 72px step starts at tablet, where the page is still one column.
+ *
  * `question` is for a title that is a whole question (Research): it keeps
- * 16 characters per line from md, and drops to 36px on phones instead of 48
- * ("Frage-Titel 36" in _Komponenten, Mobile).
+ * 16 characters per line from tablet, and drops to 36px on phones instead of
+ * 48 ("Frage-Titel 36" in _Komponenten, Mobile).
  */
 interface Props {
   title?: string;
@@ -26,12 +28,12 @@ interface Props {
 const { title, intro, size = 'page', class: className } = Astro.props;
 
 const h1 = cva(
-  'font-bold leading-[0.98] tracking-[-0.04em] text-balance md:text-[72px] md:leading-[0.94] md:tracking-[-0.05em]',
+  'font-bold leading-[0.98] tracking-[-0.04em] text-balance tablet:text-[72px] tablet:leading-[0.94] tablet:tracking-[-0.05em]',
   {
     variants: {
       size: {
         page: 'text-[48px]',
-        question: 'text-[36px] md:max-w-[16ch]',
+        question: 'text-[36px] tablet:max-w-[16ch]',
       },
     },
   },
@@ -49,7 +51,7 @@ const hasIntro = Boolean(intro) || Astro.slots.has('intro');
     <slot>{title}</slot>
   </h1>
   {hasIntro && (
-    <p class="max-w-[44ch] text-[17px] leading-[1.5] text-text-2 md:text-lead-sm">
+    <p class="max-w-[44ch] text-[17px] leading-[1.5] text-text-2 tablet:text-lead-sm">
       <slot name="intro">{intro}</slot>
     </p>
   )}

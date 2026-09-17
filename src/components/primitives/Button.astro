@@ -24,11 +24,11 @@ import { linkKind } from './links';
  *   measures the file; render the button only when the file exists.
  * Mail addresses are MailLink, never a button.
  *
- * Geometry is the boards' (13/20 padding from md, 12/18 on phones); the pill
+ * Geometry is the boards' (13/20 padding from tablet, 12/18 on phones); the pill
  * stays inline on phones and never drops below 44px.
  */
 const button = cva(
-  'group inline-flex min-h-[44px] flex-wrap items-center gap-x-2 rounded-pill px-[18px] py-3 text-[15px] font-bold leading-[1.5] transition-colors md:px-5 md:py-[13px]',
+  'group inline-flex min-h-[44px] flex-wrap items-center gap-x-2 rounded-pill px-[18px] py-3 text-[15px] font-bold leading-[1.5] transition-colors tablet:px-5 tablet:py-[13px]',
   {
     variants: {
       tone: {

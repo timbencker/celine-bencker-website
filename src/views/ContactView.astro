@@ -80,14 +80,18 @@ const profiles = site.profiles.map((profile) => ({
     <MailLink
       slot="aside"
       email={email}
-      class="-my-2 py-2 text-[20px] font-bold leading-[1.4] tracking-[-0.03em] wrap-anywhere text-sage transition-colors hover:text-ink md:text-[28px]"
+      class="-my-2 py-2 text-[20px] font-bold leading-[1.4] tracking-[-0.03em] wrap-anywhere text-sage transition-colors hover:text-ink tablet:text-[28px]"
     >
       <Fragment set:html={largeAddress} />
     </MailLink>
   </PageHeader>
 
   <Section layout="stacked" space="compact">
-    <ul role="list" aria-label={contact.reasonsLabel} class="grid gap-3 md:grid-cols-3 md:gap-6">
+    <ul
+      role="list"
+      aria-label={contact.reasonsLabel}
+      class="grid gap-3 desktop:grid-cols-3 desktop:gap-6"
+    >
       {reasons.map((reason) => (
         <li>
           <Tile
@@ -107,7 +111,7 @@ const profiles = site.profiles.map((profile) => ({
     <h2 id="contact-institute" class={heading({ level: 'section' })}>
       {institute.heading}
     </h2>
-    <div class="grid gap-5 text-[16px] leading-[1.5] md:grid-cols-2 md:gap-8 md:text-body">
+    <div class="grid gap-5 text-[16px] leading-[1.5] tablet:text-body desktop:grid-cols-2 desktop:gap-8">
       <div class="flex flex-col gap-1">
         <p class="font-bold">{institute.organisation}</p>
         <p class="text-text-2">
@@ -117,14 +121,14 @@ const profiles = site.profiles.map((profile) => ({
         </p>
       </div>
       {profiles.length > 0 && (
-        <div class="flex flex-col gap-1.5 md:gap-2">
+        <div class="flex flex-col gap-1.5 tablet:gap-2">
           <p id="contact-profiles" class="font-bold">
             {institute.profilesHeading}
           </p>
           <ul
             role="list"
             aria-labelledby="contact-profiles"
-            class="flex flex-col gap-1 text-[15px] font-semibold text-sage md:text-body"
+            class="flex flex-col gap-1 text-[15px] font-semibold text-sage tablet:text-body"
           >
             {profiles.map((profile) => (
               <li>
@@ -148,7 +152,7 @@ const profiles = site.profiles.map((profile) => ({
       {t(locale, 'footer.imprint')}
     </h2>
     {/* The same text on every width: legal text is never shortened for phones. */}
-    <div class="flex max-w-[60ch] flex-col gap-3.5 text-[14px] leading-[1.6] text-text-2 md:gap-5 md:text-meta">
+    <div class="flex max-w-[60ch] flex-col gap-3.5 text-[14px] leading-[1.6] text-text-2 tablet:gap-5 tablet:text-meta">
       {
         /* Marked so `npm run check:launch` (and with it the deploy workflow)
            refuses to publish while the legal text is unreviewed. */

@@ -38,9 +38,10 @@ const allPages = await loadPages();
 const rows = onwardRows(await navigationFor(locale, allPages), de.onward.descriptions);
 
 /**
- * "Kaputter Link gefunden?" sits beside the title from md and below the list
- * on phones, as the two artboards place it. It is rendered in both places;
- * `display: none` keeps the hidden copy out of the reading and tab order.
+ * "Kaputter Link gefunden?" sits beside the title from desktop and below the
+ * list on phones and tablets, as the two artboards place it. It is rendered
+ * in both places; `display: none` keeps the hidden copy out of the reading and
+ * tab order.
  * Without an address in site.yaml there is no link, as in the footer.
  */
 const report = 'text-[15px] text-text-2 transition-colors hover:text-ink';
@@ -56,9 +57,9 @@ const report = 'text-[15px] text-text-2 transition-colors hover:text-ink';
   backgroundPage="notfound"
   robots="noindex"
 >
-  {/* On phones the aside holds nothing visible, so it must not add a gap. */}
+  {/* Below desktop the aside holds nothing visible, so it must not add a gap. */}
   <PageHeader slot="masthead" class="gap-0">
-    <p class="font-mono text-[12px] uppercase tracking-[0.1em] text-text-3 md:text-[13px]">
+    <p class="font-mono text-[12px] uppercase tracking-[0.1em] text-text-3 tablet:text-[13px]">
       {de.label}
     </p>
     <PageTitle title={de.title} intro={de.intro} />
@@ -70,7 +71,7 @@ const report = 'text-[15px] text-text-2 transition-colors hover:text-ink';
         slot="aside"
         email={email}
         label={de.report}
-        class={cn(report, 'hidden md:block')}
+        class={cn(report, 'hidden desktop:block')}
       />
     )}
   </PageHeader>
@@ -78,7 +79,7 @@ const report = 'text-[15px] text-text-2 transition-colors hover:text-ink';
   <Section
     labelledby="not-found-onward"
     space="none"
-    class="gap-5 pb-12 pt-10 md:gap-16 md:pb-[88px] md:pt-[72px]"
+    class="gap-5 pb-12 pt-10 tablet:pb-[88px] tablet:pt-[72px] desktop:gap-16"
   >
     <h2 id="not-found-onward" class={heading({ level: 'section' })}>
       {de.onward.heading}
@@ -95,7 +96,7 @@ const report = 'text-[15px] text-text-2 transition-colors hover:text-ink';
         <MailLink
           email={email}
           label={de.report}
-          class={cn(report, 'mt-7 inline-block md:hidden')}
+          class={cn(report, 'mt-7 inline-block desktop:hidden')}
         />
       )}
     </div>

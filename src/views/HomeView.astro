@@ -42,17 +42,21 @@ const research = (await getCollection('research')).sort((a, b) => a.data.order -
 const lastLine = hero.lines.length - 1;
 
 /**
- * On desktop the title's lines never wrap, so each must fit its column: the
- * gap beside it holds the background's hero marks, and a line running into
- * the gap would put a mark under text. The size follows the column (container
+ * From tablet on the title's lines never wrap, so each must fit its column:
+ * the full page width on a tablet, the 7/12 column on desktop. There the gap
+ * beside it holds the background's hero marks, and a line running into the
+ * gap would put a mark under text. The size follows the column (container
  * query units) and the longest line, and never exceeds the spec's 88px.
  *
  * HEADING_FIT is the column share one character takes at this weight and
  * tracking (cqi × characters), measured in the browser with a margin — so a
- * heading Celine edits keeps fitting. A line may reach GAP_ALLOWANCE into the
- * 80px gap, as the board's own 1280px title does; the hero marks start at
- * least 24px in, so 8px stay clear. Measured: German 88px at 1280, 47px at
- * 768; English 82px and 44px.
+ * heading Celine edits keeps fitting. Being a share of the column, it holds
+ * at any column width. A line may reach GAP_ALLOWANCE past the column, as the
+ * board's own 1280px title does: on desktop into the 80px gap, where the hero
+ * marks start at least 24px in, so 8px stay clear; on a tablet into the 48px
+ * page margin, which has no marks. Measured: German 88px at 1280, English
+ * 82px. From the formula: at 768 (672px column) German 88px, English 86px; at
+ * 1120 (551px column) German 75px, English 70px.
  */
 const HEADING_FIT = 200;
 const GAP_ALLOWANCE = '16px';
@@ -69,19 +73,19 @@ const headingFit = `--heading-fit: calc((100cqi + ${GAP_ALLOWANCE}) * ${(HEADING
     slot="masthead"
     class={cn(
       container,
-      'grid gap-5 pt-10 md:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] md:items-end md:gap-20 md:pt-24',
+      'grid gap-5 pt-10 tablet:pt-24 desktop:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] desktop:items-end desktop:gap-20',
     )}
   >
-    <div class="@container flex flex-col gap-5 md:gap-9 md:pb-16">
+    <div class="@container flex flex-col gap-5 tablet:gap-9 desktop:pb-16">
       <h1
         style={headingFit}
-        class="text-[52px] font-bold leading-[0.98] tracking-[-0.04em] text-balance md:text-[length:min(88px,var(--heading-fit))] md:leading-[0.94] md:tracking-[-0.05em]"
+        class="text-[52px] font-bold leading-[0.98] tracking-[-0.04em] text-balance tablet:text-[length:min(88px,var(--heading-fit))] tablet:leading-[0.94] tablet:tracking-[-0.05em]"
       >
         {hero.lines.map((line, i) => (
           <>
-            {i > 0 && <br class="hidden md:inline" />}
+            {i > 0 && <br class="hidden tablet:inline" />}
             {i > 0 && ' '}
-            <span class="md:whitespace-nowrap">
+            <span class="tablet:whitespace-nowrap">
               {line}
               {i === lastLine && hero.emphasis && (
                 <>
@@ -97,12 +101,15 @@ const headingFit = `--heading-fit: calc((100cqi + ${GAP_ALLOWANCE}) * ${(HEADING
       </h1>
 
       {hero.lead && (
-        <p class="max-w-[36ch] text-[17px] leading-[1.5] text-text-2 md:text-lead">{hero.lead}</p>
+        <p class="max-w-[36ch] text-[17px] leading-[1.5] text-text-2 tablet:text-lead">
+          {hero.lead}
+        </p>
       )}
 
+      {/* One line from tablet on, like the title lines; the narrowest column is 551px (1120). */}
       <ul
         role="list"
-        class="flex flex-wrap gap-x-6 gap-y-2.5 text-[16px] md:flex-nowrap md:gap-7 md:text-[17px]"
+        class="flex flex-wrap gap-x-6 gap-y-2.5 text-[16px] tablet:flex-nowrap tablet:gap-7 tablet:text-[17px]"
       >
         {home.links.map((link) => (
           <li>
@@ -112,15 +119,23 @@ const headingFit = `--heading-fit: calc((100cqi + ${GAP_ALLOWANCE}) * ${(HEADING
       </ul>
     </div>
 
-    {/* Tucks behind the band: 72px on phones, 48px from md. */}
-    <div class="relative z-[2] -mb-[72px] mt-2 w-[70%] rounded-image shadow-[0_24px_48px_-28px_rgb(0_0_0/0.25)] md:-mb-12 md:ml-auto md:mt-0 md:w-[86%] md:shadow-[0_30px_60px_-30px_rgb(0_0_0/0.25)]">
+    {/*
+      Tucks behind the band: 72px on phones, 48px from tablet. Stacked, it is
+      70% wide, at most 420px (about its desktop size), and sits 8px further
+      from the links; beside the text, it takes 86% of its column.
+    */}
+    <div class="relative z-[2] -mb-[72px] mt-2 w-[70%] rounded-image tablet:max-w-[420px] shadow-[0_24px_48px_-28px_rgb(0_0_0/0.25)] tablet:-mb-12 tablet:shadow-[0_30px_60px_-30px_rgb(0_0_0/0.25)] desktop:ml-auto desktop:mt-0 desktop:w-[86%]">
       <Portrait locale={locale} />
     </div>
   </div>
 
   <Band locale={locale} />
 
-  <Section labelledby="home-research" space="none" class="pb-12 pt-24 md:pb-32 md:pt-[184px]">
+  <Section
+    labelledby="home-research"
+    space="none"
+    class="pb-12 pt-24 tablet:pb-32 tablet:pt-[184px]"
+  >
     <h2 id="home-research" class={heading({ level: 'section' })}>
       {home.researchHeading}
     </h2>
@@ -137,8 +152,8 @@ const headingFit = `--heading-fit: calc((100cqi + ${GAP_ALLOWANCE}) * ${(HEADING
     </ul>
   </Section>
 
-  <Section layout="stacked" space="none" class="pb-16 md:pb-24">
-    <ul role="list" class="grid gap-3 md:grid-cols-2 md:gap-6">
+  <Section layout="stacked" space="none" class="pb-16 tablet:pb-24">
+    <ul role="list" class="grid gap-3 desktop:grid-cols-2 desktop:gap-6">
       {home.exits.map((exit) => (
         <li>
           <Tile href={hrefFor(exit.to)} title={exit.title} meta={exit.meta} />

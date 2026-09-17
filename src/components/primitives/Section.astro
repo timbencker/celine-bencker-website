@@ -12,14 +12,18 @@ import { container, splitGrid } from '../../lib/styles';
  * lilac tint appears exactly once on the whole site (Talks, "Für Redaktionen").
  *
  * `split` is title + prose (5/7), `label` is label + list (3/9), `stacked` is
- * for lists and tiles. On phones every layout is one column. `split` and
- * `label` expect exactly two children.
+ * for lists and tiles. Side by side only from desktop; on phones and tablets
+ * every layout is one column. `split` and `label` expect exactly two children.
+ * `space` is 56px on phones and the board's value from tablet.
+ *
+ * A `class` that replaces a default uses the default's tier: gaps of `split`
+ * and `label` are `desktop:`, padding is `tablet:` (src/lib/styles.ts).
  *
  * `framed` is a paper block between two hairlines, inside the page margin —
- * the study on Research (10b). Its children stack 40px apart (28 on phones)
- * and are usually `splitGrid` rows. The frame brings its own padding; the
- * space around it comes from its neighbours, as on the board, so `space` does
- * not apply.
+ * the study on Research (10b). Its children stack 40px apart from tablet (28
+ * on phones) and are usually `splitGrid` rows. The frame brings its own
+ * padding; the space around it comes from its neighbours, as on the board, so
+ * `space` does not apply.
  */
 const surface = cva('', {
   variants: {
@@ -34,19 +38,19 @@ const body = cva(container, {
       split: splitGrid,
       // 3fr/9fr as board 7a draws it. The label track never gets narrower than
       // its longest heading ("Eingereicht" at 44px), so the word never breaks.
-      label: 'grid gap-6 md:grid-cols-[minmax(232px,3fr)_minmax(0,9fr)] md:gap-12',
+      label: 'grid gap-6 desktop:grid-cols-[minmax(232px,3fr)_minmax(0,9fr)] desktop:gap-12',
       stacked: 'flex flex-col',
       framed: '',
     },
     space: {
-      compact: 'py-14 md:py-24',
-      normal: 'py-14 md:py-28',
-      read: 'py-14 md:py-32',
+      compact: 'py-14 tablet:py-24',
+      normal: 'py-14 tablet:py-28',
+      read: 'py-14 tablet:py-32',
       /** For the few sections whose spacing the board sets by hand. */
       none: '',
     },
   },
-  compoundVariants: [{ layout: 'framed', class: 'py-0 md:py-0' }],
+  compoundVariants: [{ layout: 'framed', class: 'py-0 tablet:py-0' }],
   defaultVariants: { layout: 'split', space: 'normal' },
 });
 
@@ -64,7 +68,7 @@ const Tag = labelledby ? 'section' : 'div';
 <Tag class={surface({ surface: tone })} aria-labelledby={labelledby}>
   <div class={cn(body({ layout, space }), className)}>
     {layout === 'framed' ? (
-      <div class="flex flex-col gap-7 border-y border-line py-10 md:gap-10 md:py-14">
+      <div class="flex flex-col gap-7 border-y border-line py-10 tablet:gap-10 tablet:py-14">
         <slot />
       </div>
     ) : (

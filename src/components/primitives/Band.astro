@@ -10,8 +10,10 @@ import { container } from '../../lib/styles';
  * The lilac band under the Home header — `band` in _Komponenten. Static, at
  * most four items. It sits in front of the portrait, which tucks behind it.
  *
- * The board's `whitespace-nowrap overflow-hidden` would clip items on narrower
- * screens and lose content, so the row wraps instead. Keeping the four items
+ * On phones the items stack between hairlines, full bleed; from tablet they
+ * share one row inside the page margin. The board's `whitespace-nowrap
+ * overflow-hidden` would clip items on narrower screens and lose content, so
+ * the row wraps instead. Keeping the four items
  * short enough for one line is an authoring rule, not something to enforce by
  * cutting text off.
  */
@@ -37,11 +39,11 @@ if (items.length > MAX_ITEMS) {
       role="list"
       class={cn(
         container,
-        'flex flex-col px-0 text-[14px] font-medium md:flex-row md:flex-wrap md:justify-between md:gap-x-8 md:gap-y-1 md:px-12 md:py-4 md:text-[15px]',
+        'flex flex-col px-0 text-[14px] font-medium tablet:flex-row tablet:flex-wrap tablet:justify-between tablet:gap-x-8 tablet:gap-y-1 tablet:px-12 tablet:py-4 tablet:text-[15px]',
       )}
     >
       {items.map((item) => (
-        <li class="border-t border-ink/12 px-5 py-3 first:border-t-0 md:border-t-0 md:p-0">
+        <li class="border-t border-ink/12 px-5 py-3 first:border-t-0 tablet:border-t-0 tablet:p-0">
           {item.data.text[locale]}
         </li>
       ))}

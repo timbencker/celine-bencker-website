@@ -42,16 +42,18 @@ const site = await getSite();
 const lines = (await getCollection('research')).sort((a, b) => a.data.order - b.data.order);
 
 /**
- * The question wraps inside its column, and the hero marks sit in the gap
- * beside it, so its longest word must fit the column: on a tablet the 7/12
- * column is 355px, where "prämenstruelle" at 72px (486px) would break
- * mid-word. From md the size follows the column (container query units) and
- * the longest word, and never exceeds the spec's 72px.
+ * The question wraps inside its column, and on desktop the hero marks sit in
+ * the gap beside it, so its longest word must fit the column: "prämenstruelle"
+ * at 72px is 486px wide. From tablet the size follows the column (container
+ * query units) and the longest word, and never exceeds the spec's 72px. The
+ * column is the full page width on a tablet (672px and up) and the 7/12
+ * column on desktop (560px at 1120).
  *
  * WORD_FIT is the width one character takes at this weight and tracking, in
  * em, with a margin: measured in Chrome, "prämenstruelle" is 6.75em (0.48 per
  * character), "zusammenhängen?" 0.58 and "Symptome" 0.60. Measured: German
- * 72px at 1280 and 42px at 768; English 72px and 49px.
+ * and English 72px at 1280. From the formula: both 72px at 768; at 1120
+ * German about 67px, English 72px.
  */
 const WORD_FIT = 0.6;
 const longestWord = Math.max(...research.question.split(/\s+/).map((word) => [...word].length));
@@ -64,7 +66,7 @@ const titleFit = `--title-fit: calc(100cqi / ${(longestWord * WORD_FIT).toFixed(
       <PageTitle
         size="question"
         title={research.question}
-        class="md:[&_h1]:text-[length:min(72px,var(--title-fit))]"
+        class="tablet:[&_h1]:text-[length:min(72px,var(--title-fit))]"
       />
     </div>
     <RegisterToggle slot="aside" {...research.register} />
@@ -106,14 +108,14 @@ const titleFit = `--title-fit: calc(100cqi / ${(longestWord * WORD_FIT).toFixed(
       {research.collaboration.heading}
     </h2>
     <div class="flex flex-col gap-6">
-      <p class="max-w-[56ch] text-[17px] leading-[1.5] md:text-[20px]">
+      <p class="max-w-[56ch] text-[17px] leading-[1.5] tablet:text-[20px]">
         {research.collaboration.text}
       </p>
       {site.email && (
         <p>
           <MailLink
             email={site.email}
-            class="break-all text-[18px] font-bold tracking-[-0.02em] text-sage transition-colors hover:text-ink md:break-normal md:text-[20px]"
+            class="break-all text-[18px] font-bold tracking-[-0.02em] text-sage transition-colors hover:text-ink tablet:break-normal tablet:text-[20px]"
           />
         </p>
       )}

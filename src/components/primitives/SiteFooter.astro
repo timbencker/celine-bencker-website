@@ -8,9 +8,9 @@ import ExternalLink from './ExternalLink.astro';
 import MailLink from './MailLink.astro';
 
 /**
- * Footer — "Nav & Footer" in _Komponenten. One line on desktop: mail and
- * profiles on the left, © · Impressum · credit on the right. No large name, no
- * columns. On phones it stacks.
+ * Footer — "Nav & Footer" in _Komponenten. One line from tablet, wrapping
+ * where it has to: mail and profiles on the left, © · Impressum · credit on
+ * the right. No large name, no columns. On phones it stacks.
  *
  * Profiles come from site.yaml; only those with a URL are shown.
  */
@@ -28,10 +28,10 @@ const year = new Date().getFullYear();
   <div
     class={cn(
       container,
-      'flex flex-col gap-4 pb-10 pt-8 text-[14px] text-text-2 md:flex-row md:flex-wrap md:items-baseline md:justify-between md:gap-x-7 md:gap-y-3 md:py-10 md:text-[15px]',
+      'flex flex-col gap-4 pb-10 pt-8 text-[14px] text-text-2 tablet:flex-row tablet:flex-wrap tablet:items-baseline tablet:justify-between tablet:gap-x-7 tablet:gap-y-3 tablet:py-10 tablet:text-[15px]',
     )}
   >
-    <div class="flex flex-col gap-4 md:flex-row md:flex-wrap md:items-baseline md:gap-7">
+    <div class="flex flex-col gap-4 tablet:flex-row tablet:flex-wrap tablet:items-baseline tablet:gap-7">
       {site.email && (
         <MailLink email={site.email} class="font-bold text-ink transition-colors hover:text-sage" />
       )}
@@ -39,7 +39,7 @@ const year = new Date().getFullYear();
         <ul
           role="list"
           aria-label={t(locale, 'footer.profiles')}
-          class="flex flex-wrap gap-x-5 gap-y-2 md:gap-7"
+          class="flex flex-wrap gap-x-5 gap-y-2 tablet:gap-7"
         >
           {site.profiles.map((profile) => (
             <li>
@@ -57,7 +57,7 @@ const year = new Date().getFullYear();
     </div>
 
     {/* Links here are under 24px tall; the row gap keeps wrapped targets far enough apart (WCAG 2.5.8). */}
-    <div class="flex flex-wrap gap-x-4 gap-y-2 text-[12px] text-text-3 md:gap-7 md:text-[13px]">
+    <div class="flex flex-wrap gap-x-4 gap-y-2 text-[12px] text-text-3 tablet:gap-7 tablet:text-[13px]">
       <span>
         © {year} {site.siteName}
       </span>

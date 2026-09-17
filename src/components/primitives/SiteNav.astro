@@ -13,11 +13,13 @@ import LanguageSwitch from './LanguageSwitch.astro';
  * the `navLink` CVA in _Komponenten. It sits on paper inside the page header,
  * as on every board; the header supplies the hairline.
  *
- * Desktop: name left, five links and DE/EN right. Phones: name left and a
- * "Menü" control right. The menu is a <details> disclosure, so it opens with
- * no JavaScript, and it expands in the page flow rather than as an overlay —
+ * From desktop (1120px): name left, five links and DE/EN right. Below that —
+ * phones and tablets — name left and a "Menü" control right; the links do not
+ * fit one row there. The menu is a <details> disclosure, so it opens with no
+ * JavaScript, and it expands in the page flow rather than as an overlay —
  * keyboard focus can never land on content hidden behind it. The control is
- * positioned into the name row; the panel follows below it.
+ * positioned into the name row, at the page margin of its tier; the panel
+ * follows below it.
  */
 interface Props {
   locale: Locale;
@@ -43,7 +45,7 @@ const navLink = cva('pb-0.5 text-[15px] transition-opacity hover:opacity-60', {
 ---
 
 {/* --- Desktop --------------------------------------------------------- */}
-<nav class="hidden md:block" aria-label={t(locale, 'nav.primary')}>
+<nav class="hidden desktop:block" aria-label={t(locale, 'nav.primary')}>
   <div class={cn(container, 'flex items-center justify-between gap-8 py-7')}>
     <a
       href={homeHref}
@@ -73,9 +75,12 @@ const navLink = cva('pb-0.5 text-[15px] transition-opacity hover:opacity-60', {
   </div>
 </nav>
 
-{/* --- Phones ---------------------------------------------------------- */}
-<div class="relative md:hidden">
-  <div class={cn(container, 'flex items-center py-[18px] pr-28')}>
+{/* --- Phones and tablets --------------------------------------------- */}
+{/* The right padding keeps the name clear of the control: page margin plus
+    92px, on each tier — `pr-28` alone would lose to the container's tablet
+    margin. */}
+<div class="relative desktop:hidden">
+  <div class={cn(container, 'flex items-center py-[18px] pr-28 tablet:pr-35')}>
     <a
       href={homeHref}
       aria-current={onHome ? 'page' : undefined}
@@ -87,7 +92,7 @@ const navLink = cva('pb-0.5 text-[15px] transition-opacity hover:opacity-60', {
   </div>
 
   <details class="group open:bg-bone-soft">
-    <summary class="absolute right-5 top-[18px] inline-flex min-h-[44px] cursor-pointer list-none items-center gap-2 text-[15px] font-semibold text-ink [&::-webkit-details-marker]:hidden">
+    <summary class="absolute right-5 top-[18px] inline-flex min-h-[44px] cursor-pointer list-none items-center gap-2 text-[15px] font-semibold text-ink tablet:right-12 [&::-webkit-details-marker]:hidden">
       <span class="group-open:hidden">{t(locale, 'nav.menuOpen')}</span>
       <span class="hidden group-open:inline">{t(locale, 'nav.menuClose')}</span>
       <span class="inline-flex flex-col gap-[3px] group-open:hidden" aria-hidden="true">

@@ -14,9 +14,10 @@ import Portrait from '../primitives/Portrait.astro';
  * approved, so the caller passes one only from an approved media record.
  *
  * On paper, which paints nothing, so the page background shows through as on
- * the board. The CVA's grid (420px photo, 64px gap, 96px block padding) from
- * md; on phones the photo takes 60% of the width above a 30px quote, and the
- * source line wraps.
+ * the board. The CVA's grid (420px photo, 64px gap) from desktop, its 96px
+ * block padding and 44px quote from tablet. Stacked, below desktop, the photo
+ * takes 60% of the width (at most 420px, its desktop size) above the quote
+ * (30px on phones), and the source line wraps.
  *
  * Without `quote` it renders its placeholder state: the photo slot and the
  * placeholder line in the quote's type, so the page keeps its shape until a
@@ -58,23 +59,23 @@ const {
 const MARKS: Record<Locale, [string, string]> = { de: ['„', '“'], en: ['“', '”'] };
 const [open, close] = MARKS[locale];
 const quoteType =
-  'font-serif text-[30px] font-normal leading-[1.15] tracking-[-0.01em] text-balance md:text-quote';
+  'font-serif text-[30px] font-normal leading-[1.15] tracking-[-0.01em] text-balance tablet:text-quote';
 ---
 
 <div
   class={cn(
     container,
-    'grid gap-6 py-14 md:grid-cols-[420px_minmax(0,1fr)] md:items-center md:gap-16 md:py-24',
+    'grid gap-6 py-14 tablet:py-24 desktop:grid-cols-[420px_minmax(0,1fr)] desktop:items-center desktop:gap-16',
     className,
   )}
 >
-  <div class="w-[60%] md:w-full">
+  <div class="w-[60%] tablet:max-w-[420px] desktop:w-full">
     {photo ? (
       <Portrait
         locale={locale}
         src={photo.src}
         alt={photo.alt}
-        sizes="(min-width: 768px) 420px, 60vw"
+        sizes="(min-width: 1120px) 420px, 60vw"
       />
     ) : (
       <Portrait locale={locale} label={photoLabel} />
@@ -82,20 +83,20 @@ const quoteType =
   </div>
 
   {quote ? (
-    <figure class="flex flex-col gap-6 md:gap-7">
+    <figure class="flex flex-col gap-6 tablet:gap-7">
       <blockquote lang={quote.lang === locale ? undefined : quote.lang}>
         <p class={quoteType}>{[open, quote.text, close]}</p>
       </blockquote>
-      <figcaption class="flex flex-wrap items-center gap-x-4 gap-y-2 text-[14px] text-text-2 md:gap-x-5 md:text-meta">
+      <figcaption class="flex flex-wrap items-center gap-x-4 gap-y-2 text-[14px] text-text-2 tablet:gap-x-5 tablet:text-meta">
         <span>{quote.source}</span>
         {quote.audio && (
           <ExternalLink
             href={quote.audio}
             locale={locale}
-            class="min-h-[44px] items-center gap-2 font-semibold text-sage transition-colors hover:text-ink md:gap-2.5"
+            class="min-h-[44px] items-center gap-2 font-semibold text-sage transition-colors hover:text-ink tablet:gap-2.5"
           >
             <span
-              class="inline-flex size-7 items-center justify-center rounded-pill bg-bone-soft text-[11px] text-ink md:size-8 md:text-[12px]"
+              class="inline-flex size-7 items-center justify-center rounded-pill bg-bone-soft text-[11px] text-ink tablet:size-8 tablet:text-[12px]"
               aria-hidden="true"
             >
               ▶︎

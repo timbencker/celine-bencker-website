@@ -14,7 +14,7 @@
     "lighthouse": "astro build && node tests/lighthouse/run.ts",
     "check:launch": "node tests/launch/run.ts",
     "check": "astro check",
-    "lint": "eslint .",
+    "lint": "eslint . && node tests/guards/breakpoints.ts",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",

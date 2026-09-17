@@ -11,12 +11,12 @@ import { cn } from '../../lib/cn';
  * afterwards, at the same ratio so nothing moves when one replaces the other.
  *
  * - `4/5` the portrait (Home) and the press photo (Talks).
- * - `16/9` a graphic at full width on phones (the study on Research).
+ * - `16/9` a graphic at full width below desktop (the study on Research).
  * - `1/1` a square press photo.
  *
  * Without `src` it renders the board's hatched placeholder, labelled with
  * what will go there. `compact` keeps the small label at every width, for
- * small slots; by default it grows from md.
+ * small slots; by default it grows from tablet.
  *
  * With `src` (an imported image) it renders `<picture>` with AVIF and WebP
  * sources through astro:assets and crops to the ratio. `alt` is required:
@@ -41,7 +41,10 @@ interface Placeholder extends Shared {
 interface Photo extends Shared {
   src: ImageMetadata;
   alt: string;
-  /** Defaults to half the viewport from md, full width below. */
+  /**
+   * Defaults to half the viewport from desktop (1120px), where the slot sits
+   * in a column, and full width below.
+   */
   sizes?: string;
   /** Widths to generate; anything wider than the source is dropped. */
   widths?: number[];
@@ -79,7 +82,7 @@ const label =
     alt={photo.alt}
     formats={['avif', 'webp']}
     widths={fittingWidths(photo)}
-    sizes={photo.sizes ?? '(min-width: 768px) 50vw, 100vw'}
+    sizes={photo.sizes ?? '(min-width: 1120px) 50vw, 100vw'}
     priority={photo.priority}
     pictureAttributes={{ class: cn('block', className) }}
     class={cn('block h-auto w-full rounded-image object-cover', RATIO[ratio])}
@@ -89,8 +92,8 @@ const label =
     class={cn(
       'flex',
       RATIO[ratio],
-      'items-center justify-center rounded-image p-3 text-center font-mono text-[11px] text-text-2 md:p-5 md:text-[12px]',
-      placeholder?.compact && 'md:p-3 md:text-[11px]',
+      'items-center justify-center rounded-image p-3 text-center font-mono text-[11px] text-text-2 tablet:p-5 tablet:text-[12px]',
+      placeholder?.compact && 'tablet:p-3 tablet:text-[11px]',
       'bg-[repeating-linear-gradient(135deg,var(--color-line)_0_10px,var(--color-bone)_10px_20px)]',
       className,
     )}

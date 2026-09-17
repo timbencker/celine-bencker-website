@@ -51,14 +51,20 @@ const years = groupByYear(works);
 /*
  * Space between the groups, as the board sets it by hand: 96px above the
  * first, 72px after the manuscripts group, 48px between years, 96px below the
- * last; 40px above each on phones. The rows bring their own padding.
+ * last, from tablet; 40px above each on phones. The rows bring their own
+ * padding. Each class takes the tier of the Section class it replaces: the
+ * label grid's gap is `desktop:`, padding `tablet:` (src/lib/styles.ts).
  */
 const groupCount = years.length + (copy.submitted ? 1 : 0);
 const groupSpace = (index: number) =>
   cn(
-    'gap-2 pb-2 pt-10 md:gap-12',
-    index === 0 ? 'md:pt-24' : index === 1 && copy.submitted ? 'md:pt-[72px]' : 'md:pt-12',
-    index === groupCount - 1 && 'pb-16 md:pb-24',
+    'gap-2 pb-2 pt-10 desktop:gap-12',
+    index === 0
+      ? 'tablet:pt-24'
+      : index === 1 && copy.submitted
+        ? 'tablet:pt-[72px]'
+        : 'tablet:pt-12',
+    index === groupCount - 1 && 'pb-16 tablet:pb-24',
   );
 const firstYear = copy.submitted ? 1 : 0;
 
@@ -68,10 +74,11 @@ const linkClass = 'text-sage transition-colors hover:text-ink';
 <PageLayout page={page} allPages={allPages}>
   <PageHeader slot="masthead" layout="compact">
     <PageTitle title={title} />
+    {/* Under the title it wraps with the phone's tight gaps; beside it, 24px apart. */}
     <ul
       slot="aside"
       role="list"
-      class="flex flex-wrap gap-x-[18px] gap-y-2 text-[14px] font-semibold md:gap-6 md:text-meta"
+      class="flex flex-wrap gap-x-[18px] gap-y-2 text-[14px] font-semibold tablet:text-meta desktop:gap-6"
     >
       {site.profiles.map((profile) => (
         <li>

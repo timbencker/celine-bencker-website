@@ -26,38 +26,48 @@ import { linkKind } from './links';
  *   Put a Callout in the default slot for the plain summary. `status` takes
  *   the link's place for unpublished work. `columns` sets title, description
  *   and link side by side, as the Methods list on Research does.
- * - `cv` — period left (130px), entry right: bold title, then detail. From md
- *   the rows have no hairline and sit 20px apart — give their list
- *   `class="flex flex-col md:gap-5"`, as on 7b. On phones they are hairline
- *   rows with the period above.
+ * - `cv` — period left (130px), entry right: bold title, then detail. From
+ *   desktop the rows have no hairline and sit 20px apart — give their list
+ *   `class="flex flex-col desktop:gap-5"`, as on 7b. On phones and tablets
+ *   they are hairline rows with the period above.
  *
  * `edge` closes a list flush with a heading beside it (`ui-HairlineRow`):
  * `first` drops the top hairline and padding, `last` the bottom padding. Both
- * apply from md only; on phones every row keeps its hairline, as on 7b.
+ * apply from desktop only; below that the heading sits above the list and
+ * every row keeps its hairline, as on 7b.
+ *
+ * Tiers (src/lib/styles.ts): the side-by-side grids of `date`, `publication`
+ * and `cv`, their gaps and whatever sits in their columns are `desktop:`;
+ * type and padding are `tablet:`. An override of row padding is `tablet:`.
  */
 const row = cva('', {
   variants: {
     kind: {
-      // Unchanged since Home; its HTML is compared byte for byte.
+      // A grid at every width (text beside the arrow), so only its sizes change.
       default:
-        'group grid items-start border-t border-line text-ink transition-colors hover:text-sage grid-cols-[minmax(0,1fr)_20px] gap-4 py-5 md:grid-cols-[minmax(0,1fr)_28px] md:gap-8 md:py-8',
+        'group grid items-start border-t border-line text-ink transition-colors hover:text-sage grid-cols-[minmax(0,1fr)_20px] gap-4 py-5 tablet:grid-cols-[minmax(0,1fr)_28px] tablet:gap-8 tablet:py-8',
       static:
-        'flex flex-col gap-1.5 border-t border-line pb-[18px] pt-[18px] text-ink md:gap-2 md:pb-7 md:pt-7',
-      date: 'flex flex-col gap-2.5 border-t border-line pb-6 pt-6 text-ink md:grid md:grid-cols-[200px_minmax(0,1fr)_280px_28px] md:items-center md:gap-8 md:pb-9 md:pt-9',
+        'flex flex-col gap-1.5 border-t border-line pb-[18px] pt-[18px] text-ink tablet:gap-2 tablet:pb-7 tablet:pt-7',
+      date: 'flex flex-col gap-2.5 border-t border-line pb-6 pt-6 text-ink tablet:pb-9 tablet:pt-9 desktop:grid desktop:grid-cols-[200px_minmax(0,1fr)_280px_28px] desktop:items-center desktop:gap-8',
       publication:
-        'flex flex-col gap-2 border-t border-line pb-[22px] pt-[22px] text-ink md:grid md:grid-cols-[minmax(0,1fr)_80px] md:items-start md:gap-8 md:pb-8 md:pt-8',
-      cv: 'flex flex-col gap-0.5 border-t border-line pb-3.5 pt-3.5 text-[16px] leading-[1.45] text-ink md:grid md:grid-cols-[130px_minmax(0,1fr)] md:items-baseline md:gap-6 md:border-t-0 md:pb-0 md:pt-0 md:text-body',
+        'flex flex-col gap-2 border-t border-line pb-[22px] pt-[22px] text-ink tablet:pb-8 tablet:pt-8 desktop:grid desktop:grid-cols-[minmax(0,1fr)_80px] desktop:items-start desktop:gap-8',
+      cv: 'flex flex-col gap-0.5 border-t border-line pb-3.5 pt-3.5 text-[16px] leading-[1.45] text-ink tablet:text-body desktop:grid desktop:grid-cols-[130px_minmax(0,1fr)] desktop:items-baseline desktop:gap-6 desktop:border-t-0 desktop:pb-0 desktop:pt-0',
     },
   },
   defaultVariants: { kind: 'default' },
 });
 
-/** Applied after every other row class, so it wins over per-row padding. */
+/**
+ * Desktop-only on purpose: it overrides the rows' tablet padding (and the
+ * phone hairline) exactly where a heading sits beside the list. It wins
+ * there because desktop rules follow tablet rules in the stylesheet, not
+ * because of its place in the class list.
+ */
 const edge = cva('', {
   variants: {
     edge: {
-      first: 'md:border-t-0 md:pt-0',
-      last: 'md:pb-0',
+      first: 'desktop:border-t-0 desktop:pt-0',
+      last: 'desktop:pb-0',
     },
   },
 });
@@ -91,7 +101,7 @@ interface DateRow extends Base {
   /** Formats the date and speaks the link warning. */
   locale: Locale;
   title: string;
-  /** "Venue · City", "Format" — one line each from md, joined by " · " on phones. */
+  /** "Venue · City", "Format" — one line each from desktop, joined by " · " below. */
   meta?: string[];
   /** Internal → arrow; external → ↗ and a new tab. Omit for a plain row. */
   href?: string;
@@ -132,18 +142,18 @@ const rowClass = (extra?: string | false) =>
 
 {props.kind === undefined || props.kind === 'default' ? (
   <a href={props.href} class={rowClass()}>
-    <span class="flex flex-col gap-1.5 md:gap-2.5">
-      <span class="text-[22px] font-bold leading-[1.15] tracking-[-0.03em] md:text-h3 md:leading-[1.1]">
+    <span class="flex flex-col gap-1.5 tablet:gap-2.5">
+      <span class="text-[22px] font-bold leading-[1.15] tracking-[-0.03em] tablet:text-h3 tablet:leading-[1.1]">
         {props.title}
       </span>
       {props.sub && (
-        <span class="text-[15px] leading-[1.45] text-text-2 md:max-w-[56ch] md:text-body md:leading-[1.5]">
+        <span class="text-[15px] leading-[1.45] text-text-2 tablet:max-w-[56ch] tablet:text-body tablet:leading-[1.5]">
           {props.sub}
         </span>
       )}
     </span>
     <span
-      class={cn(arrow, 'pt-0.5 text-[20px] leading-none md:pt-1 md:text-[24px]')}
+      class={cn(arrow, 'pt-0.5 text-[20px] leading-none tablet:pt-1 tablet:text-[24px]')}
       aria-hidden="true"
     >
       →
@@ -153,7 +163,7 @@ const rowClass = (extra?: string | false) =>
   <div class={rowClass()}>
     <span class={heading({ level: 'lookup' })}>{props.title}</span>
     {props.sub && (
-      <span class="text-[15px] leading-[1.5] text-text-2 md:text-body">{props.sub}</span>
+      <span class="text-[15px] leading-[1.5] text-text-2 tablet:text-body">{props.sub}</span>
     )}
   </div>
 ) : props.kind === 'date' ? (
@@ -172,35 +182,35 @@ const rowClass = (extra?: string | false) =>
         rel={target === 'external' ? 'noopener' : undefined}
         class={rowClass(Boolean(href) && linked)}
       >
-        <time datetime={parts.iso} class="flex items-baseline gap-2 md:gap-2.5">
+        <time datetime={parts.iso} class="flex items-baseline gap-2 tablet:gap-2.5">
           <span
-            class="text-[40px] font-bold leading-[0.9] tracking-[-0.05em] md:text-[64px]"
+            class="text-[40px] font-bold leading-[0.9] tracking-[-0.05em] tablet:text-[64px]"
             aria-hidden="true"
           >
             {parts.day}
           </span>
-          <span class="text-meta text-text-2 md:text-[17px]" aria-hidden="true">
+          <span class="text-meta text-text-2 tablet:text-[17px]" aria-hidden="true">
             {parts.monthYear}
           </span>
           <span class="visually-hidden">{parts.long}</span>
         </time>
-        <span class="text-[20px] font-bold leading-[1.2] tracking-[-0.03em] md:text-h3 md:leading-[1.15]">
+        <span class="text-[20px] font-bold leading-[1.2] tracking-[-0.03em] tablet:text-h3 tablet:leading-[1.15]">
           {title}
           {target === 'external' && (
-            <span class="md:hidden" aria-hidden="true">
+            <span class="desktop:hidden" aria-hidden="true">
               {' '}
               {EXTERNAL_GLYPH}
             </span>
           )}
         </span>
         {meta.length > 0 && (
-          <span class="text-[14px] leading-[1.5] text-text-2 md:text-[16px]">
+          <span class="text-[14px] leading-[1.5] text-text-2 tablet:text-[16px]">
             {meta.map((line, i) => (
               <>
                 {i > 0 && (
                   <>
-                    <span class="md:hidden"> · </span>
-                    <br class="hidden md:inline" />
+                    <span class="desktop:hidden"> · </span>
+                    <br class="hidden desktop:inline" />
                   </>
                 )}
                 {line}
@@ -210,7 +220,10 @@ const rowClass = (extra?: string | false) =>
         )}
         {target === 'internal' && (
           <span
-            class={cn(arrow, 'hidden text-[24px] leading-none md:col-start-4 md:inline-block')}
+            class={cn(
+              arrow,
+              'hidden text-[24px] leading-none desktop:col-start-4 desktop:inline-block',
+            )}
             aria-hidden="true"
           >
             →
@@ -219,7 +232,7 @@ const rowClass = (extra?: string | false) =>
         {target === 'external' && (
           <>
             <span
-              class="hidden text-[24px] leading-none md:col-start-4 md:inline-block"
+              class="hidden text-[24px] leading-none desktop:col-start-4 desktop:inline-block"
               aria-hidden="true"
             >
               {EXTERNAL_GLYPH}
@@ -238,13 +251,13 @@ const rowClass = (extra?: string | false) =>
     }
     const hasSub = Boolean(sub) || Astro.slots.has('sub');
     // In `columns` the link keeps the third column even when a row has no description.
-    const asideColumn = columns && 'md:col-start-3 md:text-right';
+    const asideColumn = columns && 'desktop:col-start-3 desktop:text-right';
     const aside = href ? (
       <ExternalLink
         href={href}
         locale={locale}
         class={cn(
-          'self-start text-[14px] font-semibold text-sage transition-colors hover:text-ink md:self-auto md:justify-self-end md:pt-1 md:text-meta',
+          'self-start text-[14px] font-semibold text-sage transition-colors hover:text-ink tablet:text-meta desktop:self-auto desktop:justify-self-end desktop:pt-1',
           asideColumn,
         )}
       >
@@ -253,7 +266,7 @@ const rowClass = (extra?: string | false) =>
     ) : status ? (
       <span
         class={cn(
-          'text-[13px] text-text-3 md:justify-self-end md:pt-1 md:text-[14px]',
+          'text-[13px] text-text-3 tablet:text-[14px] desktop:justify-self-end desktop:pt-1',
           asideColumn,
         )}
       >
@@ -265,12 +278,12 @@ const rowClass = (extra?: string | false) =>
       return (
         <div
           class={rowClass(
-            'gap-1.5 pb-[18px] pt-[18px] md:grid-cols-[minmax(0,4fr)_minmax(0,6fr)_200px] md:gap-10 md:pb-[26px] md:pt-[26px]',
+            'gap-1.5 pb-[18px] pt-[18px] tablet:pb-[26px] tablet:pt-[26px] desktop:grid-cols-[minmax(0,4fr)_minmax(0,6fr)_200px] desktop:gap-10',
           )}
         >
           <span class={heading({ level: 'lookup' })}>{title}</span>
           {hasSub && (
-            <span class="text-[14px] leading-[1.5] text-text-2 md:text-[16px]">
+            <span class="text-[14px] leading-[1.5] text-text-2 tablet:text-[16px]">
               <slot name="sub">{sub}</slot>
             </span>
           )}
@@ -281,12 +294,14 @@ const rowClass = (extra?: string | false) =>
 
     return (
       <div
-        class={rowClass(!href && status && 'md:grid-cols-[minmax(0,1fr)_140px] md:pb-7 md:pt-7')}
+        class={rowClass(
+          !href && status && 'tablet:pb-7 tablet:pt-7 desktop:grid-cols-[minmax(0,1fr)_140px]',
+        )}
       >
-        <div class={cn('flex min-w-0 flex-col gap-2 md:gap-2.5', status && 'md:gap-1.5')}>
+        <div class={cn('flex min-w-0 flex-col gap-2 tablet:gap-2.5', status && 'tablet:gap-1.5')}>
           <span class={heading({ level: 'lookup' })}>{title}</span>
           {hasSub && (
-            <span class="text-[13px] leading-[1.5] text-text-3 md:text-[14px] md:leading-[1.55] [&_strong]:text-text-2">
+            <span class="text-[13px] leading-[1.5] text-text-3 tablet:text-[14px] tablet:leading-[1.55] [&_strong]:text-text-2">
               <slot name="sub">{sub}</slot>
             </span>
           )}
@@ -302,7 +317,7 @@ const rowClass = (extra?: string | false) =>
   })()
 ) : props.kind === 'cv' ? (
   <div class={rowClass()}>
-    <span class="text-[13px] text-text-3 md:text-meta">{props.period}</span>
+    <span class="text-[13px] text-text-3 tablet:text-meta">{props.period}</span>
     <span>
       {/* One expression, so no template whitespace lands before the comma. */}
       {[<strong class="font-bold">{props.title}</strong>, props.detail && `, ${props.detail}`]}

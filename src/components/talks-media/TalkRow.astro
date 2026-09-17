@@ -25,7 +25,7 @@ interface Props {
   title: string;
   /** Language of the title; marked when it differs from the page. */
   titleLang: Locale;
-  /** "Venue · City", "Format" — one line each from md, joined by " · " on phones. */
+  /** "Venue · City", "Format" — one line each from desktop, joined by " · " below. */
   meta?: string[];
   /** Internal → arrow; external → ↗ and a new tab. Omit for a plain row. */
   href?: string;
@@ -47,42 +47,42 @@ const Tag = href ? 'a' : 'div';
   target={target === 'external' ? '_blank' : undefined}
   rel={target === 'external' ? 'noopener' : undefined}
   class={cn(
-    'flex flex-col gap-2.5 border-t border-line pb-6 pt-6 text-ink md:grid md:grid-cols-[200px_minmax(0,1fr)_280px_28px] md:items-center md:gap-8 md:pb-9 md:pt-9',
+    'flex flex-col gap-2.5 border-t border-line pb-6 pt-6 text-ink tablet:pb-9 tablet:pt-9 desktop:grid desktop:grid-cols-[200px_minmax(0,1fr)_280px_28px] desktop:items-center desktop:gap-8',
     href && 'group transition-colors hover:text-sage',
     className,
   )}
 >
-  <time datetime={label.iso} class="flex items-baseline gap-2 md:gap-2.5">
+  <time datetime={label.iso} class="flex items-baseline gap-2 tablet:gap-2.5">
     <span
-      class="text-[40px] font-bold leading-[0.9] tracking-[-0.05em] md:text-[64px]"
+      class="text-[40px] font-bold leading-[0.9] tracking-[-0.05em] tablet:text-[64px]"
       aria-hidden="true"
     >
       {label.large}
     </span>
     {label.small && (
-      <span class="text-meta text-text-2 md:text-[17px]" aria-hidden="true">
+      <span class="text-meta text-text-2 tablet:text-[17px]" aria-hidden="true">
         {label.small}
       </span>
     )}
     <span class="visually-hidden">{label.long}</span>
   </time>
-  <span class="text-[20px] font-bold leading-[1.2] tracking-[-0.03em] md:text-h3 md:leading-[1.15]">
+  <span class="text-[20px] font-bold leading-[1.2] tracking-[-0.03em] tablet:text-h3 tablet:leading-[1.15]">
     <span lang={titleLang === locale ? undefined : titleLang}>{title}</span>
     {target === 'external' && (
-      <span class="md:hidden" aria-hidden="true">
+      <span class="desktop:hidden" aria-hidden="true">
         {' '}
         {EXTERNAL_GLYPH}
       </span>
     )}
   </span>
   {meta.length > 0 && (
-    <span class="text-[14px] leading-[1.5] text-text-2 md:text-[16px]">
+    <span class="text-[14px] leading-[1.5] text-text-2 tablet:text-[16px]">
       {meta.map((line, i) => (
         <>
           {i > 0 && (
             <>
-              <span class="md:hidden"> · </span>
-              <br class="hidden md:inline" />
+              <span class="desktop:hidden"> · </span>
+              <br class="hidden desktop:inline" />
             </>
           )}
           {line}
@@ -92,7 +92,7 @@ const Tag = href ? 'a' : 'div';
   )}
   {target === 'internal' && (
     <span
-      class={cn(arrow, 'hidden text-[24px] leading-none md:col-start-4 md:inline-block')}
+      class={cn(arrow, 'hidden text-[24px] leading-none desktop:col-start-4 desktop:inline-block')}
       aria-hidden="true"
     >
       →
@@ -101,7 +101,7 @@ const Tag = href ? 'a' : 'div';
   {target === 'external' && (
     <>
       <span
-        class="hidden text-[24px] leading-none md:col-start-4 md:inline-block"
+        class="hidden text-[24px] leading-none desktop:col-start-4 desktop:inline-block"
         aria-hidden="true"
       >
         {EXTERNAL_GLYPH}
