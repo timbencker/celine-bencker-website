@@ -96,7 +96,7 @@ const kitFile = kit ? findPublicFile(kit.file) : null;
 const pressIntro = kit && kitFile ? `${copy.press.intro} ${kit.contents}` : copy.press.intro;
 ---
 
-<PageLayout page={page} allPages={allPages}>
+<PageLayout page={page} allPages={allPages} serif="normal">
   <PageHeader slot="masthead" ratio="6/6">
     <PageTitle class="md:gap-8">
       {hero.lines.map((line, i) => (

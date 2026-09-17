@@ -12,9 +12,11 @@ import SiteChrome from './SiteChrome.astro';
 interface Props {
   page: ResolvedPage;
   allPages: ResolvedPage[];
+  /** The serif style the page shows, if any. See BaseLayout. */
+  serif?: 'normal' | 'italic';
 }
 
-const { page, allPages } = Astro.props;
+const { page, allPages, serif } = Astro.props;
 const { locale, entry } = page;
 
 const counterpart = findCounterpart(page, allPages);
@@ -37,6 +39,7 @@ const alternates: Alternate[] = LOCALES.flatMap((l) => {
   backgroundPage={backgroundPageFor(page.translationKey)}
   alternates={alternates}
   canonical={absolute(page)}
+  serif={serif}
 >
   <slot name="masthead" slot="masthead" />
   <slot />

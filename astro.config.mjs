@@ -2,6 +2,7 @@
 import tailwindcss from '@tailwindcss/vite';
 import { defineConfig } from 'astro/config';
 
+import { fontsource } from './src/fonts/fontsource.ts';
 import { DEFAULT_LOCALE, LOCALES } from './src/i18n/config.ts';
 
 /**
@@ -20,6 +21,46 @@ export default defineConfig({
 
   // GitHub Pages has no server: every route is pre-rendered to a file.
   output: 'static',
+
+  build: {
+    // The whole stylesheet is ~11 kB (about 3 kB compressed). Inlined, a page
+    // needs no second request before it can render — Lighthouse measured the
+    // external file as the one render-blocking resource (≈170 ms on throttled
+    // mobile). The cost is a few kB per page instead of one cached file.
+    inlineStylesheets: 'always',
+  },
+
+  // Self-hosted from the installed Fontsource packages, never hotlinked: no
+  // third-party requests means no cookie banner (the brief requires it). The
+  // canvas files link fonts.googleapis.com; that must not reach production.
+  // Astro writes the @font-face rules, a fallback face sized to each font's
+  // metrics (so the swap does not move the layout), and the preload links.
+  // BaseLayout renders them through <Font>.
+  fonts: [
+    {
+      name: 'Manrope',
+      cssVariable: '--font-manrope',
+      provider: fontsource(),
+      options: { package: '@fontsource-variable/manrope' },
+      styles: ['normal'],
+      // German and English need Latin; Latin Extended covers author names
+      // such as the ė and š in the publication list.
+      subsets: ['latin', 'latin-ext'],
+      fallbacks: ['sans-serif'],
+    },
+    {
+      // Upright for the quote block, and the true italic for Home's one serif
+      // word; without it the browser fakes the slant.
+      name: 'Instrument Serif',
+      cssVariable: '--font-instrument-serif',
+      provider: fontsource(),
+      options: { package: '@fontsource/instrument-serif' },
+      weights: ['400'],
+      styles: ['normal', 'italic'],
+      subsets: ['latin', 'latin-ext'],
+      fallbacks: ['serif'],
+    },
+  ],
 
   // Language lives in the URL, never in a cookie. Both locales are prefixed so
   // every page is linkable and citable in each language.

@@ -39,6 +39,7 @@ interface Props {
   alternates?: Alternate[];
   canonical?: string;
   robots?: string;
+  serif?: 'normal' | 'italic';
 }
 
 const { locale, currentHref, counterpartHref, ...document } = Astro.props;

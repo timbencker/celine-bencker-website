@@ -64,7 +64,7 @@ const longest = Math.max(
 const headingFit = `--heading-fit: calc((100cqi + ${GAP_ALLOWANCE}) * ${(HEADING_FIT / longest / 100).toFixed(4)})`;
 ---
 
-<PageLayout page={page} allPages={allPages}>
+<PageLayout page={page} allPages={allPages} serif={hero.emphasis ? 'italic' : undefined}>
   <div
     slot="masthead"
     class={cn(

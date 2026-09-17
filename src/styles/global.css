@@ -1,15 +1,6 @@
 @import 'tailwindcss';
 
-/*
- * Fonts are self-hosted via npm, never hotlinked from Google.
- * The brief requires it: no third-party requests means no cookie banner.
- * The canvas files link fonts.googleapis.com — that must not reach production.
- */
-@import '@fontsource-variable/manrope';
-/* Upright for the quote block; the true italic for Home's one serif word —
-   without it the browser fakes the slant. */
-@import '@fontsource/instrument-serif/400.css';
-@import '@fontsource/instrument-serif/400-italic.css';
+/* Fonts: `fonts` in astro.config.mjs, rendered by BaseLayout. */
 
 @import './tokens.css';
 

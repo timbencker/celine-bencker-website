@@ -48,8 +48,10 @@
   --color-line: #e1dcd1;
 
   /* --- Type ------------------------------------------------------------ */
-  --font-sans: 'Manrope Variable', 'Manrope', system-ui, sans-serif;
-  --font-serif: 'Instrument Serif', Georgia, serif;
+  /* Set by Astro's <Font> (astro.config.mjs): the family, its size-matched
+     fallback, then the generic family. */
+  --font-sans: var(--font-manrope);
+  --font-serif: var(--font-instrument-serif);
 
   /* Home only, and exactly one word of it in serif italic. */
   --text-display: 88px;

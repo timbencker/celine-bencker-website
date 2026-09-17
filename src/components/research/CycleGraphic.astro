@@ -37,12 +37,21 @@ const DAYS = 28;
 const PER_DAY = 5;
 
 const step = (X1 - X0) / (DAYS - 1);
+
+/**
+ * The 140 check-in dots as one path: each is a zero-length segment, which a
+ * round line cap draws as a circle of the stroke's width (2.8 = the board's
+ * r 1.4). One element instead of 140 — Lighthouse counted this group as the
+ * page's largest DOM node.
+ */
 const dots = Array.from({ length: DAYS }, (_, day) =>
-  Array.from({ length: PER_DAY }, (_, k) => ({
-    cx: (X0 + day * step).toFixed(1),
-    cy: (154 + k * 3.5).toFixed(1),
-  })),
-).flat();
+  Array.from(
+    { length: PER_DAY },
+    (_, k) => `M${(X0 + day * step).toFixed(1)},${(154 + k * 3.5).toFixed(1)}h0`,
+  ),
+)
+  .flat()
+  .join('');
 
 /** A label's left edge, as a share of the drawing width. */
 const at = (x: number) => `${((x / WIDTH) * 100).toFixed(2)}%`;
@@ -71,11 +80,13 @@ const top = (y: number) => `${((y / HEIGHT) * 100).toFixed(2)}%`;
         stroke-dasharray="6 5"
         class="stroke-sage"
       ></path>
-      <g class="fill-ink">
-        {dots.map((dot) => (
-          <circle cx={dot.cx} cy={dot.cy} r="1.4" />
-        ))}
-      </g>
+      <path
+        d={dots}
+        fill="none"
+        stroke-width="2.8"
+        stroke-linecap="round"
+        class="stroke-ink"
+      ></path>
     </svg>
     <span
       class="absolute whitespace-nowrap text-[12px] leading-none text-lilac-text"

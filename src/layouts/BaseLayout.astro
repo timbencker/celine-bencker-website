@@ -1,6 +1,8 @@
 ---
 import '../styles/global.css';
 
+import { Font } from 'astro:assets';
+
 import Background, {
   type BackgroundHue,
   type BackgroundPage,
@@ -31,6 +33,8 @@ interface Props {
   canonical?: string;
   /** e.g. `noindex` for the 404 page. */
   robots?: string;
+  /** The serif style this page shows, so its file is preloaded. */
+  serif?: 'normal' | 'italic';
 }
 
 const {
@@ -43,6 +47,7 @@ const {
   alternates = [],
   canonical,
   robots,
+  serif,
 } = Astro.props;
 
 const xDefault = alternates.find((a) => a.locale === DEFAULT_LOCALE);
@@ -53,6 +58,18 @@ const xDefault = alternates.find((a) => a.locale === DEFAULT_LOCALE);
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    {/*
+      Preloaded: the Latin files a page renders first. Otherwise the browser
+      finds a font only once it lays out text that uses it, which Lighthouse
+      reports as a request chain. Latin covers German and English; Latin
+      Extended loads when a page needs it.
+    */}
+    <Font cssVariable="--font-manrope" preload={[{ subset: 'latin' }]} />
+    <Font
+      cssVariable="--font-instrument-serif"
+      preload={serif ? [{ subset: 'latin', style: serif }] : false}
+    />
 
     <title>{title}</title>
     <meta name="description" content={description} />
