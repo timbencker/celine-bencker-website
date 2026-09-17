@@ -52,6 +52,8 @@ cv:
   preprint: Preprint
   reviews:
     title: Reviewerin für Fachzeitschriften
-    one: '{n} Gutachten'
-    other: '{n} Gutachten'
+    # `{n}` wird durch die Zahl ersetzt. `\u00A0` ist ein geschütztes
+    # Leerzeichen: Die Zahl steht so nie allein am Zeilenende. Bitte behalten.
+    one: "{n}\u00A0Gutachten"
+    other: "{n}\u00A0Gutachten"
 ---

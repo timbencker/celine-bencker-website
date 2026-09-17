@@ -64,8 +64,12 @@ export const EXTERNAL_GLYPH = '↗︎';
 export const heading = cva('font-bold text-balance', {
   variants: {
     level: {
-      /** Section title — 32px on phones, 44px from tablet. */
-      section: 'text-[32px] leading-none tracking-[-0.035em] tablet:text-h2',
+      /**
+       * Section title — 32px on phones, 44px from tablet. The phone tracking
+       * would override `text-h2`'s −0.04em, so the tablet tier restates it.
+       */
+      section:
+        'text-[32px] leading-none tracking-[-0.035em] tablet:text-h2 tablet:tracking-[-0.04em]',
       /**
        * h3 for navigating rows and the research lines, and the CV group
        * titles — 22px on phones, 28px from tablet.

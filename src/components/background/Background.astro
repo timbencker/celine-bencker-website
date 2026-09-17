@@ -133,13 +133,16 @@ function bausteine(mobile: boolean): Record<BackgroundPage, Recipe> {
   /**
    * A large motif anchored to card corners. `px * sc` on a `card`-wide board
    * is `px / 1280` of it on either card; the SVG keeps its drawn size.
+   *
+   * An offset given as a string is a CSS length and is used as it is, for a
+   * side anchored to something that does not scale with the width.
    */
   const motif = (
     name: string,
     w: number,
     h: number,
     o: number,
-    at: Record<string, number>,
+    at: Record<string, number | string>,
     body: string,
   ): Piece => ({
     name,
@@ -147,7 +150,9 @@ function bausteine(mobile: boolean): Record<BackgroundPage, Recipe> {
       width: vw(w),
       height: vw(h),
       opacity: o,
-      ...Object.fromEntries(Object.entries(at).map(([side, px]) => [side, vw(px)])),
+      ...Object.fromEntries(
+        Object.entries(at).map(([side, px]) => [side, typeof px === 'number' ? vw(px) : px]),
+      ),
     },
     svg: { w, h, width: vw(w, card), height: vw(h, card), body },
   });
@@ -306,6 +311,10 @@ function bausteine(mobile: boolean): Record<BackgroundPage, Recipe> {
             `<path d="M10,155 C190,155 270,150 330,130 C390,90 430,70 470,80 C530,95 580,140 610,155" fill="none" stroke-width="2" stroke-opacity=".5" stroke-dasharray="6 5" style="stroke:${SALBEI}"/>`,
         ),
       ];
+  // Board 6a draws the dot row just above the footer's hairline. The canvas's
+  // scaled `bottom: 96` lands inside the footer at every width (84px at 1120,
+  // 144 at 1920, the footer is 104) and the footer's surface hides it, so the
+  // bottom is anchored to the footer's fixed height instead, 4px clear of it.
   const messpunkte: Piece[] = mobile
     ? []
     : [
@@ -314,7 +323,7 @@ function bausteine(mobile: boolean): Record<BackgroundPage, Recipe> {
           300,
           10,
           0.45,
-          { bottom: 96, left: 48 },
+          { bottom: 'calc(var(--footer-h) + 4px)', left: 48 },
           `<g style="fill:${GRAU}">` +
             Array.from(
               { length: 25 },

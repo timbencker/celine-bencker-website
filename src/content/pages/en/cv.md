@@ -40,6 +40,8 @@ cv:
   preprint: preprint
   reviews:
     title: Peer reviewer for journals
-    one: '{n} review'
-    other: '{n} reviews'
+    # `{n}` wird durch die Zahl ersetzt. `\u00A0` ist ein geschütztes
+    # Leerzeichen: Die Zahl steht so nie allein am Zeilenende. Bitte behalten.
+    one: "{n}\u00A0review"
+    other: "{n}\u00A0reviews"
 ---

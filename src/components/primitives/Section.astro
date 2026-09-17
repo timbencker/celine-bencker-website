@@ -10,6 +10,9 @@ import { container, splitGrid } from '../../lib/styles';
  * Surfaces alternate paper → bone → paper. Paper paints nothing of its own, so
  * the decorative background shows through, as it does on the boards. The
  * lilac tint appears exactly once on the whole site (Talks, "Für Redaktionen").
+ * `boneSoft` is for the bands a board draws in the footer's tone rather than
+ * bone: the CV strengths, Research's "Zusammenarbeit", Contact's "Institut".
+ * Take it from the board's colour, not to vary the rhythm.
  *
  * `split` is title + prose (5/7), `label` is label + list (3/9), `stacked` is
  * for lists and tiles. Side by side only from desktop; on phones and tablets
@@ -27,7 +30,7 @@ import { container, splitGrid } from '../../lib/styles';
  */
 const surface = cva('', {
   variants: {
-    surface: { paper: '', bone: 'bg-bone', lilac: 'bg-lilac-tint' },
+    surface: { paper: '', bone: 'bg-bone', boneSoft: 'bg-bone-soft', lilac: 'bg-lilac-tint' },
   },
   defaultVariants: { surface: 'paper' },
 });

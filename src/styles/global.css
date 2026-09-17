@@ -5,6 +5,17 @@
 @import './tokens.css';
 
 @layer base {
+  :root {
+    /*
+     * The footer's desktop height, shared with the background's measuring-dot
+     * row, which sits just above it (Background.astro). The footer measures
+     * 103.5px from 1120 to 1920 (hairline, 40px padding twice, one 22.5px
+     * line); SiteFooter takes this as its desktop min-height, which rounds it
+     * up to a whole pixel and keeps the two equal.
+     */
+    --footer-h: 104px;
+  }
+
   body {
     /* Positioning context and stacking root for the decorative background. */
     position: relative;

@@ -15,6 +15,10 @@ import { withBase } from '../i18n/urls';
 /**
  * The document shell: one definition, shared by both languages, so the two
  * versions cannot drift apart. Everything language-specific arrives as props.
+ *
+ * The browser title and `og:title` read "<page title> · <site name>", e.g.
+ * "Forschung · Celine Bencker", so a tab or a shared link names whose page it
+ * is. A page whose title already is the site name (Home) keeps it as it is.
  */
 export interface Alternate {
   locale: Locale;
@@ -24,7 +28,10 @@ export interface Alternate {
 
 interface Props {
   locale: Locale;
+  /** The page's own title; the site name is added here. */
   title: string;
+  /** `siteName` from src/content/data/site/site.yaml. */
+  siteName: string;
   description: string;
   background?: BackgroundVariant;
   backgroundHue?: BackgroundHue;
@@ -40,6 +47,7 @@ interface Props {
 const {
   locale,
   title,
+  siteName,
   description,
   background = 'aus',
   backgroundHue = 'gelb',
@@ -50,6 +58,7 @@ const {
   serif,
 } = Astro.props;
 
+const documentTitle = title === siteName ? title : `${title} · ${siteName}`;
 const xDefault = alternates.find((a) => a.locale === DEFAULT_LOCALE);
 ---
 
@@ -71,7 +80,7 @@ const xDefault = alternates.find((a) => a.locale === DEFAULT_LOCALE);
       preload={serif ? [{ subset: 'latin', style: serif }] : false}
     />
 
-    <title>{title}</title>
+    <title>{documentTitle}</title>
     <meta name="description" content={description} />
     {canonical && <link rel="canonical" href={canonical} />}
     {robots && <meta name="robots" content={robots} />}
@@ -86,7 +95,8 @@ const xDefault = alternates.find((a) => a.locale === DEFAULT_LOCALE);
     {xDefault && <link rel="alternate" hreflang="x-default" href={xDefault.href} />}
 
     <meta property="og:type" content="website" />
-    <meta property="og:title" content={title} />
+    <meta property="og:title" content={documentTitle} />
+    <meta property="og:site_name" content={siteName} />
     <meta property="og:description" content={description} />
     {canonical && <meta property="og:url" content={canonical} />}
 

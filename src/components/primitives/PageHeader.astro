@@ -49,15 +49,24 @@ type Props = VariantProps<typeof header> & {
 };
 
 const { layout, ratio, class: className } = Astro.props;
+
+// A page may fill the aside conditionally (the CV passes its PDF controls only
+// when a PDF exists), and `Astro.slots.has` is true even when that renders
+// nothing. An empty wrapper would still be a flex item and add the header's
+// gap below the intro, so the slot is rendered first and the wrapper written
+// only when it has content. `render` returns plain HTML and drops what Astro
+// would add for a component script or an island, so an aside must not contain
+// either (none does).
+const aside = Astro.slots.has('aside') ? (await Astro.slots.render('aside')).trim() : '';
 ---
 
 <div class={cn(container, header({ layout, ratio }), className)}>
   <div class="flex min-w-0 flex-col gap-5">
     <slot />
   </div>
-  {Astro.slots.has('aside') && (
+  {aside && (
     <div class="flex min-w-0 flex-col items-start gap-2 tablet:gap-2.5 desktop:items-end desktop:text-right">
-      <slot name="aside" />
+      <Fragment set:html={aside} />
     </div>
   )}
 </div>

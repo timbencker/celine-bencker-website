@@ -131,6 +131,9 @@ const pressIntro = kit && kitFile ? `${copy.press.intro} ${kit.contents}` : copy
     listenLabel={copy.quote.listen}
   />
 
+  {/* One bone-soft band around both talk lists, so this stays a wrapper rather
+      than `surface="boneSoft"` on each Section: the board draws one block, and
+      the lists share its padding — only the first adds the top. */}
   {talkLists.length > 0 && (
     <div class="bg-bone-soft">
       {talkLists.map((list, i) => (

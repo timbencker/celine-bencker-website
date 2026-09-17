@@ -5,7 +5,7 @@ import type { Locale } from '../../i18n/config';
 import { pageHref, type ResolvedPage } from '../../i18n/pages';
 import { t } from '../../i18n/ui';
 import { cn } from '../../lib/cn';
-import { container } from '../../lib/styles';
+import { arrow, container } from '../../lib/styles';
 import LanguageSwitch from './LanguageSwitch.astro';
 
 /**
@@ -19,7 +19,8 @@ import LanguageSwitch from './LanguageSwitch.astro';
  * JavaScript, and it expands in the page flow rather than as an overlay —
  * keyboard focus can never land on content hidden behind it. The control is
  * positioned into the name row, at the page margin of its tier; the panel
- * follows below it.
+ * follows below it and fills the rest of the screen (board 13j), with the
+ * links and DE/EN at its bottom and the name row in the same bone-soft.
  */
 interface Props {
   locale: Locale;
@@ -78,8 +79,13 @@ const navLink = cva('pb-0.5 text-[15px] transition-opacity hover:opacity-60', {
 {/* --- Phones and tablets --------------------------------------------- */}
 {/* The right padding keeps the name clear of the control: page margin plus
     92px, on each tier — `pr-28` alone would lose to the container's tablet
-    margin. */}
-<div class="relative desktop:hidden">
+    margin.
+    While the menu is open the name row is bone-soft too, so row and panel
+    read as one sheet; the panel also paints itself, for browsers without
+    :has(). The disclosure is the named group `menu` because every link is a
+    `group` for its own arrow — an unnamed group here would nudge all arrows
+    at once. */}
+<div class="relative desktop:hidden has-[details[open]]:bg-bone-soft">
   <div class={cn(container, 'flex items-center py-[18px] pr-28 tablet:pr-35')}>
     <a
       href={homeHref}
@@ -91,44 +97,50 @@ const navLink = cva('pb-0.5 text-[15px] transition-opacity hover:opacity-60', {
     </a>
   </div>
 
-  <details class="group open:bg-bone-soft">
+  <details class="group/menu open:bg-bone-soft">
     <summary class="absolute right-5 top-[18px] inline-flex min-h-[44px] cursor-pointer list-none items-center gap-2 text-[15px] font-semibold text-ink tablet:right-12 [&::-webkit-details-marker]:hidden">
-      <span class="group-open:hidden">{t(locale, 'nav.menuOpen')}</span>
-      <span class="hidden group-open:inline">{t(locale, 'nav.menuClose')}</span>
-      <span class="inline-flex flex-col gap-[3px] group-open:hidden" aria-hidden="true">
+      <span class="group-open/menu:hidden">{t(locale, 'nav.menuOpen')}</span>
+      <span class="hidden group-open/menu:inline">{t(locale, 'nav.menuClose')}</span>
+      <span class="inline-flex flex-col gap-[3px] group-open/menu:hidden" aria-hidden="true">
         <span class="h-[1.5px] w-4 bg-ink"></span>
         <span class="h-[1.5px] w-4 bg-ink"></span>
       </span>
-      <span class="hidden text-[20px] leading-none group-open:inline" aria-hidden="true">
+      <span class="hidden text-[20px] leading-none group-open/menu:inline" aria-hidden="true">
         ×
       </span>
     </summary>
 
-    <nav aria-label={t(locale, 'nav.primary')}>
-      <ul role="list" class={cn(container, 'flex flex-col')}>
-        {nav.map((item) => {
-          const href = pageHref(item);
-          const active = href === currentHref;
-          return (
-            <li>
-              <a
-                href={href}
-                aria-current={active ? 'page' : undefined}
-                class="group flex min-h-[44px] items-center justify-between gap-4 border-t border-line py-[18px] text-[30px] font-bold tracking-[-0.035em] text-ink transition-colors hover:text-sage"
-              >
-                {item.entry.data.title}
-                <span class="text-[20px] text-sage" aria-hidden="true">
-                  →
-                </span>
-              </a>
-            </li>
-          );
-        })}
-      </ul>
-    </nav>
+    {/* The panel fills the rest of the screen, because board 13j draws the
+        open menu as a screen of its own: links in the lower part, DE/EN at
+        the very bottom, the page out of sight below. 80px is the name row
+        above it — 18px padding, the 44px name link, 18px padding. */}
+    <div class="flex min-h-[calc(100dvh-80px)] flex-col border-b border-line">
+      <nav class="mt-auto" aria-label={t(locale, 'nav.primary')}>
+        <ul role="list" class={cn(container, 'flex flex-col')}>
+          {nav.map((item) => {
+            const href = pageHref(item);
+            const active = href === currentHref;
+            return (
+              <li>
+                <a
+                  href={href}
+                  aria-current={active ? 'page' : undefined}
+                  class="group flex min-h-[44px] items-center justify-between gap-4 border-t border-line py-[18px] text-[30px] font-bold tracking-[-0.035em] text-ink transition-colors hover:text-sage"
+                >
+                  {item.entry.data.title}
+                  <span class={cn('text-[20px] text-sage', arrow)} aria-hidden="true">
+                    →
+                  </span>
+                </a>
+              </li>
+            );
+          })}
+        </ul>
+      </nav>
 
-    <div class={cn(container, 'flex justify-end pb-7 pt-4')}>
-      <LanguageSwitch locale={locale} counterpartHref={counterpartHref} />
+      <div class={cn(container, 'flex justify-end pb-7 pt-4')}>
+        <LanguageSwitch locale={locale} counterpartHref={counterpartHref} />
+      </div>
     </div>
   </details>
 </div>

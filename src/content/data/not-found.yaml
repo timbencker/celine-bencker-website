@@ -21,14 +21,12 @@
       descriptions:
         research: Projekte, Methoden und laufende Studien
         publications: Alle Arbeiten, chronologisch, mit DOI
-        # Verspricht Interviews und ein Pressekit. Nur so lassen, wenn die
-        # Seite beides zeigt – das Pressekit erscheint erst, wenn die Datei
-        # existiert.
-        talks-media: Termine, Interviews, Pressekit
-        # Verspricht Lehre und einen PDF-Download. Beides ist noch offen: die
-        # Lehre ist ein Platzhalter, der PDF-Button erscheint erst, wenn die
-        # Datei existiert.
-        cv: Stationen, Lehre, PDF-Download
+        # Nennt nur, was die Seite heute zeigt – derselbe Text wie auf der
+        # Startseite. Pressekit erst ergänzen, wenn die Datei existiert.
+        talks-media: Vorträge und Themen für Redaktionen
+        # Nennt nur, was die Seite heute zeigt – derselbe Text wie auf der
+        # Startseite. PDF-Download erst ergänzen, wenn die Datei existiert.
+        cv: Ausbildung, Positionen, Förderung und Publikationen
         contact: Mail, Institut, Profile
   en:
     # EN: Übersetzung – von Celine zu prüfen

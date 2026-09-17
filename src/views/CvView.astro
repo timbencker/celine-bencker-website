@@ -24,9 +24,9 @@ import { heading } from '../lib/styles';
  * Who: appointment and selection committees, funders.
  * Job: a quick read of the record, then the PDF.
  *
- * Title with the PDF controls beside it, "Was ich mitbringe" on bone, then the
- * record in label groups. Facts come from cv.yaml (ORCID only) and, for
- * publications, from the publications collection; nothing is retyped here.
+ * Title with the PDF controls beside it, "Was ich mitbringe" on bone-soft,
+ * then the record in label groups. Facts come from cv.yaml (ORCID only) and,
+ * for publications, from the publications collection; nothing is retyped here.
  * Unconfirmed rows are placeholders, set in grey.
  */
 interface Props {
@@ -178,28 +178,26 @@ const lastStrength = cv.strengths.items.length - 1;
     )}
   </PageHeader>
 
-  <div class="bg-bone-soft">
-    <Section labelledby="cv-strengths" space="compact">
-      <div class="flex flex-col gap-1.5 tablet:gap-3">
-        <h2 id="cv-strengths" class={heading({ level: 'section' })}>
-          {cv.strengths.heading}
-        </h2>
-        <p class="text-[14px] leading-[1.5] text-text-3 tablet:text-meta">{cv.strengths.note}</p>
-      </div>
-      <ul role="list" class="flex flex-col">
-        {cv.strengths.items.map((item, i) => (
-          <li>
-            <ListRow
-              kind="static"
-              title={item.title}
-              sub={item.text}
-              edge={i === 0 ? 'first' : i === lastStrength ? 'last' : undefined}
-            />
-          </li>
-        ))}
-      </ul>
-    </Section>
-  </div>
+  <Section labelledby="cv-strengths" surface="boneSoft" space="compact">
+    <div class="flex flex-col gap-1.5 tablet:gap-3">
+      <h2 id="cv-strengths" class={heading({ level: 'section' })}>
+        {cv.strengths.heading}
+      </h2>
+      <p class="text-[14px] leading-[1.5] text-text-3 tablet:text-meta">{cv.strengths.note}</p>
+    </div>
+    <ul role="list" class="flex flex-col">
+      {cv.strengths.items.map((item, i) => (
+        <li>
+          <ListRow
+            kind="static"
+            title={item.title}
+            sub={item.text}
+            edge={i === 0 ? 'first' : i === lastStrength ? 'last' : undefined}
+          />
+        </li>
+      ))}
+    </ul>
+  </Section>
 
   <Section
     layout="stacked"

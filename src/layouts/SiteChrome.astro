@@ -50,7 +50,7 @@ const nav = await navigationFor(locale, allPages);
 const imprintHref = `${pageHref(resolvePage('contact', locale, allPages))}#impressum`;
 ---
 
-<BaseLayout locale={locale} {...document}>
+<BaseLayout locale={locale} siteName={site.siteName} {...document}>
   <header class="relative border-b border-line">
     <SiteNav
       locale={locale}

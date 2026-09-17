@@ -12,6 +12,11 @@ import MailLink from './MailLink.astro';
  * where it has to: mail and profiles on the left, © · Impressum · credit on
  * the right. No large name, no columns. On phones it stacks.
  *
+ * From desktop its height is `--footer-h` (global.css; border-box, so the
+ * hairline and padding count) as long as it stays one row. The background's
+ * measuring dots are anchored to that height, so a footer that wraps there
+ * would cover them — keep the row short, or raise the token with it.
+ *
  * Profiles come from site.yaml; only those with a URL are shown.
  */
 interface Props {
@@ -24,7 +29,7 @@ const site = await getSite();
 const year = new Date().getFullYear();
 ---
 
-<footer class="border-t border-line bg-bone-soft">
+<footer class="border-t border-line bg-bone-soft desktop:min-h-(--footer-h)">
   <div
     class={cn(
       container,
