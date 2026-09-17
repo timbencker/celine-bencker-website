@@ -2,6 +2,7 @@
 
 An accessibility and integrity suite for the built site, run with Playwright in
 the installed Google Chrome. It never downloads a browser.
+[Lighthouse](#lighthouse) scores the same build separately.
 
 ## Running
 
@@ -103,3 +104,51 @@ The suite asserts production behaviour where the two differ:
 Page-specific acceptance specs go in `tests/e2e/pages/<page>.spec.ts`. Import
 routes and helpers from `tests/e2e/support/`, and start test titles with the
 page path so `--grep` keeps selecting one page.
+
+## Lighthouse
+
+```bash
+npm run lighthouse                                  # every page, three runs each
+LHCI_RUNS=1 npm run lighthouse                      # one run each, for a quick look
+LHCI_RUNS=1 LHCI_ONLY=forschung npm run lighthouse  # pages whose path contains the text
+```
+
+PowerShell: `$env:LHCI_RUNS=1; npm run lighthouse`. In Git Bash, give
+`LHCI_ONLY` without a leading slash; the shell rewrites values that look like
+paths.
+
+Lighthouse CI audits every URL in `dist/sitemap.xml` plus `404.html`, and
+fails when a page scores below **95** in performance, accessibility, best
+practices or SEO, the target in the brief. Performance is judged on the median
+run; the other categories hardly change between runs and use Lighthouse CI's
+default, the best run. The 404 page skips
+SEO, because it is `noindex` on purpose. The individual audits come from the
+`lighthouse:no-pwa` preset, as on
+[tanh-lab/website](https://github.com/tanh-lab/website); each one that is
+changed says why in `tests/lighthouse/run.ts`.
+
+Reports: `.lighthouse/reports/` (one HTML and one JSON file per run, and
+`manifest.json`). The `lighthouse` job in `.github/workflows/ci.yml` runs on
+every push and pull request and uploads them as the `lighthouse-reports`
+artifact, whether the job passes or fails.
+
+**How it runs**, and why it differs from tanh-lab's setup:
+
+- **Base path.** Astro's preview server serves the build under
+  `/celine-bencker-website/`, as GitHub Pages does. Lighthouse CI's own static
+  server would serve `dist/` at the root, where every asset link breaks.
+- **Browser.** The script starts the installed Google Chrome (or
+  `CHROME_PATH`) with a debugging port and Lighthouse's usual flags, and
+  Lighthouse attaches to it. When Lighthouse launches Chrome itself, deleting
+  the temporary profile fails on Windows after every audit. Playwright does not
+  start this Chrome: under Playwright, Chrome's own `chrome://` pages show up
+  in the audited page's requests.
+- **Not a dependency.** `@lhci/cli` runs through a pinned `npx`: installed, it
+  brings ten known advisories in old transitive dependencies. Nothing of it
+  ships.
+- **No public upload.** Reports stay on disk and in the CI artifact.
+  Lighthouse CI's temporary public storage would publish the draft pages.
+
+Performance scores follow the machine's load: the same page scored 93 on a
+busy laptop and 99 on a quiet one. A local performance failure is worth a
+second run before it is worth a fix.

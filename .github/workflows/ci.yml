@@ -47,3 +47,30 @@ jobs:
             playwright-report/
             test-results/
           retention-days: 14
+
+  lighthouse:
+    # Lighthouse CI against the production build, as on tanh-lab/website:
+    # every category must score at least 95 (the brief's target). The pages are
+    # served under their base path and audited in the runner's Google Chrome —
+    # tests/README.md explains the setup.
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+        env:
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1'
+      # Builds, then audits every page in the sitemap plus the 404, three runs
+      # each; performance is judged on the median run.
+      - run: npm run lighthouse
+      # Reports on success too: they are the record of the scores.
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lighthouse-reports
+          path: .lighthouse/reports/
+          retention-days: 14

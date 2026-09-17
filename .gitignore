@@ -33,3 +33,7 @@ design/
 test-results/
 playwright-report/
 blob-report/
+
+# Lighthouse CI: generated config, Chrome profile and reports; raw results
+.lighthouse/
+.lighthouseci/

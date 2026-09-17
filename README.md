@@ -57,16 +57,17 @@ npm install
 npm run dev        # lokaler Server
 ```
 
-| Befehl             | Zweck                                                       |
-| ------------------ | ----------------------------------------------------------- |
-| `npm run dev`      | Entwicklungsserver                                          |
-| `npm run build`    | Produktions-Build nach `dist/`                              |
-| `npm run preview`  | Build lokal ansehen                                         |
-| `npm run check`    | Typen und Inhalts-Schemata prüfen                           |
-| `npm run lint`     | ESLint inkl. Accessibility-Regeln                           |
-| `npm run format`   | Prettier                                                    |
-| `npm run verify`   | check + lint + build                                        |
-| `npm run test:e2e` | Barrierefreiheit und Links prüfen (siehe `tests/README.md`) |
+| Befehl               | Zweck                                                       |
+| -------------------- | ----------------------------------------------------------- |
+| `npm run dev`        | Entwicklungsserver                                          |
+| `npm run build`      | Produktions-Build nach `dist/`                              |
+| `npm run preview`    | Build lokal ansehen                                         |
+| `npm run check`      | Typen und Inhalts-Schemata prüfen                           |
+| `npm run lint`       | ESLint inkl. Accessibility-Regeln                           |
+| `npm run format`     | Prettier                                                    |
+| `npm run verify`     | check + lint + build                                        |
+| `npm run test:e2e`   | Barrierefreiheit und Links prüfen (siehe `tests/README.md`) |
+| `npm run lighthouse` | Lighthouse-Werte jeder Seite prüfen, Ziel ≥ 95              |
 
 Node-Version siehe `.nvmrc`.
 

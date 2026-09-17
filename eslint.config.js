@@ -14,6 +14,9 @@ export default [
       'test-results/',
       'playwright-report/',
       'blob-report/',
+      // Lighthouse CI output
+      '.lighthouse/',
+      '.lighthouseci/',
     ],
   },
   js.configs.recommended,
