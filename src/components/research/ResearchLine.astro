@@ -20,11 +20,11 @@ import Term from './Term.astro';
  * - A plain line sits on paper; the board spaces the first 96px below the
  *   header and the last 96px above Methods, 80px elsewhere.
  * - A line with a `study` is the `framed` block: the same row, then the cycle
- *   graphic with its caption beside the study's facts (5/7). That second row
- *   follows its own width, not the viewport: below 1024px it stacks, which
- *   covers every width below desktop (the frame is 1024px wide at 1120, a
- *   little less beside a scrollbar). The facts take three columns only from
- *   576px; on a phone they would be 100px wide and break words apart.
+ *   graphic with its caption beside the study's facts, on the same 5fr/7fr
+ *   tracks as the row above and, like every side-by-side layout, from
+ *   desktop. The facts list follows its own column's width instead: three
+ *   columns only from 576px; on a phone they would be 100px wide and break
+ *   words apart.
  *
  * The wrapper carries the line id, which Home links to.
  *
@@ -125,31 +125,25 @@ const spacing = cn(
     </div>
 
     {study && (
-      <div class="@container">
-        <div class="flex flex-col gap-7 @5xl:grid @5xl:grid-cols-12 @5xl:items-end @5xl:gap-16">
-          <div class="flex max-w-[640px] flex-col gap-2.5 @5xl:col-span-5">
-            <CycleGraphic labels={graphic} />
-            <p class="max-w-[60ch] text-[13px] leading-[1.5] text-text-3">
-              {study.caption[locale]}
-            </p>
-          </div>
-          {study.facts.length > 0 && (
-            <div class="@container @5xl:col-span-7">
-              <dl class="flex flex-col @xl:grid @xl:grid-cols-3 @xl:gap-8">
-                {study.facts.map((fact) => (
-                  <div class="flex flex-col gap-1 border-t border-line py-3 @xl:gap-1.5 @xl:pb-0 @xl:pt-4">
-                    <dt class="text-[12px] leading-[1.5] text-text-3 tablet:text-[13px]">
-                      {fact.label[locale]}
-                    </dt>
-                    <dd class="text-[15px] leading-[1.4] tablet:text-[17px]">
-                      {fact.value[locale]}
-                    </dd>
-                  </div>
-                ))}
-              </dl>
-            </div>
-          )}
+      <div class="flex flex-col gap-7 desktop:grid desktop:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] desktop:items-end desktop:gap-16">
+        <div class="flex max-w-[640px] flex-col gap-2.5">
+          <CycleGraphic labels={graphic} />
+          <p class="max-w-[60ch] text-[13px] leading-[1.5] text-text-3">{study.caption[locale]}</p>
         </div>
+        {study.facts.length > 0 && (
+          <div class="@container">
+            <dl class="flex flex-col @xl:grid @xl:grid-cols-3 @xl:gap-8">
+              {study.facts.map((fact) => (
+                <div class="flex flex-col gap-1 border-t border-line py-3 @xl:gap-1.5 @xl:pb-0 @xl:pt-4">
+                  <dt class="text-[12px] leading-[1.5] text-text-3 tablet:text-[13px]">
+                    {fact.label[locale]}
+                  </dt>
+                  <dd class="text-[15px] leading-[1.4] tablet:text-[17px]">{fact.value[locale]}</dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+        )}
       </div>
     )}
   </Section>

@@ -3,23 +3,23 @@ import { expect, test } from '@playwright/test';
 import { findMidWordBreaks, measureOverflow } from './support/layout';
 import { open, report } from './support/page';
 import { checkedRoutes } from './support/routes';
+import { AUDIT_VIEWPORTS, DESKTOP } from './support/viewports';
 
 /**
  * The layout holds at every width, not only at the three that site.spec.ts
  * audits in depth. The widths straddle the tiers in src/styles/tokens.css:
- * phone below 768px, tablet from 768px, desktop from 1120px.
+ * phone below 768px, tablet from 768px, desktop from `--breakpoint-desktop`,
+ * which support/viewports.ts reads from that file.
  *
  * One test per page and width, one page load each. What each check
  * guarantees: tests/README.md.
  */
 
-const WIDTHS = [360, 390, 768, 900, 1119, 1120, 1280, 1920];
-
-/** `--breakpoint-desktop` in tokens.css. */
-const DESKTOP = 1120;
+/** Both sides of the desktop tier, and the widths around it. */
+const WIDTHS = [360, 390, 768, 900, DESKTOP - 1, DESKTOP, 1280, 1920];
 
 /** Widths whose overflow site.spec.ts already checks. */
-const OVERFLOW_CHECKED_ELSEWHERE = new Set([375, 768, 1280]);
+const OVERFLOW_CHECKED_ELSEWHERE = new Set(AUDIT_VIEWPORTS.map((viewport) => viewport.width));
 
 for (const route of checkedRoutes()) {
   for (const width of WIDTHS) {
@@ -68,20 +68,27 @@ for (const route of checkedRoutes()) {
           }
 
           // The measuring-dot motif is anchored to this height (Background.astro).
+          // A probe element resolves `--footer-h` to px, whatever unit it is
+          // written in; the browser's own rounding leaves up to a pixel.
           const footer = await page.evaluate(() => {
-            const expected = getComputedStyle(document.documentElement)
+            const declared = getComputedStyle(document.documentElement)
               .getPropertyValue('--footer-h')
               .trim();
+            const probe = document.createElement('div');
+            probe.style.height = 'var(--footer-h)';
+            document.body.append(probe);
+            const expected = probe.getBoundingClientRect().height;
+            probe.remove();
             const actual = (
               document.querySelector('body > footer') ?? document.querySelector('footer')
-            )?.getBoundingClientRect();
-            return { expected, actual: actual ? Math.round(actual.height) : null };
+            )?.getBoundingClientRect().height;
+            return { declared, expected, actual: actual ?? null };
           });
-          if (!footer.expected) {
+          if (!footer.declared || footer.expected === 0) {
             problems.push('--footer-h is not defined');
-          } else if (footer.actual !== Math.round(Number.parseFloat(footer.expected))) {
+          } else if (footer.actual === null || Math.abs(footer.actual - footer.expected) > 1) {
             problems.push(
-              `the footer is ${footer.actual}px tall, --footer-h is ${footer.expected}`,
+              `the footer is ${footer.actual}px tall, --footer-h is ${footer.declared} (${footer.expected}px)`,
             );
           }
         }

@@ -44,12 +44,16 @@ Jede Seite hat ihren eigenen Block: `home`, `research`, `publications`, `cv`,
 `talksMedia` oder `contact`. Welche Felder darin stehen, zeigen die
 Kommentare in der jeweiligen Datei.
 
-**Unter der zweiten `---`-Zeile bleibt die Datei leer.** Text dort erscheint
-nicht auf der Website. Damit er nicht unbemerkt verloren geht, bricht der Build
-ab und nennt die Datei — der Text gehört in den passenden Block im Kopfbereich.
+**Unter der zweiten `---`-Zeile bleibt die Datei leer.** Jede Seite, die es
+heute gibt, hat ihre eigene Gestaltung, und die zeigt nur die Blöcke aus dem
+Kopfbereich. Text darunter erschiene also nirgends; damit er nicht unbemerkt
+verloren geht, bricht der Build ab und nennt die Datei — er gehört in den
+passenden Block. Nur bei einer neuen Seite, für die es noch keine eigene
+Gestaltung gibt, erscheint dieser Text: als schlichter Entwurf.
 
-Zeilen, die mit `#` beginnen, sind Kommentare — sie erscheinen nicht auf der
-Website.
+Im Kopfbereich sind Zeilen, die mit `#` beginnen, Kommentare — sie erscheinen
+nicht auf der Website. Unter der zweiten `---`-Zeile macht `#` dagegen eine
+Überschrift.
 
 ### Listen: Publikationen, Vorträge, Lebenslauf …
 
@@ -91,7 +95,7 @@ npm run dev        # lokaler Server
 | `npm run build`        | Produktions-Build nach `dist/`                                     |
 | `npm run preview`      | Build lokal ansehen                                                |
 | `npm run check`        | Typen und Inhalts-Schemata prüfen                                  |
-| `npm run lint`         | ESLint inkl. Accessibility-Regeln                                  |
+| `npm run lint`         | ESLint inkl. Accessibility-Regeln, dazu die Breakpoint-Namen       |
 | `npm run format`       | Prettier                                                           |
 | `npm run verify`       | check + lint + test:unit + build                                   |
 | `npm run test:unit`    | Prüfregeln für Datendateien, Seitentexte und Veröffentlichungsziel |

@@ -1,6 +1,6 @@
 # Remaining pages — work specification
 
-Status: **active** · Manager: the coordinating session · Started 2026-09-16
+Status: **record** · Manager: the coordinating session · Started 2026-09-16
 
 Everything after Home, split into work units that agents build in parallel,
 each in its own git worktree, and the manager reviews and merges.
@@ -55,6 +55,11 @@ the real test suite.
 7. One breakpoint, `md` (768px). Desktop values come from the 1280px artboard,
    phone values from the "Mobile · 390" artboard beside it in the same board
    file. Content must never be clipped; wrap instead.
+   — Superseded during integration: one breakpoint let the desktop grids reach
+   down to 768px, where words split. The site has three tiers — phone,
+   `tablet:` (768px), `desktop:` (1120px); settled item 21 in
+   `docs/design-inventory.md`, rules in the header of `src/lib/styles.ts`. The
+   artboards are still the source of the values.
 8. Zero JavaScript by default. Prefer HTML and CSS (`<details>`, radio inputs
    with `:has()`). Any `<script>` needs a reason in your report. No framework
    islands.

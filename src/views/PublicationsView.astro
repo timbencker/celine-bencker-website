@@ -74,11 +74,15 @@ const linkClass = 'text-sage transition-colors hover:text-ink';
 <PageLayout page={page} allPages={allPages}>
   <PageHeader slot="masthead" layout="compact">
     <PageTitle title={title} />
-    {/* Under the title it wraps with the phone's tight gaps; beside it, 24px apart. */}
+    {/*
+      A row at every width, because it wraps: only the gap between the links
+      follows the tier (18px, 24px from tablet, as on CV). The gap between
+      wrapped lines stays the phone's tight 8px wherever the list sits.
+    */}
     <ul
       slot="aside"
       role="list"
-      class="flex flex-wrap gap-x-[18px] gap-y-2 text-[14px] font-semibold tablet:text-meta desktop:gap-6"
+      class="flex flex-wrap gap-x-[18px] gap-y-2 text-[14px] font-semibold tablet:gap-x-6 tablet:text-meta"
     >
       {site.profiles.map((profile) => (
         <li>

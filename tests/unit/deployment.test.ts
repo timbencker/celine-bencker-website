@@ -28,6 +28,17 @@ describe('resolveDeployment', () => {
     });
   });
 
+  it('treats an empty variable as unset, as GitHub Actions passes it', () => {
+    assert.deepEqual(resolveDeployment({ SITE: '', BASE_PATH: '' }), resolveDeployment({}));
+  });
+
+  it('allows a dot in a segment, but not a segment that is only dots', () => {
+    assert.equal(resolveDeployment({ BASE_PATH: '/x.github.io' }).basePath, '/x.github.io/');
+    for (const BASE_PATH of ['/..', '/site/../other', '/./site']) {
+      assert.throws(() => resolveDeployment({ BASE_PATH }), /BASE_PATH/, BASE_PATH);
+    }
+  });
+
   it('normalises missing and extra slashes', () => {
     for (const BASE_PATH of ['site', '/site', 'site/', '//site//']) {
       const { astroBase, basePath } = resolveDeployment({ BASE_PATH });
@@ -40,6 +51,17 @@ describe('resolveDeployment', () => {
     assert.throws(
       () => resolveDeployment({ BASE_PATH: 'C:/Program Files/Git/' }),
       /BASE_PATH[\s\S]*MSYS_NO_PATHCONV=1/,
+    );
+  });
+
+  it('names the Git Bash hint only for a value that looks like a Windows path', () => {
+    assert.throws(
+      () => resolveDeployment({ BASE_PATH: '/site?x=1' }),
+      (error: Error) => {
+        assert.match(error.message, /BASE_PATH/);
+        assert.doesNotMatch(error.message, /MSYS_NO_PATHCONV/);
+        return true;
+      },
     );
   });
 

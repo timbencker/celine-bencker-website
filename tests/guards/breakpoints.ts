@@ -8,6 +8,10 @@
  *
  * Allowed: `tablet:`, `desktop:`, their `max-` forms, and container-query
  * variants (`@xl:`, `@5xl:`), which size against a container, not the screen.
+ *
+ * A match must start where a class starts — the beginning of the line, a
+ * space, a quote, a backtick, `{` or `(` — so that a file name in prose
+ * (`docs/i18n-policy.md:`) is not read as a class.
  */
 import { readdirSync, readFileSync } from 'node:fs';
 import { join, relative } from 'node:path';
@@ -17,7 +21,7 @@ const ROOT = fileURLToPath(new URL('../../', import.meta.url));
 const SRC = join(ROOT, 'src');
 
 /** Tailwind's default screen variants, plain or `max-`, and arbitrary `min-[…]:` / `max-[…]:`. */
-const FORBIDDEN = /(?<![\w@\-[])(?:(?:max-)?(?:sm|md|lg|xl|2xl)|(?:min|max)-\[[^\]\s]*\]):/g;
+const FORBIDDEN = /(?<=^|[\s"'`{(])(?:(?:max-)?(?:sm|md|lg|xl|2xl)|(?:min|max)-\[[^\]\s]*\]):/g;
 
 const files = readdirSync(SRC, { recursive: true, encoding: 'utf8' })
   .filter((file) => /\.(astro|ts|css|mjs)$/.test(file))

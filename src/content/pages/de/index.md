@@ -5,7 +5,8 @@ description: Klinische und Gesundheitspsychologin an der Universität Wien. Fors
 background: verwoben
 backgroundHue: gelb
 
-# Die große Überschrift. Jede Zeile bricht nur am Desktop um.
+# Die große Überschrift. Ab Tablet (768px) steht jede Zeile für sich; auf dem
+# Handy fließt der Text.
 # `emphasis` ist das eine Wort in Serif-Kursiv – das gibt es nur hier.
 hero:
   lines:

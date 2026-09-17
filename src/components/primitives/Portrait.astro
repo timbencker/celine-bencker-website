@@ -42,8 +42,9 @@ interface Photo extends Shared {
   src: ImageMetadata;
   alt: string;
   /**
-   * Defaults to half the viewport from desktop (1120px), where the slot sits
-   * in a column, and full width below.
+   * Defaults to Home's portrait: 70% of the viewport on phones, and 420px
+   * from tablet, where the slot stops growing (at most 420px stacked, about
+   * 400px in its desktop column). Pass the widths of any other slot.
    */
   sizes?: string;
   /** Widths to generate; anything wider than the source is dropped. */
@@ -82,7 +83,7 @@ const label =
     alt={photo.alt}
     formats={['avif', 'webp']}
     widths={fittingWidths(photo)}
-    sizes={photo.sizes ?? '(min-width: 1120px) 50vw, 100vw'}
+    sizes={photo.sizes ?? '(min-width: 768px) 420px, 70vw'}
     priority={photo.priority}
     pictureAttributes={{ class: cn('block', className) }}
     class={cn('block h-auto w-full rounded-image object-cover', RATIO[ratio])}

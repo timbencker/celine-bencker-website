@@ -27,12 +27,28 @@ export interface Deployment {
 const DEFAULT_SITE = 'https://timbencker.github.io';
 const DEFAULT_BASE_PATH = '/celine-bencker-website';
 
-/** A URL path segment as the site uses them: letters, digits, `_` and `-`. */
-const SEGMENT = /^[\w-]+$/;
+/**
+ * A URL path segment as the site uses them: letters, digits, `_`, `-` and `.`
+ * — a user site lives under `x.github.io`. `.` and `..` alone are path
+ * navigation, not a name.
+ */
+const SEGMENT = /^(?!\.\.?$)[\w.-]+$/;
+
+/** A value the shell turned into a Windows path: a drive letter or a backslash. */
+const WINDOWS_PATH = /^[A-Za-z]:[\\/]|\\/;
+
+/**
+ * An unset variable and an empty one mean the same thing: use the default. A
+ * workflow that does not set `SITE` or `BASE_PATH` still passes `${{ vars.X }}`,
+ * which GitHub Actions substitutes with an empty string — silently publishing
+ * to the root, where every asset link breaks. The root is asked for with `/`.
+ */
+const given = (value: string | undefined) =>
+  value === undefined || value === '' ? undefined : value;
 
 export function resolveDeployment(vars: Record<string, string | undefined>): Deployment {
-  const rawSite = vars.SITE ?? DEFAULT_SITE;
-  const rawBase = vars.BASE_PATH ?? DEFAULT_BASE_PATH;
+  const rawSite = given(vars.SITE) ?? DEFAULT_SITE;
+  const rawBase = given(vars.BASE_PATH) ?? DEFAULT_BASE_PATH;
 
   let url: URL | undefined;
   try {
@@ -57,10 +73,14 @@ export function resolveDeployment(vars: Record<string, string | undefined>): Dep
   const trimmed = rawBase.replace(/^\/+|\/+$/g, '');
   const segments = trimmed === '' ? [] : trimmed.split('/');
   if (!segments.every((segment) => SEGMENT.test(segment))) {
+    const message = `BASE_PATH must be a URL path such as "/celine-bencker-website" or "/", got "${rawBase}".`;
     throw new Error(
-      `BASE_PATH must be a URL path such as "/celine-bencker-website" or "/", got "${rawBase}". ` +
-        'Git Bash rewrites values that start with "/" into Windows paths ' +
-        '(e.g. "C:/Program Files/Git/"); set MSYS_NO_PATHCONV=1 for that command.',
+      // Only a value that looks like a Windows path came from the shell rather
+      // than from whoever set the variable.
+      WINDOWS_PATH.test(rawBase)
+        ? `${message} Git Bash rewrites values that start with "/" into Windows paths ` +
+            '(e.g. "C:/Program Files/Git/"); set MSYS_NO_PATHCONV=1 for that command.'
+        : message,
     );
   }
 

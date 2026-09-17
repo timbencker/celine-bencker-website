@@ -9,7 +9,8 @@ the installed Google Chrome. It never downloads a browser.
 ## Structure
 
 - `tests/e2e/` — the browser suites; `support/` holds their shared helpers
-  (server, routes, page probes, axe), `pages/` the page specs.
+  (server, routes, page probes, axe, the viewports both suites use), `pages/`
+  the page specs.
 - `tests/unit/` — unit tests for build-time code.
 - `tests/guards/` — source checks that run with `npm run lint`.
 - `tests/launch/` — the launch check on the built `dist/`.
@@ -101,7 +102,10 @@ titles start with the page path.
 ## Layout at every width
 
 `layout.spec.ts` loads every page `site.spec.ts` covers at 360, 390, 768, 900,
-1119, 1120, 1280 and 1920px, one test per page and width. The widths straddle the three tiers:
+1119, 1120, 1280 and 1920px, one test per page and width. The desktop tier and
+the two widths around it come from `--breakpoint-desktop` in
+`src/styles/tokens.css`, read by `support/viewports.ts`, which also holds the
+three widths `site.spec.ts` audits. The widths straddle the three tiers:
 phone below 768px, tablet from 768px (still one column, with desktop type and
 margins), and desktop from 1120px (the board layouts). `src/styles/tokens.css`
 sets the tiers; `src/lib/styles.ts` says which classes belong to which.
@@ -145,8 +149,9 @@ npm run build && npm run check:launch
 
 Scans the existing `dist/` for placeholder text (`PLATZHALTER`, `PLACEHOLDER`)
 and launch blockers: elements marked `data-launch-blocker`, such as the note
-that the legal text has not been reviewed yet. It prints what is left per file
-and fails until nothing is. The manual deploy workflow
+that the legal text has not been reviewed yet. It prints when `dist/` was
+written, what is left per file, and each blocker's own text, and fails until
+nothing is left. The manual deploy workflow
 (`.github/workflows/deploy.yml`) runs it before publishing.
 
 ## Local preview and GitHub Pages

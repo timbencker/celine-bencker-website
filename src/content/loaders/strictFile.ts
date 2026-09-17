@@ -10,8 +10,9 @@ import { file, type Loader, type LoaderContext } from 'astro/loaders';
  * page then ships without the list, and nobody notices. This wrapper records
  * what the loader reports and turns it into one error after the first load:
  *
- *   - the store is cleared first: on a parse error `file()` returns before
- *     clearing, so entries cached by an earlier build would ship stale;
+ *   - the store is cleared before the first load: on a parse error `file()`
+ *     returns before clearing, so entries cached by an earlier build would
+ *     ship stale;
  *   - `error()` and `debug()` messages are recorded, because the parser's own
  *     message (with the `(line:column)` position) only goes to `debug()`;
  *   - thrown errors are caught too: a file holding only comments parses to
@@ -108,7 +109,13 @@ export function strictFile(fileName: string, options: StrictFileOptions = {}): L
         watcher: context.watcher && guardedWatcher(context.watcher, logger, fileName),
       };
 
-      context.store.clear();
+      // Only the first load starts from an empty store. A later load — a dev
+      // re-sync rather than a watcher reload — must not empty the collection
+      // when the file is broken now: `file()` would return before writing
+      // anything, and the pages would lose a list the running server still
+      // shows. Once the file parses, `file()` clears the store itself, so a
+      // removed entry still disappears.
+      if (isFirstLoad) context.store.clear();
       let thrown: unknown;
       try {
         await inner.load(wrapped);

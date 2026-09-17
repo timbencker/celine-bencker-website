@@ -192,8 +192,8 @@ The canvas has three layers that do not always agree: the brief, the
 14. **Decoration stops growing at 1920px.** Past that the motifs kept scaling
     while the content stayed 1280 wide, and the curve pair on Home reached the
     last research row.
-15. **Home's title is sized to its column.** Its desktop lines never wrap, and
-    the hero marks sit in the gap beside the column. The size follows the
+15. **Home's title is sized to its column.** Its lines never wrap from tablet
+    on, and the hero marks sit in the gap beside the column. The size follows the
     column and the longest line (German 88px at 1280, English 82px); a line
     may reach 16px into the gap, as on the board, leaving 8px before a mark.
 16. **Callout colours via tokens.** The board's #f1ecfa surface, #2e2a38 text

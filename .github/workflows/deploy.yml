@@ -7,12 +7,17 @@ name: Deploy to GitHub Pages
 # asks for it (Actions -> Deploy to GitHub Pages -> Run workflow), never on a
 # push.
 #
-# Before anything is built for publishing, the `gate` job runs every check CI
-# runs, and then `npm run check:launch`: publishing is refused while any page
-# still shows PLATZHALTER / PLACEHOLDER text, or while the draft legal note on
-# the contact page (`imprint.reviewNote`) is there — it goes once the legal
-# text has been reviewed. README.md -> "Veröffentlichen" explains it for
+# Before anything is published, the `gate` job runs CI's checks except
+# Lighthouse (format, lint, astro check, unit tests, the e2e suite), and then
+# `npm run check:launch` on the dist/ that e2e built: publishing is refused
+# while any page still shows PLATZHALTER / PLACEHOLDER text or carries a launch
+# blocker — today the draft legal note on the contact page
+# (`imprint.reviewNote`), which goes once the legal text has been reviewed. The
+# check names every one it finds. README.md -> "Veröffentlichen" explains it for
 # editors.
+#
+# The gate's build is not the one that goes online: `withastro/action` builds
+# the site again in the `build` job, from the same commit.
 #
 # Pages must be enabled on the repository once before the first run:
 #
@@ -53,7 +58,7 @@ jobs:
       # checks (tests/README.md).
       - run: npm run test:e2e
       # Reads the dist/ the e2e run just built; fails while placeholder text or
-      # a launch blocker (the unreviewed legal note) is left.
+      # a launch blocker is left, and prints each one.
       - run: npm run check:launch
 
   build:

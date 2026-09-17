@@ -19,6 +19,10 @@ import { cva } from 'class-variance-authority';
  *   with something beside them.
  * - `tablet:` — everything else: margins, padding, type, colour, radii, and
  *   rows that stay rows when narrow because they wrap (Band, SiteFooter).
+ *   A grid or row that exists at every width (e.g. ListRow's default text +
+ *   arrow row) keeps its gaps and tracks at `tablet:`: nothing stacks there,
+ *   so the gap is never a tall one, and the phone value would otherwise hold
+ *   through the whole tablet tier.
  *
  * Same-tier rule: an override — a variant over the base, a `class` prop over
  * a component's default, a compound variant — uses the tier of the class it

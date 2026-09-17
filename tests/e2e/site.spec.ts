@@ -15,18 +15,13 @@ import {
   toLocalUrl,
 } from './support/site';
 import { resolveTarget } from './support/site-index';
+import { AUDIT_VIEWPORTS } from './support/viewports';
 
 /**
  * Every page in the built sitemap, at phone, tablet and desktop width.
  * Test titles start with the page path, so `--grep "/de/forschung/"` runs one
  * page. What each check guarantees: tests/README.md.
  */
-
-const VIEWPORTS = [
-  { width: 375, height: 812 },
-  { width: 768, height: 1024 },
-  { width: 1280, height: 800 },
-];
 
 const GERMAN = LOCALE_HTML_LANG[DEFAULT_LOCALE];
 
@@ -53,7 +48,7 @@ test('/robots.txt names the sitemap under the base path', async ({ request }) =>
 });
 
 for (const route of checkedRoutes()) {
-  for (const viewport of VIEWPORTS) {
+  for (const viewport of AUDIT_VIEWPORTS) {
     test.describe(`${route.path} @ ${viewport.width}px`, () => {
       test.use({ viewport });
 

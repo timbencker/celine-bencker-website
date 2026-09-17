@@ -143,6 +143,16 @@ describe('strictFile', () => {
     await assert.rejects(load(strictFile('./missing.yaml'), context), /missing\.yaml/);
   });
 
+  it('keeps the entries of the last good load when a later load breaks', async () => {
+    const { dir, context, entries } = setup({ 'talks.yaml': '- id: a\n  title: A\n' });
+    const loader = strictFile('./talks.yaml');
+    await load(loader, context);
+
+    writeFileSync(join(dir, 'talks.yaml'), '- id: a\n  title: "unclosed\n');
+    await assert.doesNotReject(load(loader, context));
+    assert.deepEqual([...entries.keys()], ['a'], 'the collection is not emptied');
+  });
+
   it('only logs when a file breaks after the first load (astro dev)', async () => {
     const { dir, context, logged, listeners } = setup({ 'talks.yaml': '- id: a\n' });
     await load(strictFile('./talks.yaml'), context);
