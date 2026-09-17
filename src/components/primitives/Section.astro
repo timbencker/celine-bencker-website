@@ -12,7 +12,8 @@ import { container, splitGrid } from '../../lib/styles';
  * lilac tint appears exactly once on the whole site (Talks, "Für Redaktionen").
  *
  * `split` is title + prose (5/7), `label` is label + list (3/9), `stacked` is
- * for lists and tiles. On phones every layout is one column.
+ * for lists and tiles. On phones every layout is one column. `split` and
+ * `label` expect exactly two children.
  *
  * `framed` is a paper block between two hairlines, inside the page margin —
  * the study on Research (10b). Its children stack 40px apart (28 on phones)
@@ -31,8 +32,9 @@ const body = cva(container, {
   variants: {
     layout: {
       split: splitGrid,
-      label:
-        'grid gap-6 md:grid-cols-12 md:gap-12 md:[&>*:first-child]:col-span-3 md:[&>*:last-child]:col-span-9',
+      // 3fr/9fr as board 7a draws it. The label track never gets narrower than
+      // its longest heading ("Eingereicht" at 44px), so the word never breaks.
+      label: 'grid gap-6 md:grid-cols-[minmax(232px,3fr)_minmax(0,9fr)] md:gap-12',
       stacked: 'flex flex-col',
       framed: '',
     },

@@ -210,10 +210,13 @@ The canvas has three layers that do not always agree: the brief, the
 19. **Promises only for what exists.** Buttons and lines that promise a CV PDF
     or a press kit appear only once the file is under `public/`; until then
     Home's two exit lines describe what the pages actually show.
-20. **The split grid is two tracks.** `_Komponenten` defines `split` as
-    12 columns with 64px gaps; below 800px the gaps alone exceed the content
-    width and the columns collapsed. The first track is the same 5 columns
-    plus 4 gaps, written so it stays positive at every width.
+20. **The split and label grids are two proportional tracks.** `_Komponenten`
+    defines `split` and `label` as 12 columns with 64px/48px gaps; every
+    board draws them as `5fr/7fr` and `3fr/9fr` with one gap. The site
+    follows the boards: the 12-column version put the prose 11px and the
+    publication list 24px further left, and collapsed below 800px, where the
+    gaps alone were wider than the content. The label track keeps a 232px
+    minimum so "Eingereicht" never breaks.
 
 ## Contrast over the background
 

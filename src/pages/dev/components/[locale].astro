@@ -464,9 +464,9 @@ const frame = 'border-y border-line';
   </Section>
 
   <Section layout="stacked" space="compact">
-    <div class="grid gap-3 border-t border-line py-7 md:grid-cols-12 md:gap-12 md:py-10">
-      <p class:list={[heading({ level: 'row' }), 'md:col-span-3']}>cv</p>
-      <ul role="list" class="flex flex-col md:col-span-9 md:gap-5">
+    <div class="grid gap-3 border-t border-line py-7 md:grid-cols-[minmax(0,3fr)_minmax(0,9fr)] md:gap-12 md:py-10">
+      <p class={heading({ level: 'row' })}>cv</p>
+      <ul role="list" class="flex flex-col md:gap-5">
         <li>
           <ListRow
             kind="cv"
