@@ -10,6 +10,7 @@
     "build": "astro build",
     "preview": "astro preview",
     "test:e2e": "node tests/e2e/support/run.ts",
+    "test:unit": "node --test \"tests/unit/**/*.test.ts\"",
     "lighthouse": "astro build && node tests/lighthouse/run.ts",
     "check": "astro check",
     "lint": "eslint .",
