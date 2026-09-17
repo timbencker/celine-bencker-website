@@ -323,7 +323,9 @@ function bausteine(mobile: boolean): Record<BackgroundPage, Recipe> {
           300,
           10,
           0.45,
-          { bottom: 'calc(var(--footer-h) + 4px)', left: 48 },
+          // Above the footer, and on the page margin: past 1280px the content
+          // is centred, so the row follows the column rather than the window.
+          { bottom: 'calc(var(--footer-h) + 4px)', left: fromColumn(48) },
           `<g style="fill:${GRAU}">` +
             Array.from(
               { length: 25 },
