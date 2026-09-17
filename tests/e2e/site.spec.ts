@@ -3,13 +3,14 @@ import { type Page, expect, test } from '@playwright/test';
 import { DEFAULT_LOCALE, LOCALE_HTML_LANG } from '../../src/i18n/config';
 import { formatViolations, runAxe } from './support/axe';
 import { collectPageErrors } from './support/errors';
+import { measureOverflow } from './support/layout';
+import { open, report } from './support/page';
+import { NOT_FOUND, checkedRoutes } from './support/routes';
 import {
   type Alternate,
   BASE_PATH,
   BASE_URL,
   PRODUCTION_BASE_URL,
-  type Route,
-  loadSitemapRoutes,
   routePathOf,
   toLocalUrl,
 } from './support/site';
@@ -29,18 +30,6 @@ const VIEWPORTS = [
 
 const GERMAN = LOCALE_HTML_LANG[DEFAULT_LOCALE];
 
-async function open(page: Page, route: Route) {
-  const response = await page.goto(route.url);
-  await page.evaluate(async () => {
-    await document.fonts.ready;
-  });
-  return response;
-}
-
-function report(title: string, problems: string[]): string {
-  return `${title}:\n${problems.map((problem) => `  - ${problem}`).join('\n')}`;
-}
-
 async function readAlternates(page: Page): Promise<Alternate[]> {
   return page.locator('link[rel~="alternate"][hreflang]').evaluateAll((elements) =>
     elements.map((el) => ({
@@ -52,33 +41,18 @@ async function readAlternates(page: Page): Promise<Alternate[]> {
 
 const byHreflang = (a: Alternate, b: Alternate) => a.hreflang.localeCompare(b.hreflang);
 
-interface CheckedRoute extends Route {
-  /** The HTTP status the page is served with. */
-  status: number;
-}
+test('/robots.txt names the sitemap under the base path', async ({ request }) => {
+  const response = await request.get(new URL('robots.txt', BASE_URL).href);
+  expect(response.status(), 'HTTP status').toBe(200);
+  const sitemapLine = (await response.text())
+    .split('\n')
+    .find((line) => line.startsWith('Sitemap:'));
+  expect(sitemapLine?.slice('Sitemap:'.length).trim(), 'the Sitemap: line').toBe(
+    new URL('sitemap.xml', PRODUCTION_BASE_URL).href,
+  );
+});
 
-/**
- * The 404 page is not in the sitemap, but every visitor who follows a broken
- * link sees it, so it gets the same checks — served with 404, and without
- * hreflang alternates (it has no language counterpart).
- */
-const NOT_FOUND_PATH = '/de/diese-seite-gibt-es-nicht/';
-const NOT_FOUND: CheckedRoute = {
-  path: NOT_FOUND_PATH,
-  locale: 'de',
-  expectedLang: GERMAN,
-  url: new URL(NOT_FOUND_PATH.slice(1), BASE_URL).href,
-  productionUrl: new URL(NOT_FOUND_PATH.slice(1), PRODUCTION_BASE_URL).href,
-  alternates: [],
-  status: 404,
-};
-
-const ROUTES: CheckedRoute[] = [
-  ...loadSitemapRoutes().map((route) => ({ ...route, status: 200 })),
-  NOT_FOUND,
-];
-
-for (const route of ROUTES) {
+for (const route of checkedRoutes()) {
   for (const viewport of VIEWPORTS) {
     test.describe(`${route.path} @ ${viewport.width}px`, () => {
       test.use({ viewport });
@@ -147,33 +121,7 @@ for (const route of ROUTES) {
 
       test('has no horizontal overflow', async ({ page }) => {
         await open(page, route);
-
-        const layout = await page.evaluate(() => {
-          const root = document.documentElement;
-          const limit = root.clientWidth;
-          const clipped = (el: Element) => {
-            for (let p = el.parentElement; p && p !== root; p = p.parentElement) {
-              if (getComputedStyle(p).overflowX !== 'visible') return true;
-            }
-            return false;
-          };
-          const describe = (el: Element) =>
-            el.tagName.toLowerCase() +
-            (el.id ? `#${el.id}` : '') +
-            (typeof el.className === 'string' && el.className.trim()
-              ? `.${el.className.trim().split(/\s+/).slice(0, 4).join('.')}`
-              : '');
-          const offenders = Array.from(document.body.querySelectorAll('*'))
-            .filter((el) => {
-              const rect = el.getBoundingClientRect();
-              return rect.width > 0 && rect.right > limit + 0.5 && !clipped(el);
-            })
-            .slice(0, 8)
-            .map(
-              (el) => `${describe(el)} ends at ${Math.round(el.getBoundingClientRect().right)}px`,
-            );
-          return { scrollWidth: root.scrollWidth, clientWidth: limit, offenders };
-        });
+        const layout = await measureOverflow(page);
 
         expect(
           layout.scrollWidth,
